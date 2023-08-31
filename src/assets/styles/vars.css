@@ -1,0 +1,18 @@
+:root {
+  --primary-color: #010145;
+  --secondary-color: #4240ce;
+  --success-color: #00b96b;
+  --danger-color: #e63757;
+  --warning-color: #f5803e;
+  --info-color: #4240ce;
+  --light-color: #f9fafd;
+  --dark-color: #0b1727;
+  --body-bg-color: #edf2f9;
+  --main-text-color: #444444;
+  --base-font-size: 14px;
+  --base-border-color: #d9d9d9;
+  --base-border-radius: 5px;
+  --font-size-sm: 12px;
+  --main-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}

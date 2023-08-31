@@ -1,0 +1,309 @@
+@import '~antd/dist/reset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&display=swap');
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: var(--base-font-size);
+  scrollbar-width: none; /* Firefox 64 */
+  -ms-overflow-style: none; /* Internet Explorer 11 */
+}
+
+body {
+  margin: 0;
+  position: relative;
+  font-family: var(--main-font);
+  color: var(--main-text-color);
+  background-color: var(--body-bg-color);
+  -ms-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  scrollbar-width: none; /* Firefox 64 */
+  -ms-overflow-style: none; /* Internet Explorer 11 */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  /** WebKit */
+  display: none;
+}
+
+::selection {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: smooth;
+  }
+}
+
+.app-bg {
+  background-color: var(--body-bg-color) !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.w-100 {
+  width: 100% !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+
+.mt-0,
+.my-0 {
+  margin-top: 0 !important;
+}
+
+.mr-0,
+.mx-0 {
+  margin-right: 0 !important;
+}
+
+.mb-0,
+.my-0 {
+  margin-bottom: 0 !important;
+}
+
+.ml-0,
+.mx-0 {
+  margin-left: 0 !important;
+}
+
+.m-1 {
+  margin: 0.25rem !important;
+}
+
+.mt-1,
+.my-1 {
+  margin-top: 0.25rem !important;
+}
+
+.mr-1,
+.mx-1 {
+  margin-right: 0.25rem !important;
+}
+
+.mb-1,
+.my-1 {
+  margin-bottom: 0.25rem !important;
+}
+
+.ml-1,
+.mx-1 {
+  margin-left: 0.25rem !important;
+}
+
+.m-2 {
+  margin: 0.5rem !important;
+}
+
+.mt-2,
+.my-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mr-2,
+.mx-2 {
+  margin-right: 0.5rem !important;
+}
+
+.mb-2,
+.my-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.ml-2,
+.mx-2 {
+  margin-left: 0.5rem !important;
+}
+
+.m-3 {
+  margin: 1rem !important;
+}
+
+.mt-3,
+.my-3 {
+  margin-top: 1rem !important;
+}
+
+.mr-3,
+.mx-3 {
+  margin-right: 1rem !important;
+}
+
+.mb-3,
+.my-3 {
+  margin-bottom: 1rem !important;
+}
+
+.ml-3,
+.mx-3 {
+  margin-left: 1rem !important;
+}
+
+.m-4 {
+  margin: 1.5rem !important;
+}
+
+.mt-4,
+.my-4 {
+  margin-top: 1.5rem !important;
+}
+
+.mr-4,
+.mx-4 {
+  margin-right: 1.5rem !important;
+}
+
+.mb-4,
+.my-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.ml-4,
+.mx-4 {
+  margin-left: 1.5rem !important;
+}
+
+.m-5 {
+  margin: 3rem !important;
+}
+
+.mt-5,
+.my-5 {
+  margin-top: 3rem !important;
+}
+
+.mr-5,
+.mx-5 {
+  margin-right: 3rem !important;
+}
+
+.mb-5,
+.my-5 {
+  margin-bottom: 3rem !important;
+}
+
+.ml-5,
+.mx-5 {
+  margin-left: 3rem !important;
+}
+
+.text-disabled {
+  color: var(--textColorDisabled) !important;
+}
+
+/* Related to Quill Editor */
+
+.ql-toolbar.ql-snow,
+.ql-toolbar.ql-snow + .ql-container.ql-snow {
+  border-color: var(--base-border-color) !important;
+}
+.ql-toolbar.ql-snow {
+  border-top-right-radius: var(--base-border-radius) !important;
+  border-top-left-radius: var(--base-border-radius) !important;
+}
+.ql-toolbar.ql-snow + .ql-container.ql-snow {
+  border-bottom-right-radius: var(--base-border-radius) !important;
+  border-bottom-left-radius: var(--base-border-radius) !important;
+}
+.ql-editor {
+  min-height: 150px;
+}
+.large .ql-editor {
+  min-height: 300px;
+}
+.ql-editor.ql-blank::before {
+  font-style: normal !important;
+}
+
+/* Related to AntD */
+
+.ant-form-item-explain-error {
+  font-size: var(--font-size-sm);
+  line-height: 1.1;
+  margin-top: 0px;
+}
+
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-menu-inline {
+  border-inline-end: none !important;
+}
+
+.custom-dragger .ant-upload-wrapper {
+  width: 100% !important;
+}
+
+.large .ant-upload.ant-upload-btn {
+  min-height: 170px;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.3rem;
+}
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3 {
+  margin-bottom: 0.3em;
+}
+
+.full-width .ant-modal-confirm-content {
+  width: 100%;
+}
+
+/* TinyMCE editor override */
+.tox-tinymce {
+  border: 1px solid var(--base-border-color) !important;
+  border-radius: var(--base-border-radius) !important;
+}
+
+.tox .tox-button:not(.tox-button--naked, .tox-button--secondary) {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  border-radius: var(--base-border-radius) !important;
+}
+
+.ant-modal-width-mid {
+  width: 850px !important;
+}
+
+.ant-modal-width-full {
+  width: calc(100vw - 5%) !important;
+}
+
+.ant-select.ant-select-sm.ant-pagination-options-size-changer {
+  min-width: 123px;
+}
