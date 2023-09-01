@@ -2,15 +2,7 @@ import Axios from 'axios'
 import { useSafeState } from 'ahooks'
 import { useSelector, useDispatch } from 'react-redux'
 import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space } from 'antd'
-import {
-  CaretLeftOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  LockOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-  SaveOutlined
-} from '@ant-design/icons'
+import { CaretLeftOutlined, CheckOutlined, CloseOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons'
 
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
@@ -21,7 +13,7 @@ import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
 const cPanelStyles = { border: 'none', borderRadius: 6 }
-const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 3}`
+const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 2}`
 
 const Profile = () => {
   const dispatch = useDispatch()
@@ -118,18 +110,14 @@ const Profile = () => {
                 </Col>
               </Row>
               <Form.Item
-                label="Company Name"
-                name="company_name"
-                rules={[{ whitespace: true, required: true, message: 'Provide company name!' }]}
-              >
-                <Input allowClear placeholder="Company Name" />
-              </Form.Item>
-              <Form.Item
                 label="LinkedIn"
                 name="linkedin"
                 rules={[{ whitespace: true, required: true, message: 'Please provide LinkedIn!' }]}
               >
                 <Input allowClear placeholder="LinkedIn" />
+              </Form.Item>
+              <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
+                <Input allowClear placeholder="Website" />
               </Form.Item>
               <Form.Item label="Address" name="address" rules={[{ required: true, message: 'Provide address!' }]}>
                 <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
@@ -157,7 +145,12 @@ const Profile = () => {
                     </Form.Item>
                   </Collapse.Panel>
 
-                  <Collapse.Panel header="Update Industries" key="2" style={cPanelStyles} className={getCPanelClass()}>
+                  <Collapse.Panel
+                    header="Update Industries"
+                    key="2"
+                    style={cPanelStyles}
+                    className={getCPanelClass(true)}
+                  >
                     <Form.Item
                       name="industries"
                       label="Select Industries"
@@ -174,59 +167,6 @@ const Profile = () => {
                         className="w-100"
                       />
                     </Form.Item>
-                  </Collapse.Panel>
-
-                  <Collapse.Panel
-                    header="Update Current PR"
-                    key="3"
-                    style={cPanelStyles}
-                    className={getCPanelClass(true)}
-                  >
-                    <Form.List name="pr">
-                      {(fields, { add, remove }) => (
-                        <>
-                          {fields.map(({ key, name, ...restField }) => (
-                            <Row
-                              key={key}
-                              align="middle"
-                              className="mb-3 rounded-lg border-2 border-solid border-[--body-bg-color] px-2 py-3"
-                              wrap={false}
-                              gutter={[10, 0]}
-                            >
-                              <Col flex={1}>
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, 'link']}
-                                  rules={[{ required: true, validator: validateUrl }]}
-                                >
-                                  <Input placeholder="URL or Link" />
-                                </Form.Item>
-                                <Form.Item
-                                  {...restField}
-                                  name={[name, 'comment']}
-                                  rules={[{ whitespace: true, message: 'Space not allowed!' }]}
-                                >
-                                  <Input.TextArea
-                                    allowClear
-                                    maxLength={200}
-                                    showCount
-                                    placeholder="Comment or Information"
-                                  />
-                                </Form.Item>
-                              </Col>
-                              <Col>
-                                <MinusCircleOutlined style={{ fontSize: 18 }} onClick={() => remove(name)} />
-                              </Col>
-                            </Row>
-                          ))}
-                          <Form.Item>
-                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                              Add PR Link
-                            </Button>
-                          </Form.Item>
-                        </>
-                      )}
-                    </Form.List>
                   </Collapse.Panel>
                 </Collapse>
               </div>

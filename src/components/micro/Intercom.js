@@ -15,10 +15,11 @@ function IntercomComponent() {
   const { isAuthenticated, user } = useSelector(state => state.auth)
 
   if (isAuthenticated && user) {
+    const company_name = user.company?.name || user.email
     const userInfo = {
       email: user.email,
       name: user.first_name + ' ' + user.last_name,
-      company: { company_id: user.company_name, name: user.company_name },
+      company: { company_id: company_name, name: company_name },
       ...(user.image ? { avatar: { type: 'avatar', image_url: user.image.secure_url } } : {}),
       created_at: moment(user.createdAt).valueOf()
     }

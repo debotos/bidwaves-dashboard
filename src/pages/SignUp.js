@@ -4,16 +4,7 @@ import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Row, Button, Form, Input, Typography, Col, Steps, Space, message } from 'antd'
-import {
-  LockOutlined,
-  SendOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-  MailOutlined,
-  UserOutlined,
-  BankOutlined,
-  LinkedinOutlined
-} from '@ant-design/icons'
+import { LockOutlined, SendOutlined, MailOutlined, UserOutlined, LinkedinOutlined } from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -41,13 +32,6 @@ function SignUp() {
   const onFinish = async () => {
     try {
       const postData = { ...values }
-      if (Object.prototype.hasOwnProperty.call(postData, 'pr')) {
-        if (!Array.isArray(postData.pr)) {
-          postData.pr = []
-        } else {
-          postData.pr = postData.pr.filter(x => !!x)
-        }
-      }
       window.log('Signup postData:', postData)
       setLoading(true)
       const { data } = await Axios.post(endpoints.signup, postData)
@@ -107,16 +91,13 @@ function SignUp() {
             </Col>
           </Row>
           <Form.Item
-            name="company_name"
-            rules={[{ whitespace: true, required: true, message: 'Provide company name!' }]}
-          >
-            <Input allowClear prefix={<BankOutlined />} placeholder="Company Name" />
-          </Form.Item>
-          <Form.Item
             name="linkedin"
             rules={[{ whitespace: true, required: true, message: 'Please provide LinkedIn!' }]}
           >
             <Input allowClear prefix={<LinkedinOutlined />} placeholder="LinkedIn" />
+          </Form.Item>
+          <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
+            <Input allowClear placeholder="Website" />
           </Form.Item>
           <Form.Item
             name="email"
@@ -172,54 +153,6 @@ function SignUp() {
               className="w-100"
             />
           </Form.Item>
-        </>
-      )
-    },
-    {
-      ...getStepProps(3),
-      title: 'Any Past Media/PR?',
-      content: (
-        <>
-          <Form.List name="pr">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map(({ key, name, ...restField }) => (
-                  <Row
-                    key={key}
-                    align="middle"
-                    className="mb-3 rounded-lg border-2 border-solid border-[--body-bg-color] px-2 py-3"
-                    wrap={false}
-                    gutter={[10, 0]}
-                  >
-                    <Col flex={1}>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'link']}
-                        rules={[{ required: true, validator: validateUrl }]}
-                      >
-                        <Input placeholder="URL or Link" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'comment']}
-                        rules={[{ whitespace: true, message: 'Space not allowed!' }]}
-                      >
-                        <Input.TextArea allowClear maxLength={200} showCount placeholder="Comment or Information" />
-                      </Form.Item>
-                    </Col>
-                    <Col>
-                      <MinusCircleOutlined style={{ fontSize: 18 }} onClick={() => remove(name)} />
-                    </Col>
-                  </Row>
-                ))}
-                <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    Click Here To Add Previous Media/PR (optional)
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
         </>
       )
     }

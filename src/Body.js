@@ -29,7 +29,6 @@ const ForgotPassword = React.lazy(() => import('pages/ForgotPassword'))
 const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
 const Products = React.lazy(() => import('pages/Products'))
 const Orders = React.lazy(() => import('pages/Orders'))
-const PR = React.lazy(() => import('pages/PR'))
 
 function Body() {
   const dispatch = useDispatch()
@@ -126,7 +125,6 @@ function Body() {
                 <Route end path={links.profile.to} element={<Profile />} />
                 <Route end path={links.products.to} element={<Products />} />
                 <Route end path={links.orders.to} element={<Orders />} />
-                <Route end path={links.pr.to} element={<PR />} />
               </Route>
             </Route>
 
