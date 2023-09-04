@@ -5,6 +5,7 @@ import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space }
 import { CaretLeftOutlined, CheckOutlined, CloseOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons'
 
 import endpoints from 'config/endpoints'
+import { companyFields } from './SignUp'
 import handleError from 'helpers/handleError'
 import { Page } from 'components/micro/Common'
 import { basePasswordRule, validateUrl } from 'helpers/utility'
@@ -130,6 +131,10 @@ const Profile = () => {
                   expandIconPosition="end"
                   expandIcon={({ isActive }) => <CaretLeftOutlined rotate={isActive ? -90 : 0} />}
                 >
+                  <Collapse.Panel header="Update Company" key="0" style={cPanelStyles} className={getCPanelClass()}>
+                    {companyFields}
+                  </Collapse.Panel>
+
                   <Collapse.Panel header="Update Budget" key="1" style={cPanelStyles} className={getCPanelClass()}>
                     <Form.Item
                       name="budget"

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
-import { Row, Button, Form, Input, Typography, Col, Steps, Space, message } from 'antd'
+import { Row, Button, Form, Input, Typography, Col, Steps, Space, message, Tooltip } from 'antd'
 import { LockOutlined, SendOutlined, MailOutlined, UserOutlined, LinkedinOutlined } from '@ant-design/icons'
 
 import keys from 'config/keys'
@@ -16,6 +16,53 @@ import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 import { basePasswordRule, validateUrl } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
+
+export const companyFields = [
+  <Form.Item
+    key="name"
+    name={['company', 'name']}
+    rules={[{ whitespace: true, required: true, message: 'Provide name!' }]}
+  >
+    <Input allowClear placeholder="Company Name" />
+  </Form.Item>,
+  <Form.Item key="url" name={['company', 'url']} rules={[{ required: false, validator: validateUrl }]}>
+    <Input allowClear placeholder="Website URL" />
+  </Form.Item>,
+  <Tooltip
+    key="phone"
+    trigger={['focus']}
+    title={`Please prefix the phone number with valid country code (eg. +88)`}
+    placement="topLeft"
+  >
+    <Form.Item
+      name={['company', 'phone']}
+      rules={[{ required: false, whitespace: true, message: 'Provide contact number with country code!' }]}
+    >
+      <Input allowClear placeholder="Contact number with country code" />
+    </Form.Item>
+  </Tooltip>,
+  <Form.Item
+    key="address"
+    name={['company', 'address']}
+    rules={[{ required: false, whitespace: true, message: 'Provide address!' }]}
+  >
+    <Input.TextArea rows={1} allowClear placeholder="Address" />
+  </Form.Item>,
+  <Form.Item
+    key="goal"
+    name={['company', 'goal']}
+    rules={[{ required: false, whitespace: true, message: 'Provide goal info!' }]}
+  >
+    <Input.TextArea rows={2} allowClear placeholder="Primary Goal" />
+  </Form.Item>,
+  <Form.Item
+    key="note"
+    name={['company', 'note']}
+    rules={[{ required: false, whitespace: true, message: 'Provide notes & goals!' }]}
+  >
+    <Input.TextArea rows={3} allowClear placeholder="Notes & Goals" />
+  </Form.Item>
+]
 
 function SignUp() {
   const [form] = Form.useForm()
@@ -155,6 +202,11 @@ function SignUp() {
           </Form.Item>
         </>
       )
+    },
+    {
+      ...getStepProps(3),
+      title: 'Your Company',
+      content: <>{companyFields}</>
     }
   ]
   const items = steps.map(item => ({ ...item, key: item.title, title: item.title }))
