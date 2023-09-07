@@ -4,7 +4,7 @@ import { Row, Select, Skeleton, Spin } from 'antd'
 import { useDebounceEffect, useSafeState } from 'ahooks'
 
 import handleError from 'helpers/handleError'
-import { sleep } from 'helpers/utility'
+import { isEmpty, sleep } from 'helpers/utility'
 
 export const genericSearchOptionsFunc = async (_ep, searchText, config) => {
   try {
@@ -28,7 +28,12 @@ export const genericSearchOptionsFunc = async (_ep, searchText, config) => {
     const req = await Axios.get(_ep)
     const res = req.data
     window.log(`Data response -> `, res)
-    return res.list.map(option => ({ ...option, key: option.id, value: option.id }))
+    return res.list.map(option => ({
+      ...option,
+      label: option.label ?? option.name ?? option.tag?.label,
+      key: option.id,
+      value: option.id
+    }))
   } catch (error) {
     handleError(error, true)
   }
@@ -39,6 +44,8 @@ const AsyncSelect = ({
   handleGetOptions,
   onlyFetchOnSearch,
   onlyInitialSearch = false,
+  firstCustomOption,
+  lastCustomOption,
   ...rest
 }) => {
   const [options, setOptions] = useSafeState([])
@@ -53,6 +60,8 @@ const AsyncSelect = ({
     if (!isCountOk) return
     setLoading(true)
     const results = await handleGetOptions(searchTerm)
+    if (!isEmpty(firstCustomOption)) results.unshift(firstCustomOption)
+    if (!isEmpty(lastCustomOption)) results.push(lastCustomOption)
     setOptions(results)
     await sleep(500)
     setLoading(false)
@@ -83,9 +92,9 @@ const AsyncSelect = ({
   if (isInitialLoad && loading) return <Skeleton.Input active={true} block={true} />
 
   const getShowArrow = () => {
-    if (!onlyFetchOnSearch) return true
-    if (options.length) return true
-    return false
+    if (!onlyFetchOnSearch) return undefined
+    if (options.length) return undefined
+    return null
   }
 
   const handleBlur = () => {
@@ -113,7 +122,7 @@ const AsyncSelect = ({
       loading={loading}
       onSearch={onSearch}
       onBlur={handleBlur}
-      showArrow={getShowArrow()}
+      suffixIcon={getShowArrow()}
       onDropdownVisibleChange={onDropdownVisibleChange}
       notFoundContent={getNotFoundContent()}
       {...rest}

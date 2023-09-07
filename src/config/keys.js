@@ -30,6 +30,7 @@ const keys = {
   ENUM_COL_PREFIX: '__enum_',
   BOOL_COL_PREFIX: '__bool_',
   EQUAL_TO_COL_PREFIX: '__equal_',
+  NULL_COL_PREFIX: '__null_',
   // Others
   LOCAL_PREFIX: '__local_'
 }

@@ -137,10 +137,7 @@ function SignUp() {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item
-            name="linkedin"
-            rules={[{ whitespace: true, required: true, message: 'Please provide LinkedIn!' }]}
-          >
+          <Form.Item name="linkedin" rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}>
             <Input allowClear prefix={<LinkedinOutlined />} placeholder="LinkedIn" />
           </Form.Item>
           <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
@@ -161,8 +158,8 @@ function SignUp() {
             <Input.Password allowClear prefix={<LockOutlined />} type="password" placeholder="Password" />
           </Form.Item>
 
-          <Form.Item name="address" rules={[{ required: true, whitespace: true, message: 'Provide address!' }]}>
-            <Input.TextArea rows={2} allowClear placeholder="Business Address" />
+          <Form.Item name="address" rules={[{ whitespace: true, message: 'Provide address!' }]}>
+            <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
           </Form.Item>
         </>
       )
@@ -172,10 +169,13 @@ function SignUp() {
       title: 'Your Budget',
       content: (
         <>
-          <Form.Item name="budget" rules={[{ required: true, message: 'Select budget!' }]}>
+          <Form.Item name="budget">
             <AsyncSelect
+              allowClear={true}
               filterOption={false}
-              handleGetOptions={val => genericSearchOptionsFunc(endpoints.budgetBase, val)}
+              handleGetOptions={val =>
+                genericSearchOptionsFunc(endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`, val)
+              }
               placeholder="Select your budget"
               className="w-100"
             />
@@ -188,15 +188,18 @@ function SignUp() {
       title: 'Your Industries',
       content: (
         <>
-          <Form.Item name="industries" rules={[{ required: true, message: 'Select at least one industry!' }]}>
+          <Form.Item name="industries">
             <AsyncSelect
               mode="multiple"
+              allowClear={true}
               showSearch={true}
               filterOption={true}
               onlyInitialSearch={true}
               optionFilterProp="label"
               placeholder="Select your industries"
-              handleGetOptions={val => genericSearchOptionsFunc(endpoints.industryBase, val)}
+              handleGetOptions={val =>
+                genericSearchOptionsFunc(endpoints.industryBase + `?${keys.NULL_COL_PREFIX}budgetId=`, val)
+              }
               className="w-100"
             />
           </Form.Item>

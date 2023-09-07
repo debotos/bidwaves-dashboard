@@ -12,6 +12,7 @@ import { basePasswordRule, validateUrl } from 'helpers/utility'
 import ChangeAvatar from 'components/micro/fields/ChangeAvatar'
 import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
+import keys from 'config/keys'
 
 const cPanelStyles = { border: 'none', borderRadius: 6 }
 const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 2}`
@@ -87,7 +88,7 @@ const Profile = () => {
             <Form
               form={profileForm}
               layout="vertical"
-              initialValues={{ ...user, budget: user.budget.id, industries: user.industries.map(x => x.id) }}
+              initialValues={{ ...user, budget: user.budget?.id, industries: user.industries?.map(x => x.id) }}
               onFinish={handleProfileUpdate}
             >
               <Row gutter={[10, 0]}>
@@ -110,18 +111,53 @@ const Profile = () => {
                   </Form.Item>
                 </Col>
               </Row>
+
               <Form.Item
                 label="LinkedIn"
                 name="linkedin"
-                rules={[{ whitespace: true, required: true, message: 'Please provide LinkedIn!' }]}
+                rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}
               >
                 <Input allowClear placeholder="LinkedIn" />
               </Form.Item>
+
               <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
                 <Input allowClear placeholder="Website" />
               </Form.Item>
-              <Form.Item label="Address" name="address" rules={[{ required: true, message: 'Provide address!' }]}>
+
+              <Form.Item
+                label="Address"
+                name="address"
+                rules={[{ whitespace: true, message: 'Please provide address!' }]}
+              >
                 <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
+              </Form.Item>
+
+              <Form.Item name="budget" label="Select Budget">
+                <AsyncSelect
+                  allowClear={true}
+                  filterOption={false}
+                  handleGetOptions={val =>
+                    genericSearchOptionsFunc(endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`, val)
+                  }
+                  placeholder="Select your budget"
+                  className="w-100"
+                />
+              </Form.Item>
+
+              <Form.Item name="industries" label="Select Industries">
+                <AsyncSelect
+                  mode="multiple"
+                  allowClear={true}
+                  showSearch={true}
+                  filterOption={true}
+                  onlyInitialSearch={true}
+                  optionFilterProp="label"
+                  placeholder="Select your industries"
+                  handleGetOptions={val =>
+                    genericSearchOptionsFunc(endpoints.industryBase + `?${keys.NULL_COL_PREFIX}budgetId=`, val)
+                  }
+                  className="w-100"
+                />
               </Form.Item>
 
               <div className="rounded-md bg-white p-2">
@@ -131,47 +167,8 @@ const Profile = () => {
                   expandIconPosition="end"
                   expandIcon={({ isActive }) => <CaretLeftOutlined rotate={isActive ? -90 : 0} />}
                 >
-                  <Collapse.Panel header="Update Company" key="0" style={cPanelStyles} className={getCPanelClass()}>
+                  <Collapse.Panel header="Update Company" key="0" style={cPanelStyles} className={getCPanelClass(true)}>
                     {companyFields}
-                  </Collapse.Panel>
-
-                  <Collapse.Panel header="Update Budget" key="1" style={cPanelStyles} className={getCPanelClass()}>
-                    <Form.Item
-                      name="budget"
-                      label="Select Budget"
-                      rules={[{ required: true, message: 'Select budget!' }]}
-                    >
-                      <AsyncSelect
-                        filterOption={false}
-                        handleGetOptions={val => genericSearchOptionsFunc(endpoints.budgetBase, val)}
-                        placeholder="Select your budget"
-                        className="w-100"
-                      />
-                    </Form.Item>
-                  </Collapse.Panel>
-
-                  <Collapse.Panel
-                    header="Update Industries"
-                    key="2"
-                    style={cPanelStyles}
-                    className={getCPanelClass(true)}
-                  >
-                    <Form.Item
-                      name="industries"
-                      label="Select Industries"
-                      rules={[{ required: true, message: 'Select at least one industry!' }]}
-                    >
-                      <AsyncSelect
-                        mode="multiple"
-                        showSearch={true}
-                        filterOption={true}
-                        onlyInitialSearch={true}
-                        optionFilterProp="label"
-                        placeholder="Select your industries"
-                        handleGetOptions={val => genericSearchOptionsFunc(endpoints.industryBase, val)}
-                        className="w-100"
-                      />
-                    </Form.Item>
                   </Collapse.Panel>
                 </Collapse>
               </div>
