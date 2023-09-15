@@ -52,6 +52,14 @@ body::-webkit-scrollbar {
   }
 }
 
+a:hover,
+.ant-btn-link:hover {
+  color: var(--primary-color) !important;
+}
+a.within:hover {
+  color: #fff !important;
+}
+
 .app-bg {
   background-color: var(--body-bg-color) !important;
 }

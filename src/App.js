@@ -28,7 +28,8 @@ const getTheme = () => {
       fontFamily: cssVars.mainFontFamily,
       fontSize: cssVars.baseFontSize,
       colorPrimaryHover: cssVars.secondaryColor,
-      controlItemBgActive: `${cssVars.secondaryColor}40`
+      controlItemBgActive: `${cssVars.secondaryColor}40`,
+      controlHeightLG: 38
     }
   }
 }

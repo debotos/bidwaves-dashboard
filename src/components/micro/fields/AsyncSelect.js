@@ -8,7 +8,7 @@ import { isEmpty, sleep } from 'helpers/utility'
 
 export const genericSearchOptionsFunc = async (_ep, searchText, config) => {
   try {
-    const { searchField = 'label', sortByQuery = 'order@asc' } = config || {}
+    const { searchField = 'label', sortByQuery = 'order@asc', optionPropsOverrideCb } = config || {}
     // For pagination | After this portion '?' is always present
     const paginationQuery = `all=true`
     const paginationQueryPrefix = _ep.includes('?') ? '&' : '?'
@@ -28,12 +28,16 @@ export const genericSearchOptionsFunc = async (_ep, searchText, config) => {
     const req = await Axios.get(_ep)
     const res = req.data
     window.log(`Data response -> `, res)
-    return res.list.map(option => ({
-      ...option,
-      label: option.label ?? option.name ?? option.tag?.label,
-      key: option.id,
-      value: option.id
-    }))
+    return res.list.map(option => {
+      const overrideOptionProps = optionPropsOverrideCb ? optionPropsOverrideCb(option) : {}
+      return {
+        ...option,
+        label: option.label ?? option.name ?? option.tag?.label,
+        key: option.id,
+        value: option.id,
+        ...overrideOptionProps
+      }
+    })
   } catch (error) {
     handleError(error, true)
   }
@@ -89,7 +93,8 @@ const AsyncSelect = ({
 
   const onSearch = onlyInitialSearch ? undefined : handleSearch
 
-  if (isInitialLoad && loading) return <Skeleton.Input active={true} block={true} />
+  if (isInitialLoad && loading)
+    return <Skeleton.Input active={true} block={true} size={rest.size || undefined} style={rest.style ?? undefined} />
 
   const getShowArrow = () => {
     if (!onlyFetchOnSearch) return undefined
@@ -125,14 +130,9 @@ const AsyncSelect = ({
       suffixIcon={getShowArrow()}
       onDropdownVisibleChange={onDropdownVisibleChange}
       notFoundContent={getNotFoundContent()}
+      onClear={() => rest.onChange(null)}
       {...rest}
-    >
-      {options.map(option => (
-        <Select.Option key={option.value} value={option.value}>
-          {option.label}
-        </Select.Option>
-      ))}
-    </Select>
+    />
   )
 }
 

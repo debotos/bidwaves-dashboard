@@ -1,7 +1,7 @@
 import he from 'he'
 import moment from 'moment'
 import { htmlToText } from 'html-to-text'
-import { Alert, Button, Modal, Popover, Result, Row, Spin, Tag } from 'antd'
+import { Alert, Button, Input, Modal, Popover, Result, Row, Spin, Tag } from 'antd'
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -397,4 +397,8 @@ export const antdPreviewCommonProps = {
     zoomOut: <ZoomOutOutlined />,
     close: <CloseCircleOutlined />
   }
+}
+
+export const getPlaceholderInput = (props = {}) => {
+  return <Input disabled={true} {...props} />
 }

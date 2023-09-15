@@ -18,6 +18,11 @@ export default {
     return `${this.client(id)}/password/change`
   },
   registerClient: `${API_ENDPOINT_PREFIX}/auth/${CLIENT_TYPE}/register`,
+  // Advertisement
+  advertisementBase: `${API_ENDPOINT_PREFIX}/advertisement`,
+  advertisement: function (id) {
+    return `${this.advertisementBase}/${id}`
+  },
   // Industry
   industryBase: `${API_ENDPOINT_PREFIX}/industry`,
   industry: function (id) {
