@@ -48,6 +48,7 @@ const AsyncSelect = ({
   handleGetOptions,
   onlyFetchOnSearch,
   onlyInitialSearch = false,
+  defaultSelectFirstOption = false,
   firstCustomOption,
   lastCustomOption,
   ...rest
@@ -68,6 +69,10 @@ const AsyncSelect = ({
     if (!isEmpty(lastCustomOption)) results.push(lastCustomOption)
     setOptions(results)
     await sleep(500)
+    if (defaultSelectFirstOption && results.length) {
+      console.log({ results, defaultSelectFirstOption })
+      rest.onChange(results[0].value, results[0])
+    }
     setLoading(false)
     setIsApiCalled(true)
     setIsInitialLoad(false)
@@ -131,6 +136,7 @@ const AsyncSelect = ({
       onDropdownVisibleChange={onDropdownVisibleChange}
       notFoundContent={getNotFoundContent()}
       onClear={() => rest.onChange(null)}
+      defaultValue={defaultSelectFirstOption && options.length ? options[0].value : undefined}
       {...rest}
     />
   )

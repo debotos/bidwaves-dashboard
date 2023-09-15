@@ -321,8 +321,11 @@ export const getFileObjForAjax = (file, data, needClean = true) => {
   }
 }
 
-export const getReadableCurrency = (value, space = true) =>
-  `$${space ? ' ' : ''}${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+export const getReadableCurrency = (value, config) => {
+  const { showUnlimited } = config || {}
+  if (isEmpty(value) && showUnlimited) return `Unlimited`
+  return `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
 
 export const getReadableFileSize = size => {
   let _size = size

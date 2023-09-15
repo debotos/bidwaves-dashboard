@@ -52,14 +52,6 @@ body::-webkit-scrollbar {
   }
 }
 
-a:hover,
-.ant-btn-link:hover {
-  color: var(--primary-color) !important;
-}
-a.within:hover {
-  color: #fff !important;
-}
-
 .app-bg {
   background-color: var(--body-bg-color) !important;
 }
@@ -314,4 +306,35 @@ a.within:hover {
 
 .ant-select.ant-select-sm.ant-pagination-options-size-changer {
   min-width: 123px;
+}
+
+.app-custom-slider .ant-slider-handle::after,
+.app-custom-slider .ant-slider-handle::before {
+  display: none;
+}
+
+.cta-btn,
+.cta-btn:focus,
+.cta-btn:hover,
+.cta-btn:active {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  transition: all 0.3s ease-in-out;
+  color: #fff !important;
+  font-weight: bold;
+}
+.cta-btn:hover {
+  transform: scale(1.1);
+}
+
+a:hover,
+.ant-btn-link:hover {
+  color: var(--primary-color) !important;
+}
+a.within:hover {
+  color: #fff !important;
+}
+
+.min-w-93 {
+  min-width: 93px;
 }
