@@ -9,6 +9,8 @@ import {
   SyncOutlined
 } from '@ant-design/icons'
 
+import { links } from 'config/vars'
+
 export const Page = ({ children, ...rest }) => {
   return <Fade {...rest}>{children}</Fade>
 }
@@ -89,10 +91,22 @@ export const loadableOptions = {
   )
 }
 
-export const Logo = ({ light = false, width = 320, rowProps = {} }) => {
+export const Logo = ({ light = false, width = 320, rowProps = {}, onClick }) => {
   return (
     <Row justify="center" className="my-4" {...rowProps}>
-      <img src={light ? '/bidwaves-logo-light.png' : '/bidwaves-logo-dark.png'} alt="Bidwaves" width={width} />
+      <img
+        className={onClick ? 'cursor-pointer' : ''}
+        onClick={onClick}
+        src={light ? '/bidwaves-logo-light.png' : '/bidwaves-logo-dark.png'}
+        alt="Bidwaves"
+        width={width}
+      />
     </Row>
   )
 }
+
+export const CalenderLink = ({ label, href = links.calendar.to, qs = '' }) => (
+  <a href={href + qs} target="_blank" rel="noreferrer" className="within font-semibold text-[--secondary-color]">
+    {label || 'Click This'}
+  </a>
+)

@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import React, { useState, useRef, useEffect } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { Row, Button, Form, Input, message, Col, Modal } from 'antd'
@@ -11,6 +11,7 @@ import { Page, Logo } from 'components/micro/Common'
 
 function ForgotPassword() {
   const _isMounted = useRef(false)
+  const { state } = useLocation() // Pending Campaign Creation Data
 
   const [loading, setLoading] = useState(false)
 
@@ -73,14 +74,14 @@ function ForgotPassword() {
 
           <Row justify="space-between" className="mt-3">
             <Col>
-              <Link to={links.register.to}>
+              <Link to={links.register.to} state={state}>
                 <Button type="link" className="pl-0">
                   Sign Up
                 </Button>
               </Link>
             </Col>
             <Col>
-              <Link to={links.login.to}>
+              <Link to={links.login.to} state={state}>
                 <Button type="link" className="pr-0">
                   Sign In
                 </Button>

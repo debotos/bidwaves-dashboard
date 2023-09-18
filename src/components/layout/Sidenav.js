@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 
-import { privateRoutes } from 'config/vars'
 import { isMobile } from 'helpers/utility'
 import { Logo } from 'components/micro/Common'
+import { privateRoutes } from 'config/vars'
 import { toggleSidebar } from 'redux/slices/themeSlice'
 
 function Sidenav() {
@@ -34,8 +34,11 @@ function Sidenav() {
           mode="inline"
           className="app-bg"
           selectedKeys={[location.pathname]}
-          items={Object.keys(privateRoutes)
-            .filter(x => privateRoutes[x].sidenav !== false)
+          items={Object.keys({ ...privateRoutes })
+            .filter(key => {
+              const route = privateRoutes[key]
+              return route.sidenav !== false
+            })
             .map(key => {
               const route = privateRoutes[key]
               const icon = route.icon ? <route.icon style={{ fontSize: route.iconSize || 22 }} /> : null

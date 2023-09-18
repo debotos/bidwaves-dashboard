@@ -1,8 +1,8 @@
 import Axios from 'axios'
-import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
+import { Link, useLocation } from 'react-router-dom'
 import { Row, Button, Form, Input, Typography, Col, Steps, Space, message, Tooltip } from 'antd'
 import { LockOutlined, SendOutlined, MailOutlined, UserOutlined, LinkedinOutlined } from '@ant-design/icons'
 
@@ -14,7 +14,7 @@ import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
-import { basePasswordRule, validateUrl } from 'helpers/utility'
+import { basePasswordRule, isEmpty, validateUrl } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
 export const companyFields = [
@@ -68,6 +68,7 @@ function SignUp() {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
   const _isMounted = useRef(false)
+  const { state } = useLocation() // Pending Campaign Creation Data
 
   const [values, setValues] = useSetState({})
   const [firstTry, setFirstTry] = useSafeState(true)
@@ -88,6 +89,17 @@ function SignUp() {
       setAxiosAuthHeaderToken(token)
       /* Store token to localStorage for future */
       localStorage.setItem(keys.AUTH_TOKEN, token)
+      /* Check pending order creation | From calculator page */
+      if (!isEmpty(state)) {
+        try {
+          const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
+          window.log(`Create campaign response -> `, order)
+        } catch (error) {
+          console.log('Create campaign error:', error)
+        } finally {
+          localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
+        }
+      }
       /* Update the auth state */
       dispatch(setCurrentUser(user))
       localStorage.setItem(keys.SIGNUP_DONE_NOW, 'true')
@@ -264,7 +276,7 @@ function SignUp() {
 
           <Row justify="center" className="mt-3">
             <Col>
-              <Link to={links.login.to}>
+              <Link to={links.login.to} state={state}>
                 <Button type="link" className="pl-0">
                   Already have an account?
                 </Button>

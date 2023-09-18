@@ -10,17 +10,17 @@ import keys from 'config/keys'
 import endpoints from 'config/endpoints'
 import { reloadChannel, APP_ID } from 'App'
 import handleError from 'helpers/handleError'
-import { basePasswordRule } from 'helpers/utility'
 import { Logo, Page } from 'components/micro/Common'
 import { setCurrentUser } from 'redux/slices/authSlice'
+import { basePasswordRule, isEmpty, isObject } from 'helpers/utility'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 
 const { Paragraph, Text } = Typography
 
 export default function ResetPassword() {
-  const location = useLocation()
   const dispatch = useDispatch()
-  const searchParams = new URLSearchParams(location.search)
+  const { search } = useLocation()
+  const searchParams = new URLSearchParams(search)
   const token = searchParams.get('token')
 
   const [ok, setOk] = useSafeState(true)
@@ -38,6 +38,26 @@ export default function ResetPassword() {
       setAxiosAuthHeaderToken(newToken)
       /* Store token to localStorage for future */
       localStorage.setItem(keys.AUTH_TOKEN, newToken)
+      try {
+        /* Check pending order creation | From calculator page */
+        const pending_item = localStorage.getItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
+        const pending = pending_item ? JSON.parse(pending_item) : undefined
+        if (isObject(pending) && isObject(pending?.postData) && !isEmpty(pending?.postData)) {
+          const timestamp = Number(pending.timestamp)
+          const currentTimestamp = Date.now()
+          const difference = currentTimestamp - timestamp
+          // Check if the difference is less than 10 minutes (600,000 milliseconds)
+          const isNot10MinutesOld = difference < 600000
+          if (timestamp && isNot10MinutesOld) {
+            const { data: order } = await Axios.post(endpoints.orderBase, { ...pending.postData, clientId: user.id })
+            window.log(`Create campaign response -> `, order)
+          }
+        }
+      } catch (error) {
+        console.log('Create campaign error:', error)
+      } finally {
+        localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
+      }
       setTimeout(() => {
         /* Update the auth state */
         dispatch(setCurrentUser(user))

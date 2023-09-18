@@ -25,6 +25,7 @@ import { setCurrentUser, logoutUser } from 'redux/slices/authSlice'
 const Profile = React.lazy(() => import('pages/Profile'))
 const SignIn = React.lazy(() => import('pages/SignIn'))
 const SignUp = React.lazy(() => import('pages/SignUp'))
+const Calendar = React.lazy(() => import('pages/Calendar'))
 const Calculator = React.lazy(() => import('pages/Calculator'))
 const ForgotPassword = React.lazy(() => import('pages/ForgotPassword'))
 const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
@@ -126,11 +127,13 @@ function Body() {
                 <Route end path={links.profile.to} element={<Profile />} />
                 <Route end path={links.products.to} element={<Products />} />
                 <Route end path={links.orders.to} element={<Orders />} />
+                <Route path={links.private_calculator.to} element={<Calculator embed={true} />} />
               </Route>
             </Route>
 
             {/* Common */}
             <Route path={links.calculator.to} element={<Calculator />} />
+            <Route path={links.calendar.to} element={<Calendar />} />
 
             {/* Not Found */}
             <Route path="*" element={<PageNotFound />} />

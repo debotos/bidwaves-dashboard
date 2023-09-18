@@ -1,20 +1,20 @@
-import { useSetState } from 'ahooks'
+import Axios from 'axios'
 import styled from 'styled-components'
-import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button } from 'antd'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { useSafeState, useSetState } from 'ahooks'
+import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button, message } from 'antd'
 
 import keys from 'config/keys'
+import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
-import { Page } from 'components/micro/Common'
+import handleError from 'helpers/handleError'
 import PublicHeader from 'components/micro/PublicHeader'
+import { CalenderLink, Page } from 'components/micro/Common'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 import { getCssVar, getPlaceholderInput, getReadableCurrency, isEmpty } from 'helpers/utility'
 
 const { useBreakpoint } = Grid
-const enterpriseLink = (
-  <a href="" target="_blank" rel="noreferrer" className="within font-semibold text-[--secondary-color]">
-    Click This
-  </a>
-)
 const valClass = 'm-0 whitespace-nowrap font-bold text-[--primary-color] lg:text-2xl'
 const initialState = {
   advertisement: null,
@@ -26,9 +26,46 @@ const initialState = {
   industryId: ''
 }
 
-const Calculator = () => {
+const Calculator = ({ embed }) => {
+  const navigate = useNavigate()
   const screens = useBreakpoint()
+  const [loading, setLoading] = useSafeState(false)
   const [state, setState] = useSetState({ ...initialState })
+
+  const { isAuthenticated, user } = useSelector(state => state.auth)
+
+  const handleStart = async () => {
+    try {
+      setLoading(true)
+
+      const postData = {
+        clientId: user?.id,
+        advertisementId: state.advertisementId,
+        budgetId: state.budgetId,
+        budget_amount: state.budget_amount,
+        industries: [state.industryId]
+      }
+
+      if (!isAuthenticated) {
+        // Save it locally
+        localStorage.setItem(
+          keys.PENDING_CREATE_CAMPAIGN_DATA,
+          JSON.stringify({ ...state, postData, timestamp: Date.now() })
+        )
+        navigate(links.login.to, { state: postData })
+        return
+      }
+
+      const { data: order } = await Axios.post(endpoints.orderBase, postData)
+      window.log(`Order response -> `, order)
+      message.success(`"${order.name}" created successfully!`)
+      navigate(links.orders.to)
+    } catch (error) {
+      handleError(error, true)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const inputMinWidth = screens.lg ? 366 : 300
 
@@ -50,7 +87,7 @@ const Calculator = () => {
     leads_count = Math.round((visitors_count * Number(state.industry.rate_pct)) / 100)
 
     cta_el = (
-      <Button size="large" shape="round" className="cta-btn">
+      <Button size="large" shape="round" className="cta-btn" loading={loading} onClick={handleStart}>
         Start Your Campaign
       </Button>
     )
@@ -58,15 +95,17 @@ const Calculator = () => {
 
   return (
     <>
-      <div className="w-100 fixed top-0 z-10">
-        <PublicHeader />
-      </div>
+      {!embed && (
+        <div className="w-100 fixed top-0 z-10">
+          <PublicHeader />
+        </div>
+      )}
       <Page>
         <Row>
-          <Col span={24} lg={12}>
-            <div className="bg-[--primary-color] lg:min-h-screen">
-              <div className="pt-14 lg:pt-16">
-                <div className="px-4 py-5 pt-11 lg:pt-14">
+          <Col span={24} lg={embed ? 11 : 12}>
+            <div className={`bg-[--primary-color] ${embed ? 'rounded-lg' : 'lg:min-h-screen'}`}>
+              <div className={`${embed ? 'mt-4' : 'pt-14 lg:pt-16'}`}>
+                <div className={`px-4 py-5 pt-11 lg:pt-14 ${embed ? 'pb-11 lg:pb-14' : ''}`}>
                   <h1 className="text-center text-white lg:text-5xl">BidWaves PPC Calculator</h1>
                   <div className="mt-9 lg:mt-14">
                     <Space direction="vertical" size={24} align="center" className="w-100">
@@ -219,7 +258,7 @@ const Calculator = () => {
                           {cta_el}
 
                           <p className="px-5 text-white">
-                            Are you spending more than $10,000 a month? {enterpriseLink}
+                            Are you spending more than $10,000 a month? <CalenderLink />
                           </p>
                         </>
                       )}
@@ -229,12 +268,14 @@ const Calculator = () => {
               </div>
             </div>
           </Col>
-          <Col span={24} lg={12}>
-            <div className="pt-6 lg:pt-16">
-              <div className="px-4 py-5 pb-16 lg:pt-14">
+          <Col span={24} lg={embed ? 13 : 12}>
+            <div className={`${embed ? '' : 'pt-6 lg:pt-16'}`}>
+              <div className={`px-4 py-5 pb-16 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
                 {enterpriseSelected ? (
                   <>
-                    <h2 className="text-center">You spending more than $10,000 a month? {enterpriseLink}</h2>
+                    <h2 className="text-center">
+                      You spending more than $10,000 a month? <CalenderLink />
+                    </h2>
                   </>
                 ) : (
                   <>

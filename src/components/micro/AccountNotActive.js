@@ -33,7 +33,7 @@ const AccountNotActive = () => {
           <div className="text-center">
             <>
               <h4>Please wait 24 hours while our team reviews your profile and sets up your Bidwaves Dashboard.</h4>
-              <h4>If you don’t see the email, please make sure to check your spam inbox</h4>
+              <h4>If you don’t see the email, please make sure to check your spam inbox.</h4>
             </>
             <Row justify="center" align="middle" gutter={[10, 0]} wrap={false} className="mt-5">
               <Col>

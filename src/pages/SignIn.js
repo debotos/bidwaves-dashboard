@@ -1,6 +1,6 @@
 import Axios from 'axios'
-import { Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { Link, useLocation } from 'react-router-dom'
 import React, { useState, useRef, useEffect } from 'react'
 import { Row, Button, Form, Input, Typography, message, Col } from 'antd'
 import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons'
@@ -8,6 +8,7 @@ import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons'
 import keys from 'config/keys'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
+import { isEmpty } from 'helpers/utility'
 import { APP_ID, reloadChannel } from 'App'
 import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
@@ -17,6 +18,7 @@ import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 function Login() {
   const dispatch = useDispatch()
   const _isMounted = useRef(false)
+  const { state } = useLocation() // Pending Campaign Creation Data
 
   const [loading, setLoading] = useState(false)
 
@@ -32,6 +34,16 @@ function Login() {
       setAxiosAuthHeaderToken(token)
       /* Store token to localStorage for future */
       localStorage.setItem(keys.AUTH_TOKEN, token)
+      if (!isEmpty(state)) {
+        try {
+          const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
+          window.log(`Create campaign response -> `, order)
+        } catch (error) {
+          console.log('Create campaign error:', error)
+        } finally {
+          localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
+        }
+      }
       /* Update the auth state */
       dispatch(setCurrentUser(user))
       reloadChannel.postMessage(APP_ID)
@@ -84,14 +96,14 @@ function Login() {
 
           <Row justify="space-between" className="mt-3">
             <Col>
-              <Link to={links.register.to}>
+              <Link to={links.register.to} state={state}>
                 <Button type="link" className="pl-0">
                   Create an account
                 </Button>
               </Link>
             </Col>
             <Col>
-              <Link to={links.forgotPassword.to}>
+              <Link to={links.forgotPassword.to} state={state}>
                 <Button type="link" className="pr-0">
                   Forgot password?
                 </Button>

@@ -30,6 +30,7 @@ import {
   renderBoolTag,
   getCssVar
 } from 'helpers/utility'
+import keys from 'config/keys'
 
 const searchableColumns = [
   { key: 'name', label: 'Name' },
@@ -140,6 +141,7 @@ function ListComponent() {
       const postData = { clientId: user.id, productId, paymentId: payment.id }
       const { data } = await Axios.post(endpoints.orderBase, postData)
       window.log(`Order response -> `, data)
+      localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
       _isMounted.current && setState({ viewingProduct: null })
       showResultModal({ subTitle: 'Please check Orders page.' })
       getMainData()

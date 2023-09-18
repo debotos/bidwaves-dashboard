@@ -34,7 +34,7 @@ const searchableColumns = [
   { key: 'content', label: 'Content' }
 ]
 const defaultSearchField = searchableColumns[0].key
-// const exportColumns = [...searchableColumns.map(x => x.key), 'status', 'assets', 'done', 'paid']
+// const exportColumns = [...searchableColumns.map(x => x.key), 'status', 'assets', 'complete', 'paid']
 
 function ListComponent({ reRender }) {
   const _isMounted = useRef(false)
@@ -88,9 +88,9 @@ function ListComponent({ reRender }) {
       }
 
       if (isShowOnlyCompleted()) {
-        _ep += `&${keys.BOOL_COL_PREFIX}done=true`
+        _ep += `&${keys.BOOL_COL_PREFIX}complete=true`
       } else {
-        _ep += `&${keys.BOOL_COL_PREFIX}done=false`
+        _ep += `&${keys.BOOL_COL_PREFIX}complete=false`
 
         if (state.activeStatus) {
           _ep += `&${keys.ENUM_COL_PREFIX}status=${encodeURIComponent(state.activeStatus)}`
@@ -211,7 +211,7 @@ function ListComponent({ reRender }) {
     { title: 'Press Title', dataIndex: 'title', sorter: true, render: text => truncate(text, 'Press Title', 40) },
     // {
     //   title: 'Complete',
-    //   dataIndex: 'done',
+    //   dataIndex: 'complete',
     //   align: 'center',
     //   sorter: true,
     //   width: 70,
@@ -219,7 +219,7 @@ function ListComponent({ reRender }) {
     //     return (
     //       <AsyncSwitch
     //         initVal={value}
-    //         fieldKey="done"
+    //         fieldKey="complete"
     //         record={record}
     //         endpoint={endpoints.order(record.id)}
     //         onFinish={updates => updateLocalStateDataList?.(updates)}
