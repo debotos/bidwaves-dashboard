@@ -8,10 +8,11 @@ export const localStorageKeys = {
 
 export const ORDER_STATUS = {
   PROGRESS: 'In Progress',
-  READY: 'Ready To Publish',
-  PUBLISHED: 'Published',
   CANCELLED: 'Cancelled',
-  REFUNDING: 'Refund In Progress'
+  WAITING: 'Waiting For Review',
+  REFUNDING: 'Refund In Progress',
+  RUNNING: 'Running',
+  ALL_GOOD: 'All Good'
 }
 
 export const IO_EVENTS = {

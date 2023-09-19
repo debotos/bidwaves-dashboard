@@ -8,11 +8,12 @@ import ProfileDropdown from './ProfileDropdown'
 
 const { useBreakpoint } = Grid
 
+const linkHome = `https://www.bidwaves.com/`
 const anchors = [
-  { label: 'Home', link: '' },
-  { label: 'How it Works', link: '' },
-  { label: 'About Us', link: '' },
-  { label: 'Book a Demo', link: '' }
+  { label: 'Home', link: linkHome },
+  { label: 'How it Works', link: linkHome + `/how-it-works` },
+  { label: 'About Us', link: linkHome + `/about-us` },
+  { label: 'Book a Demo', link: linkHome + `/book-a-demo` }
 ]
 
 const PublicHeader = () => {

@@ -327,9 +327,18 @@ body::-webkit-scrollbar {
   transform: scale(1.1);
 }
 
+a,
+.ant-btn-link {
+  color: var(--secondary-color);
+}
 a:hover,
 .ant-btn-link:hover {
+  cursor: pointer;
   color: var(--primary-color) !important;
+}
+a.within,
+.ant-btn-link.within {
+  color: var(--info-color) !important;
 }
 a.within:hover {
   color: #fff !important;

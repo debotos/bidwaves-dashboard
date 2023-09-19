@@ -14,7 +14,7 @@ import handleError from 'helpers/handleError'
 // import AsyncSwitch from 'components/micro/fields/AsyncSwitch'
 import {
   DeleteIcon,
-  EditButton,
+  ConfigButton,
   // ExportButton,
   RefreshButton
 } from 'components/micro/Common'
@@ -22,7 +22,6 @@ import {
   isEmpty,
   defaultPaginationConfig,
   readableTime,
-  truncate,
   // commonBoolColProps,
   getOrderStatusColProps
 } from 'helpers/utility'
@@ -30,8 +29,8 @@ import {
 const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
 const FULLFIL_STATUS = { COMPLETE: 'Complete', NOT_COMPLETE: 'Not Complete' }
 const searchableColumns = [
-  { key: 'title', label: 'Title' },
-  { key: 'content', label: 'Content' }
+  { key: 'name', label: 'Name' },
+  { key: 'status', label: 'Status' }
 ]
 const defaultSearchField = searchableColumns[0].key
 // const exportColumns = [...searchableColumns.map(x => x.key), 'status', 'assets', 'complete', 'paid']
@@ -154,7 +153,7 @@ function ListComponent({ reRender }) {
   //     _isMounted.current && setState({ exporting: true })
   //     const list = state.dataResponse.list
   //     if (isEmpty(list)) return message.info('Sorry, Data is empty.')
-  //     generateExcel(list, `Bidwaves Orders (Page ${state.paginationCurrentPage})`, exportColumns)
+  //     generateExcel(list, `Bidwaves Campaigns (Page ${state.paginationCurrentPage})`, exportColumns)
   //     message.success('Data exported successfully!')
   //   } catch (error) {
   //     handleError(error, true)
@@ -200,33 +199,13 @@ function ListComponent({ reRender }) {
   const showOnlyCompleted = isShowOnlyCompleted()
 
   const columns = [
-    // { title: 'Paid', sorter: true, ...commonBoolColProps('paid') },
-    { title: 'Status', sorter: true, ...getOrderStatusColProps('status') },
     {
-      title: 'Product Name',
-      dataIndex: 'title',
-      sorter: false,
-      render: (_, record) => truncate(record.product_info?.name, 'Product Name', 40)
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+      render: val => <span className="font-bold text-[--primary-color]">{val}</span>
     },
-    { title: 'Press Title', dataIndex: 'title', sorter: true, render: text => truncate(text, 'Press Title', 40) },
-    // {
-    //   title: 'Complete',
-    //   dataIndex: 'complete',
-    //   align: 'center',
-    //   sorter: true,
-    //   width: 70,
-    //   render: (value, record) => {
-    //     return (
-    //       <AsyncSwitch
-    //         initVal={value}
-    //         fieldKey="complete"
-    //         record={record}
-    //         endpoint={endpoints.order(record.id)}
-    //         onFinish={updates => updateLocalStateDataList?.(updates)}
-    //       />
-    //     )
-    //   }
-    // },
+    { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: undefined },
     {
       title: 'Last Updated',
       dataIndex: 'updatedAt',
@@ -242,13 +221,11 @@ function ListComponent({ reRender }) {
       align: 'center',
       dataIndex: 'action',
       render: (_, record) => {
-        const { id, status } = record
-        const finalSubmitted = status === keys.ORDER_STATUS.READY
+        const { id } = record
         return (
           <Row justify="space-around">
             <Col>
               <DeleteIcon
-                disabled={finalSubmitted}
                 loading={state.idDeleting === id}
                 title={`Sure to delete?`}
                 onClick={() => deleteListItem(id)}
@@ -259,7 +236,7 @@ function ListComponent({ reRender }) {
             </Col>
             {!showOnlyCompleted && (
               <Col>
-                <EditButton disabled={finalSubmitted} onClick={() => setState({ editingItem: record })} />
+                <ConfigButton onClick={() => setState({ editingItem: record })} />
               </Col>
             )}
           </Row>
@@ -273,8 +250,8 @@ function ListComponent({ reRender }) {
 
   return (
     <>
-      <h2 className="mb-1">Here Are Your Open Orders</h2>
-      <p className="mb-4">Manage all your orders from here</p>
+      <h2 className="mb-1">Here Are Your Open Campaigns</h2>
+      <p className="mb-4">Manage all your campaigns from here</p>
       <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4">
         <Col>
           <Space>
@@ -357,6 +334,7 @@ function ListComponent({ reRender }) {
         onChange={onTableChange}
         pagination={{
           ...defaultPaginationConfig,
+          hideOnSinglePage: true,
           total: state.dataResponse?.total ?? 0,
           current: state.paginationCurrentPage,
           pageSize: state.paginationPageSize,
@@ -371,7 +349,7 @@ function ListComponent({ reRender }) {
       />
 
       <Drawer
-        title="Manage Order"
+        title="Manage Campaign"
         placement="right"
         size="large"
         width="100%"

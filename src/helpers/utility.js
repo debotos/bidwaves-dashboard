@@ -174,12 +174,15 @@ export const commonBoolColProps = dataIndex => ({
 })
 
 export const getOrderStatusTag = (status, record) => {
-  if (record.done)
+  if (record.complete) {
     return (
       <Tag color={getCssVar('success-color')} icon={<CheckCircleOutlined />}>
         Complete
       </Tag>
     )
+  }
+
+  if (!status) return null
 
   switch (status) {
     case keys.ORDER_STATUS.CANCELLED:
@@ -196,14 +199,7 @@ export const getOrderStatusTag = (status, record) => {
         </Tag>
       )
 
-    case keys.ORDER_STATUS.PUBLISHED:
-      return (
-        <Tag icon={<CheckCircleOutlined />} color="success">
-          {status}
-        </Tag>
-      )
-
-    case keys.ORDER_STATUS.READY:
+    case keys.ORDER_STATUS.WAITING:
       return (
         <Tag icon={<ClockCircleOutlined />} color="cyan">
           {status}
@@ -213,6 +209,14 @@ export const getOrderStatusTag = (status, record) => {
     case keys.ORDER_STATUS.REFUNDING:
       return (
         <Tag icon={<ExclamationCircleOutlined />} color="warning">
+          {status}
+        </Tag>
+      )
+
+    case keys.ORDER_STATUS.ALL_GOOD:
+    case keys.ORDER_STATUS.RUNNING:
+      return (
+        <Tag icon={<CheckCircleOutlined />} color="success">
           {status}
         </Tag>
       )

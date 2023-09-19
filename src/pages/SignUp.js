@@ -4,7 +4,14 @@ import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Link, useLocation } from 'react-router-dom'
 import { Row, Button, Form, Input, Typography, Col, Steps, Space, message, Tooltip } from 'antd'
-import { LockOutlined, SendOutlined, MailOutlined, UserOutlined, LinkedinOutlined } from '@ant-design/icons'
+import {
+  LockOutlined,
+  SendOutlined,
+  MailOutlined,
+  UserOutlined,
+  LinkedinOutlined,
+  GlobalOutlined
+} from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -149,12 +156,6 @@ function SignUp() {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="linkedin" rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}>
-            <Input allowClear prefix={<LinkedinOutlined />} placeholder="LinkedIn" />
-          </Form.Item>
-          <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
-            <Input allowClear placeholder="Website" />
-          </Form.Item>
           <Form.Item
             name="email"
             hasFeedback
@@ -165,11 +166,21 @@ function SignUp() {
           >
             <Input allowClear prefix={<MailOutlined />} placeholder="Email" />
           </Form.Item>
-
           <Form.Item name="password" hasFeedback rules={[basePasswordRule]}>
             <Input.Password allowClear prefix={<LockOutlined />} type="password" placeholder="Password" />
           </Form.Item>
-
+          <Row gutter={[10, 0]}>
+            <Col span={24} md={12}>
+              <Form.Item name="linkedin" rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}>
+                <Input allowClear prefix={<LinkedinOutlined />} placeholder="LinkedIn" />
+              </Form.Item>
+            </Col>
+            <Col span={24} md={12}>
+              <Form.Item name="website" rules={[{ required: false, validator: validateUrl }]}>
+                <Input allowClear prefix={<GlobalOutlined />} placeholder="Website" />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="address" rules={[{ whitespace: true, message: 'Provide address!' }]}>
             <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
           </Form.Item>

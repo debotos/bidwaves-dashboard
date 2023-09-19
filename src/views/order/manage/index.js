@@ -1,20 +1,23 @@
 import Axios from 'axios'
 import styled from 'styled-components'
-import { Button, Col, Row, Alert } from 'antd'
+import loadable from '@loadable/component'
+import { Button, Col, Row, Alert, Tabs } from 'antd'
 import { ReloadOutlined } from '@ant-design/icons'
 import { useSafeState, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
 import endpoints from 'config/endpoints'
-import Video from 'components/micro/Video'
 import handleError from 'helpers/handleError'
 import { getErrorAlert, isEmpty } from 'helpers/utility'
+import { loadableOptions } from 'components/micro/Common'
 
-import OrderNote from './note'
-import OrderQA from './OrderQA'
-import OrderEdit from './OrderEdit'
-import OrderAssetList from './OrderAssetList'
+const OrderNote = loadable(() => import('./note'), loadableOptions)
+const OrderQA = loadable(() => import('./OrderQA'), loadableOptions)
+const OrderEdit = loadable(() => import('./OrderEdit'), loadableOptions)
+const Video = loadable(() => import('components/micro/Video'), loadableOptions)
+// const OrderAssetList = loadable(() => import('./OrderAssetList'), loadableOptions)
+const ProductSuggestion = loadable(() => import('./suggestion/ProductSuggestion'), loadableOptions)
 
 const Manage = props => {
   const { order: initialOrder } = props
@@ -31,7 +34,7 @@ const Manage = props => {
       setFetching(true)
       const ep = endpoints.order(orderId)
       const { data } = await Axios.get(ep)
-      console.log(`Product response: `, data)
+      console.log(`Order/Campaign response: `, data)
       setOrder(data)
     } catch (error) {
       handleError(error, true)
@@ -67,29 +70,53 @@ const Manage = props => {
 
   if (isEmpty(order)) return getErrorAlert({ onRetry: getData })
 
-  const { editor_enabled } = order
-  const cProps = { order, setOrder, updateOrder, fetching }
+  const cProps = { order, setOrder, updateOrder, fetching, refetch: getData }
 
   if (order.done) {
-    return <Alert message="This order has already been marked as complete!" type="success" showIcon />
+    return <Alert message="This campaign has already been marked as complete!" type="success" showIcon />
   }
+
+  const items = [
+    {
+      label: 'Campaign Manager',
+      key: 'campaign_manager',
+      children: (
+        <>
+          <Row gutter={[20, 20]}>
+            <Col span={24} md={14} lg={16} xl={17} xxl={20} key={key}></Col>
+            <Col span={24} md={10} lg={8} xl={7} xxl={4}>
+              <OrderNote {...props} {...cProps} />
+            </Col>
+          </Row>
+        </>
+      )
+    },
+    {
+      label: 'Campaign QA',
+      key: 'campaign_qa',
+      children: (
+        <>
+          <OrderQA {...props} {...cProps} />
+        </>
+      )
+    },
+    {
+      label: 'Product Suggestion',
+      key: 'product_suggestion',
+      children: <ProductSuggestion {...props} {...cProps} />
+    },
+    {
+      label: 'Campaign Update',
+      key: 'campaign_update',
+      children: <OrderEdit key={key} {...props} {...cProps} />
+    }
+  ]
+
+  const renderTabBar = (props, DefaultTabBar) => <DefaultTabBar {...props} />
 
   return (
     <>
-      <Row gutter={[20, 20]}>
-        <Col span={24} md={14} lg={16} xl={17} xxl={20} key={key}>
-          <OrderQA {...props} {...cProps} />
-          {editor_enabled ? (
-            <>
-              <OrderEdit {...props} {...cProps} />
-              <OrderAssetList {...props} {...cProps} />
-            </>
-          ) : null}
-        </Col>
-        <Col span={24} md={10} lg={8} xl={7} xxl={4}>
-          <OrderNote {...props} {...cProps} />
-        </Col>
-      </Row>
+      <Tabs defaultActiveKey={items[0].key} destroyInactiveTabPane renderTabBar={renderTabBar} items={items} />
 
       <RefreshButton>
         <Button type="dashed" onClick={getData} loading={fetching} icon={<ReloadOutlined />}>
