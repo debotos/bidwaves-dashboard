@@ -76,6 +76,26 @@ const Manage = props => {
     return <Alert message="This campaign has already been marked as complete!" type="success" showIcon />
   }
 
+  const noQA = isEmpty(order.qa)
+  const QA_UI = <OrderQA {...props} {...cProps} />
+
+  if (!order.qa_approved && !noQA)
+    return (
+      <>
+        <Alert
+          className="mb-3"
+          message={
+            <>
+              Please <b>submit</b> the answer of this below questions to get started.
+            </>
+          }
+          type="info"
+          showIcon
+        />
+        {QA_UI}
+      </>
+    )
+
   const items = [
     {
       label: 'Campaign Manager',
@@ -91,15 +111,7 @@ const Manage = props => {
         </>
       )
     },
-    {
-      label: 'Campaign QA',
-      key: 'campaign_qa',
-      children: (
-        <>
-          <OrderQA {...props} {...cProps} />
-        </>
-      )
-    },
+    ...(noQA ? [] : [{ label: 'Campaign QA', key: 'campaign_qa', children: QA_UI }]),
     {
       label: 'Product Suggestion',
       key: 'product_suggestion',

@@ -69,10 +69,10 @@ const OrderQA = props => {
     try {
       setSubmittingQA(true)
       const { id } = order
-      const postData = { qa_submitted: true, allow_qa_edit: false }
+      const postData = { qa_submitted: true }
       const { data } = await Axios.patch(endpoints.order(id), postData)
       window.log(`QA submit response -> `, data)
-      message.success('Action successful.')
+      message.success('Submit successful. Please wait until CMS review the answers.')
       updateOrder(data)
     } catch (error) {
       handleError(error, true)
@@ -95,7 +95,7 @@ const OrderQA = props => {
         initialValues={{ ...order }}
         onFinish={onEditFinish}
       >
-        <Collapse defaultActiveKey={order.editor_enabled ? undefined : 'qa'}>
+        <Collapse defaultActiveKey={order.qa_approved ? undefined : 'qa'}>
           <Collapse.Panel
             header={
               <>
@@ -186,7 +186,7 @@ const OrderQA = props => {
                         loading={submittingQA}
                         onClick={confirmSubmitQA}
                       >
-                        Submit Questions
+                        Submit For Review
                       </Button>
                     </Form.Item>
                   </Col>

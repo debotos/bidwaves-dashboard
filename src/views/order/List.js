@@ -349,7 +349,7 @@ function ListComponent({ reRender }) {
       />
 
       <Drawer
-        title="Manage Campaign"
+        title={'Manage ' + state.editingItem?.name || 'Campaign'}
         placement="right"
         size="large"
         width="100%"
@@ -360,7 +360,7 @@ function ListComponent({ reRender }) {
         destroyOnClose
         extra={
           <Space>
-            <Button onClick={closeManageUI}>Done</Button>
+            <Button onClick={closeManageUI}>Close</Button>
           </Space>
         }
       >
