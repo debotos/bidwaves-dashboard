@@ -1,13 +1,14 @@
 import Axios from 'axios'
 import { useSafeState } from 'ahooks'
-import { SaveOutlined, SendOutlined } from '@ant-design/icons'
 import { Button, Col, Collapse, Empty, Form, Input, Modal, Row, Space, Tag } from 'antd'
+import { CheckCircleOutlined, ClockCircleOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
 
 import { message } from 'App'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
 import { isEmpty } from 'helpers/utility'
 
+export const ctaLabel = `Submit For Review`
 const cPanelStyles = { borderRadius: 6 }
 const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 3}`
 
@@ -100,14 +101,22 @@ const OrderQA = props => {
             header={
               <>
                 Questionnaire{' '}
-                {order.qa_submitted ? (
-                  <Tag className="ml-2" color="success">
-                    Submitted
+                {order.qa_approved ? (
+                  <Tag className="ml-2" color="success" icon={<CheckCircleOutlined />}>
+                    Approved
                   </Tag>
                 ) : (
-                  <Tag className="ml-2" color="error">
-                    Not Submitted
-                  </Tag>
+                  <>
+                    {order.qa_submitted ? (
+                      <Tag className="ml-2" color="success" icon={<ClockCircleOutlined />}>
+                        Submitted
+                      </Tag>
+                    ) : (
+                      <Tag className="ml-2" color="error">
+                        Not Submitted
+                      </Tag>
+                    )}
+                  </>
                 )}
               </>
             }
@@ -186,7 +195,7 @@ const OrderQA = props => {
                         loading={submittingQA}
                         onClick={confirmSubmitQA}
                       >
-                        Submit For Review
+                        {ctaLabel}
                       </Button>
                     </Form.Item>
                   </Col>

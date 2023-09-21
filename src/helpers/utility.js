@@ -133,7 +133,8 @@ export const truncate = (_input = '', title, length = 5, tooltip = true) => {
   )
 }
 
-export const readableTime = (value, full = false) => moment(value).format(full ? 'LLLL' : 'ddd, MMM Do YY')
+export const readableTime = (value, full = false) =>
+  moment(value).format(full ? 'MMM DD, YYYY ddd h:mm A' : 'ddd, MMM Do YY')
 export const readableDate = value => moment(value).format('MMM Do YY')
 
 export const basePasswordRule = {

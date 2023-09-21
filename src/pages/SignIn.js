@@ -39,7 +39,7 @@ function Login() {
           const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
           window.log(`Create campaign response -> `, order)
         } catch (error) {
-          console.log('Create campaign error:', error)
+          window.log('Create campaign error:', error)
         } finally {
           localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
         }
@@ -63,7 +63,7 @@ function Login() {
 
   return (
     <Page>
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="mb-5 w-full max-w-md p-4">
           <Row justify="center" className="my-4">
             <Logo />

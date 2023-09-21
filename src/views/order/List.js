@@ -209,7 +209,7 @@ function ListComponent({ reRender }) {
     {
       title: 'Last Updated',
       dataIndex: 'updatedAt',
-      width: 280,
+      width: 210,
       render: value => readableTime(value, true),
       sorter: true
     },

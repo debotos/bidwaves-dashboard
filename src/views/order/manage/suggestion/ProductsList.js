@@ -1,9 +1,15 @@
 import React from 'react'
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
-import { Row, Col, Input, Table, Dropdown, Tooltip, Button } from 'antd'
+import { Row, Col, Input, Table, Dropdown, Tooltip, Button, Modal } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
-import { CaretDownFilled, ClearOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons'
+import {
+  CaretDownFilled,
+  ClearOutlined,
+  PlusCircleOutlined,
+  QuestionCircleFilled,
+  SearchOutlined
+} from '@ant-design/icons'
 
 import { message } from 'App'
 import endpoints from 'config/endpoints'
@@ -17,7 +23,7 @@ const searchableColumns = [
 ]
 const defaultSearchField = searchableColumns[0].key
 
-function ListComponent({ orderId, suggestionUI = false }) {
+function ListComponent({ orderId, suggestionUI = false, currentProductIds = [], setProducts }) {
   const _isMounted = useRef(false)
   const [state, setState] = useSetState({
     searchText: '',
@@ -118,6 +124,7 @@ function ListComponent({ orderId, suggestionUI = false }) {
       const postData = { productId }
       const { data } = await Axios.post(endpoints.orderBase + `/${orderId}/product`, postData)
       window.log(`Product add response -> `, data)
+      setProducts(prevItems => [data, ...prevItems])
       message.success('Successfully added to the campaign.')
       getMainData()
     } catch (error) {
@@ -161,13 +168,32 @@ function ListComponent({ orderId, suggestionUI = false }) {
           <Row justify="space-around" gutter={[8, 0]} wrap={false}>
             {suggestionUI && (
               <Col>
-                <Tooltip title={`Add To My Campaign`} placement="topRight">
+                <Tooltip title={`Add To This Campaign`} placement="topRight">
                   <Button
                     size="small"
                     type="primary"
                     icon={<PlusCircleOutlined />}
                     loading={state.idAdding === id}
-                    onClick={() => handleAddProduct(record)}
+                    onClick={() => {
+                      if (currentProductIds.includes(id)) {
+                        Modal.confirm({
+                          title: 'Please confirm before proceeding?',
+                          icon: <QuestionCircleFilled />,
+                          okText: 'Yes, Add Again',
+                          cancelText: 'No',
+                          content: (
+                            <div
+                              dangerouslySetInnerHTML={{
+                                __html: `The product with the name "<b>${record.name}</b>" already exist in this campaign. You want to add again?<br/>Please carefully review and verify the changes before proceeding to ensure accuracy and prevent potential errors.`
+                              }}
+                            />
+                          ),
+                          onOk: () => handleAddProduct(record)
+                        })
+                      } else {
+                        handleAddProduct(record)
+                      }
+                    }}
                   >
                     Add
                   </Button>
@@ -235,7 +261,7 @@ function ListComponent({ orderId, suggestionUI = false }) {
 
       <Table
         rowKey="id"
-        size="middle"
+        size="small"
         className="mb-4"
         onChange={onTableChange}
         pagination={{

@@ -1,7 +1,7 @@
-import { FaUserCircle, FaCubes, FaRegCalendarAlt } from 'react-icons/fa'
-import { LoginOutlined, UserAddOutlined, LockOutlined } from '@ant-design/icons'
 import { MdCampaign } from 'react-icons/md'
 import { BsCalculator } from 'react-icons/bs'
+import { FaUserCircle, FaRegCalendarAlt } from 'react-icons/fa'
+import { LoginOutlined, UserAddOutlined, LockOutlined } from '@ant-design/icons'
 
 export const commonRoutes = {
   calculator: { to: '/', label: 'Calculator', icon: BsCalculator, iconSize: 22 },
@@ -9,7 +9,6 @@ export const commonRoutes = {
 }
 export const privateRoutes = {
   orders: { to: '/campaigns', label: 'Campaigns', icon: MdCampaign, iconSize: 22 },
-  products: { to: '/products', label: 'Products', icon: FaCubes, iconSize: 22 },
   profile: { to: '/profile', label: 'My Profile', icon: FaUserCircle, iconSize: 22, sidenav: false },
   private_calculator: { ...commonRoutes.calculator, label: 'PPC Calculator', to: '/calculator' }
 }

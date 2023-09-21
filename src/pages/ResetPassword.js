@@ -54,7 +54,7 @@ export default function ResetPassword() {
           }
         }
       } catch (error) {
-        console.log('Create campaign error:', error)
+        window.log('Create campaign error:', error)
       } finally {
         localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
       }

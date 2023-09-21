@@ -70,7 +70,6 @@ const AsyncSelect = ({
     setOptions(results)
     await sleep(500)
     if (defaultSelectFirstOption && results.length) {
-      console.log({ results, defaultSelectFirstOption })
       rest.onChange(results[0].value, results[0])
     }
     setLoading(false)

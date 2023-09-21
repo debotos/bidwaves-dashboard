@@ -29,7 +29,6 @@ const Calendar = React.lazy(() => import('pages/Calendar'))
 const Calculator = React.lazy(() => import('pages/Calculator'))
 const ForgotPassword = React.lazy(() => import('pages/ForgotPassword'))
 const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
-const Products = React.lazy(() => import('pages/Products'))
 const Orders = React.lazy(() => import('pages/Orders'))
 
 function Body() {
@@ -125,7 +124,6 @@ function Body() {
             <Route element={<PrivateRoute />}>
               <Route element={<MainLayout />}>
                 <Route end path={links.profile.to} element={<Profile />} />
-                <Route end path={links.products.to} element={<Products />} />
                 <Route end path={links.orders.to} element={<Orders />} />
                 <Route path={links.private_calculator.to} element={<Calculator embed={true} />} />
               </Route>

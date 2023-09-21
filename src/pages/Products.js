@@ -1,4 +1,4 @@
-import MainUI from 'views/product/List'
+import MainUI from 'views/order/manage/suggestion/ProductsList'
 import { Page } from 'components/micro/Common'
 
 const Products = () => {

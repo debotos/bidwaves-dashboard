@@ -41,7 +41,7 @@ function OrderNote({ order }) {
 
       const req = await Axios.get(_ep)
       const res = req.data
-      window.log(`Data response -> `, res)
+      window.log(`Notes response -> `, res)
       setState({ dataResponse: res, paginationCurrentPage: page })
     } catch (error) {
       handleError(error, true)

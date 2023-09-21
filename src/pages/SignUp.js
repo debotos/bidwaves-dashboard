@@ -102,7 +102,7 @@ function SignUp() {
           const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
           window.log(`Create campaign response -> `, order)
         } catch (error) {
-          console.log('Create campaign error:', error)
+          window.log('Create campaign error:', error)
         } finally {
           localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
         }
@@ -239,7 +239,7 @@ function SignUp() {
 
   return (
     <Page>
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="w-full max-w-4xl p-4">
           <Row justify="center" className="mt-4 py-4">
             <Logo />
