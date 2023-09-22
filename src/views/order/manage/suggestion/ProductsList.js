@@ -80,7 +80,7 @@ function ListComponent({ orderId, suggestionUI = false, currentProductIds = [], 
 
       const req = await Axios.get(_ep)
       const res = req.data
-      window.log(`Data response -> `, res)
+      window.log(`Products suggestion response -> `, res)
       setState({ dataResponse: res, paginationCurrentPage: page })
     } catch (error) {
       handleError(error, true)

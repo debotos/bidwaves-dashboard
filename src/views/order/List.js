@@ -1,12 +1,14 @@
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
-import { CaretDownFilled, SearchOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
+import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
 import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button } from 'antd'
 
 import Manage from './manage'
 import keys from 'config/keys'
 import { message } from 'App'
+import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
 import OrderPayment from './OrderPayment'
 import handleError from 'helpers/handleError'
@@ -37,6 +39,7 @@ const defaultSearchField = searchableColumns[0].key
 
 function ListComponent({ reRender }) {
   const _isMounted = useRef(false)
+  const navigate = useNavigate()
   const [state, setState] = useSetState({
     searchText: '',
     activeStatus: '',
@@ -265,47 +268,42 @@ function ListComponent({ reRender }) {
           </Space>
         </Col>
         <Col flex={1}>
-          <div className="flex justify-center">
-            <Input
-              allowClear
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={handleSearchInputChange}
-              style={{ width: 'clamp(350px, 60%, 400px)' }}
-              suffix={
-                <Dropdown
-                  placement="bottomRight"
-                  menu={{
-                    items: searchableColumns.map(x => {
-                      return {
-                        key: x.key,
-                        label: x.label,
-                        className: `font-semibold`,
-                        onClick: () => setState({ searchField: x.key })
-                      }
-                    }),
-                    selectable: true,
-                    defaultSelectedKeys: [defaultSearchField]
-                  }}
-                  trigger={['click']}
-                >
-                  <CaretDownFilled className="caret-icon" />
-                </Dropdown>
-              }
-            />
-          </div>
-        </Col>
-
-        <Col>
-          <Space className="w-100" wrap={true}>
-            <Select
-              placeholder="Complete"
-              style={{ width: 140 }}
-              value={state.fullfilStatus || undefined}
-              options={Object.values(FULLFIL_STATUS).map(x => ({ value: x, label: x }))}
-              onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, fullfilStatus: val ?? '' })}
-            />
-            {/* <Select
+          <Row justify="center">
+            <Space align="middle" wrap={true}>
+              <Input
+                allowClear
+                placeholder="Search"
+                prefix={<SearchOutlined />}
+                onChange={handleSearchInputChange}
+                suffix={
+                  <Dropdown
+                    placement="bottomRight"
+                    menu={{
+                      items: searchableColumns.map(x => {
+                        return {
+                          key: x.key,
+                          label: x.label,
+                          className: `font-semibold`,
+                          onClick: () => setState({ searchField: x.key })
+                        }
+                      }),
+                      selectable: true,
+                      defaultSelectedKeys: [defaultSearchField]
+                    }}
+                    trigger={['click']}
+                  >
+                    <CaretDownFilled className="caret-icon" />
+                  </Dropdown>
+                }
+              />
+              <Select
+                placeholder="Complete"
+                style={{ width: 140 }}
+                value={state.fullfilStatus || undefined}
+                options={Object.values(FULLFIL_STATUS).map(x => ({ value: x, label: x }))}
+                onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, fullfilStatus: val ?? '' })}
+              />
+              {/* <Select
               allowClear
               placeholder="Payment"
               style={{ width: 110 }}
@@ -314,16 +312,23 @@ function ListComponent({ reRender }) {
               options={Object.values(PAID_STATUS).map(x => ({ value: x, label: x }))}
               onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, paidStatus: val ?? '' })}
             /> */}
-            <Select
-              allowClear
-              placeholder="Status"
-              style={{ width: 170 }}
-              disabled={showOnlyCompleted}
-              value={state.activeStatus || undefined}
-              options={Object.values(keys.ORDER_STATUS).map(x => ({ value: x, label: x }))}
-              onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, activeStatus: val ?? '' })}
-            />
-          </Space>
+              <Select
+                allowClear
+                placeholder="Status"
+                style={{ width: 185 }}
+                disabled={showOnlyCompleted}
+                value={state.activeStatus || undefined}
+                options={Object.values(keys.ORDER_STATUS).map(x => ({ value: x, label: x }))}
+                onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, activeStatus: val ?? '' })}
+              />
+            </Space>
+          </Row>
+        </Col>
+
+        <Col>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(links.private_calculator.to)}>
+            Add A New Campaign
+          </Button>
         </Col>
       </Row>
 

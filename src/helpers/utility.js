@@ -214,6 +214,13 @@ export const getOrderStatusTag = (status, record) => {
         </Tag>
       )
 
+    case keys.ORDER_STATUS.AWAITING_PAYMENT:
+      return (
+        <Tag icon={<ClockCircleOutlined />} color="warning">
+          {status}
+        </Tag>
+      )
+
     case keys.ORDER_STATUS.ALL_GOOD:
     case keys.ORDER_STATUS.RUNNING:
       return (

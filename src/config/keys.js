@@ -7,12 +7,13 @@ export const localStorageKeys = {
 }
 
 export const ORDER_STATUS = {
-  PROGRESS: 'In Progress',
+  PROGRESS: 'Setup In Progress',
+  AWAITING_PAYMENT: 'Awaiting For Payment',
   CANCELLED: 'Cancelled',
   WAITING: 'Waiting For Review',
   REFUNDING: 'Refund In Progress',
-  RUNNING: 'Running',
-  ALL_GOOD: 'All Good'
+  ALL_GOOD: 'All Good',
+  RUNNING: 'Running'
 }
 
 export const IO_EVENTS = {
