@@ -47,6 +47,7 @@ const Manage = props => {
       })
     )
   }
+  const deleteProduct = id => setProducts(prevValues => prevValues.filter(x => x.id !== id))
 
   const getOrderProducts = async () => {
     try {
@@ -107,6 +108,7 @@ const Manage = props => {
   if (isEmpty(order)) return getErrorAlert({ onRetry: getData })
 
   const cProps = {
+    orderEp,
     fetching,
     order,
     setOrder,
@@ -117,6 +119,7 @@ const Manage = props => {
     products,
     setProducts,
     updateProduct,
+    deleteProduct,
     refetchProducts: getOrderProducts,
     currentProductIds: products.map(x => x.productId)
   }

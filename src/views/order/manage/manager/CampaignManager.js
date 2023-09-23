@@ -1,14 +1,37 @@
 import React from 'react'
-import { useMount } from 'ahooks'
 import Fade from 'react-reveal/Fade'
-import { Card, Empty, Skeleton, Space } from 'antd'
+import { useMount, useUnmount } from 'ahooks'
+import { Card, Empty, Skeleton, Space, Tag } from 'antd'
 
+import keys from 'config/keys'
+import { socketIO } from 'App'
 import { isEmpty } from 'helpers/utility'
+import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
 function CampaignManager(props) {
-  const { fetching, fetchingProducts, refetchProducts, products } = props
+  const { orderEp, fetching, fetchingProducts, refetchProducts, products, deleteProduct, updateProduct } = props
 
-  useMount(() => refetchProducts())
+  const handleDeleteProduct = info => deleteProduct(info.id)
+  const handleComplete = info => updateProduct(info.id, { complete: true })
+
+  const listenSocketIOEvents = () => {
+    socketIO.on(keys.IO_EVENTS.ORDER_PRODUCT_DELETED, handleDeleteProduct)
+    socketIO.on(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMPLETE, handleComplete)
+  }
+
+  const stopListeningSocketIOEvents = () => {
+    socketIO.off(keys.IO_EVENTS.ORDER_PRODUCT_DELETED, handleDeleteProduct)
+    socketIO.off(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMPLETE, handleComplete)
+  }
+
+  useMount(() => {
+    listenSocketIOEvents()
+    refetchProducts()
+  })
+
+  useUnmount(() => {
+    stopListeningSocketIOEvents()
+  })
 
   if (fetching || fetchingProducts) {
     return Array(8)
@@ -38,9 +61,45 @@ function CampaignManager(props) {
   }
 
   return (
-    <div>
-      <pre>{JSON.stringify(products, null, 2)}</pre>
-    </div>
+    <>
+      {products.map((product, index) => {
+        const isFirstProduct = index === 0
+        const isComplete = product.complete
+        const productId = product.id
+        const productEp = orderEp + `/product/${productId}`
+
+        return (
+          <Fade key={productId}>
+            <Card
+              size="small"
+              title={
+                <Space>
+                  <b>{product.product_info?.name}</b>
+                  {isComplete && <Tag color="success">Complete</Tag>}
+                </Space>
+              }
+              className={`mb-3 ${isFirstProduct ? 'mt-2' : ''}`}
+              bodyStyle={isComplete ? { padding: 0 } : {}}
+              extra={
+                <Space size="middle">
+                  <AsyncDeleteButton
+                    disabled={isComplete}
+                    endpoint={productEp}
+                    onFinish={() => deleteProduct(productId)}
+                  />
+                </Space>
+              }
+            >
+              {isComplete ? null : (
+                <>
+                  <pre>{JSON.stringify(product, null, 2)}</pre>
+                </>
+              )}
+            </Card>
+          </Fade>
+        )
+      })}
+    </>
   )
 }
 
