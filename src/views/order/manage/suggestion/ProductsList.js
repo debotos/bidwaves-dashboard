@@ -23,7 +23,7 @@ const searchableColumns = [
 ]
 const defaultSearchField = searchableColumns[0].key
 
-function ListComponent({ orderId, suggestionUI = false, currentProductIds = [], setProducts }) {
+function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, setProducts }) {
   const _isMounted = useRef(false)
   const [state, setState] = useSetState({
     searchText: '',
@@ -175,7 +175,7 @@ function ListComponent({ orderId, suggestionUI = false, currentProductIds = [], 
                     icon={<PlusCircleOutlined />}
                     loading={state.idAdding === id}
                     onClick={() => {
-                      if (currentProductIds.includes(id)) {
+                      if (getCurrentProductIds().includes(id)) {
                         Modal.confirm({
                           title: 'Please confirm before proceeding?',
                           icon: <QuestionCircleFilled />,

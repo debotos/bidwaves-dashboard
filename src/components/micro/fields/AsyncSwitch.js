@@ -6,7 +6,7 @@ import { CheckOutlined, CloseOutlined, QuestionCircleFilled } from '@ant-design/
 import handleError from 'helpers/handleError'
 
 const AsyncSwitch = props => {
-  const { initVal, endpoint, onFinish, fieldKey, confirmModalProps = {} } = props
+  const { disabled, initVal, endpoint, onFinish, fieldKey, confirmModalProps = {} } = props
   const [val, setVal] = useSafeState(!!initVal)
   const [loading, setLoading] = useSafeState(false)
 
@@ -42,6 +42,7 @@ const AsyncSwitch = props => {
     <Switch
       checked={val}
       loading={loading}
+      disabled={!!disabled}
       checkedChildren={<CheckOutlined />}
       unCheckedChildren={<CloseOutlined />}
       onChange={handleChange}

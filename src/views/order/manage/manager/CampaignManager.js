@@ -1,27 +1,50 @@
 import React from 'react'
+import Axios from 'axios'
 import Fade from 'react-reveal/Fade'
+import { useSelector } from 'react-redux'
+import loadable from '@loadable/component'
 import { useMount, useUnmount } from 'ahooks'
-import { Card, Empty, Skeleton, Space, Tag } from 'antd'
+import { Alert, Card, Empty, Skeleton, Space, Tag } from 'antd'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
 import { isEmpty } from 'helpers/utility'
+import handleError from 'helpers/handleError'
+import { loadableOptions } from 'components/micro/Common'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
+
+const GoogleTag = loadable(() => import('./products/GoogleTag'), loadableOptions)
 
 function CampaignManager(props) {
   const { orderEp, fetching, fetchingProducts, refetchProducts, products, deleteProduct, updateProduct } = props
+  const { user } = useSelector(state => state.auth)
+
+  const getSingleOrderProduct = async id => {
+    try {
+      const { data } = await Axios.get(orderEp + `/product/${id}`)
+      window.log(`Order/Campaign product response: `, data)
+      data && updateProduct(id, data)
+    } catch (error) {
+      handleError(error, true)
+    }
+  }
 
   const handleDeleteProduct = info => deleteProduct(info.id)
-  const handleComplete = info => updateProduct(info.id, { complete: true })
+  const handleCommonBoolUpdate = info => updateProduct(info.id, { [info.property]: info.value })
+  const refetchSingleOrderProduct = info => info.clientId === user.id && getSingleOrderProduct(info.id)
 
   const listenSocketIOEvents = () => {
     socketIO.on(keys.IO_EVENTS.ORDER_PRODUCT_DELETED, handleDeleteProduct)
-    socketIO.on(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMPLETE, handleComplete)
+    socketIO.on(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_REFETCH, refetchSingleOrderProduct)
+    socketIO.on(keys.IO_EVENTS.ORDER_PRODUCT_COMMON_BOOL_UPDATE, handleCommonBoolUpdate)
+    socketIO.on(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMMON_BOOL_UPDATE, handleCommonBoolUpdate)
   }
 
   const stopListeningSocketIOEvents = () => {
     socketIO.off(keys.IO_EVENTS.ORDER_PRODUCT_DELETED, handleDeleteProduct)
-    socketIO.off(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMPLETE, handleComplete)
+    socketIO.off(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_REFETCH, refetchSingleOrderProduct)
+    socketIO.off(keys.IO_EVENTS.ORDER_PRODUCT_COMMON_BOOL_UPDATE, handleCommonBoolUpdate)
+    socketIO.off(keys.IO_EVENTS.CLIENT_ORDER_PRODUCT_COMMON_BOOL_UPDATE, handleCommonBoolUpdate)
   }
 
   useMount(() => {
@@ -60,13 +83,42 @@ function CampaignManager(props) {
     )
   }
 
+  const getProductComponent = product => {
+    if (!product.setup_ready) {
+      return (
+        <Alert
+          showIcon
+          type="info"
+          message="Please wait until CMS setup or update the necessary configuration for this product."
+        />
+      )
+    }
+
+    const cProps = { product }
+    const type = product.product_info?.type
+    if (!type) {
+      return <Alert showIcon type="error" message="Something is wrong. Original product not found. Contact support." />
+    }
+
+    switch (type) {
+      case keys.PRODUCT_TYPES.google_tag:
+        return <GoogleTag {...props} {...cProps} />
+
+      default:
+        return <Alert showIcon type="error" message="Not implemented yet." />
+    }
+  }
+
   return (
     <>
       {products.map((product, index) => {
         const isFirstProduct = index === 0
         const isComplete = product.complete
+        const isSubmitted = product.submitted
+        const isApproved = product.approved
         const productId = product.id
         const productEp = orderEp + `/product/${productId}`
+        const common_disable = isComplete || isSubmitted || isApproved
 
         return (
           <Fade key={productId}>
@@ -75,7 +127,13 @@ function CampaignManager(props) {
               title={
                 <Space>
                   <b>{product.product_info?.name}</b>
-                  {isComplete && <Tag color="success">Complete</Tag>}
+                  {isComplete ? (
+                    <Tag color="success">Complete</Tag>
+                  ) : isApproved ? (
+                    <Tag color="success">Approved</Tag>
+                  ) : (
+                    <>{isSubmitted && <Tag color="processing">Submitted. Waiting for CMS to review.</Tag>}</>
+                  )}
                 </Space>
               }
               className={`mb-3 ${isFirstProduct ? 'mt-2' : ''}`}
@@ -83,18 +141,14 @@ function CampaignManager(props) {
               extra={
                 <Space size="middle">
                   <AsyncDeleteButton
-                    disabled={isComplete}
+                    disabled={common_disable}
                     endpoint={productEp}
                     onFinish={() => deleteProduct(productId)}
                   />
                 </Space>
               }
             >
-              {isComplete ? null : (
-                <>
-                  <pre>{JSON.stringify(product, null, 2)}</pre>
-                </>
-              )}
+              {isComplete ? null : <>{getProductComponent({ ...product, common_disable, productEp })}</>}
             </Card>
           </Fade>
         )

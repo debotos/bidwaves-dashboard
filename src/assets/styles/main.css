@@ -313,17 +313,17 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-.cta-btn,
-.cta-btn:focus,
-.cta-btn:hover,
-.cta-btn:active {
+.cta-btn:not(:disabled),
+.cta-btn:not(:disabled):focus,
+.cta-btn:not(:disabled):hover,
+.cta-btn:not(:disabled):active {
   background-color: var(--secondary-color);
   border-color: var(--secondary-color);
   transition: all 0.3s ease-in-out;
   color: #fff !important;
-  font-weight: bold;
+  font-weight: 500;
 }
-.cta-btn:hover {
+.cta-btn:not(:disabled):hover {
   transform: scale(1.1);
 }
 
@@ -336,12 +336,14 @@ a:hover,
   cursor: pointer;
   color: var(--primary-color) !important;
 }
-a.within,
+a.within {
+  color: #fff !important;
+}
 .ant-btn-link.within {
   color: var(--info-color) !important;
 }
 a.within:hover {
-  color: #fff !important;
+  color: var(--info-color) !important;
 }
 
 .min-w-93 {

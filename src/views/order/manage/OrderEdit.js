@@ -41,7 +41,7 @@ const OrderEdit = props => {
   return (
     <>
       <Row justify="center">
-        <Col span={24} md={14} xl={10} xxl={8}>
+        <Col span={24} md={14} xl={10} xxl={9}>
           <Form disabled={fetching} form={form} layout="vertical" initialValues={{ ...order }} onFinish={onEditFinish}>
             <Form.Item className="mt-4 flex justify-center">
               <Space align="center">
@@ -184,7 +184,8 @@ const OrderEdit = props => {
                     <Form.Item shouldUpdate={true} noStyle>
                       {() => {
                         const budget_amount = form.getFieldValue('budget_amount')
-                        if (!budget_amount || isEmpty(industry)) return null
+                        const industries = form.getFieldValue('industries')
+                        if (!budget_amount || isEmpty(industry) || isEmpty(industries)) return null
 
                         const visitors_count = Math.round(budget_amount / Number(industry.cpc))
                         const leads_count = Math.round((visitors_count * Number(industry.rate_pct)) / 100)

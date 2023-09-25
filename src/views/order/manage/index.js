@@ -107,6 +107,18 @@ const Manage = props => {
 
   if (isEmpty(order)) return getErrorAlert({ onRetry: getData })
 
+  const asyncUpdateProduct = async (productId, values) => {
+    try {
+      const req = await Axios.patch(orderEp + `/product/${productId}`, values)
+      const res = req.data
+      window.log(`Update order product response -> `, res)
+      message.success('Action successful.')
+      updateProduct(productId, res)
+    } catch (error) {
+      handleError(error, true)
+    }
+  }
+
   const cProps = {
     orderEp,
     fetching,
@@ -119,9 +131,11 @@ const Manage = props => {
     products,
     setProducts,
     updateProduct,
+    asyncUpdateProduct,
     deleteProduct,
     refetchProducts: getOrderProducts,
-    currentProductIds: products.map(x => x.productId)
+    getCurrentOrderedProductIds: () => products.map(x => x.id),
+    getCurrentProductIds: () => products.map(x => x.productId)
   }
 
   if (order.done) {

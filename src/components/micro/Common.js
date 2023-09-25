@@ -1,4 +1,5 @@
 import Fade from 'react-reveal/Fade'
+import { Link } from 'react-router-dom'
 import { Button, Empty, Popconfirm, Row, Spin, Tooltip } from 'antd'
 import {
   DeleteOutlined,
@@ -105,8 +106,22 @@ export const Logo = ({ light = false, width = 320, rowProps = {}, onClick }) => 
   )
 }
 
-export const CalenderLink = ({ label, href = links.calendar.to, qs = '' }) => (
-  <a href={href + qs} target="_blank" rel="noreferrer" className="within font-semibold text-[--secondary-color]">
-    {label || 'Click This'}
-  </a>
-)
+export const CalenderLink = ({ label, href = links.calendar.to, qs = '', asBtn, btnProps = {} }) => {
+  const path = href + qs
+
+  if (asBtn) {
+    return (
+      <Link to={path} target="_blank" rel="noopener noreferrer">
+        <Button shape="round" type="primary" size="large" className="" {...btnProps}>
+          {label || 'Need Help?'}
+        </Button>
+      </Link>
+    )
+  }
+
+  return (
+    <a href={path} target="_blank" rel="noreferrer" className="within font-semibold text-[--secondary-color]">
+      {label || 'Click This'}
+    </a>
+  )
+}

@@ -88,7 +88,7 @@ const Calculator = ({ embed }) => {
 
     cta_el = (
       <Button size="large" shape="round" className="cta-btn" loading={loading} onClick={handleStart}>
-        Start Your Campaign
+        <span className="font-bold">Start Your Campaign</span>
       </Button>
     )
   }
