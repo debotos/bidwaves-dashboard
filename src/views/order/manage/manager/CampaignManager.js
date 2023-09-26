@@ -3,8 +3,9 @@ import Axios from 'axios'
 import Fade from 'react-reveal/Fade'
 import { useSelector } from 'react-redux'
 import loadable from '@loadable/component'
-import { useMount, useUnmount } from 'ahooks'
-import { Alert, Card, Empty, Skeleton, Space, Tag } from 'antd'
+import { useMount, useSet, useUnmount } from 'ahooks'
+import { DownOutlined, UpOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Empty, Skeleton, Space, Tag, Tooltip } from 'antd'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
@@ -19,6 +20,7 @@ const GoogleTag = loadable(() => import('./products/GoogleTag'), loadableOptions
 function CampaignManager(props) {
   const { orderEp, fetching, fetchingProducts, refetchProducts, products, deleteProduct, updateProduct } = props
   const { user } = useSelector(state => state.auth)
+  const [set, { add, remove, reset }] = useSet([])
 
   const getSingleOrderProduct = async id => {
     try {
@@ -55,6 +57,7 @@ function CampaignManager(props) {
 
   useUnmount(() => {
     stopListeningSocketIOEvents()
+    reset()
   })
 
   if (fetching || fetchingProducts) {
@@ -116,6 +119,7 @@ function CampaignManager(props) {
   return (
     <>
       {products.map((product, index) => {
+        const isActive = set.has(product.id)
         const isFirstProduct = index === 0
         const isComplete = product.complete
         const isSubmitted = product.submitted
@@ -124,12 +128,21 @@ function CampaignManager(props) {
         const productEp = orderEp + `/product/${productId}`
         const common_disable = isComplete || isSubmitted || isApproved
 
+        const handleToggleView = e => {
+          e.stopPropagation()
+          if (isActive) {
+            remove(productId)
+          } else {
+            add(productId)
+          }
+        }
+
         return (
           <Fade key={productId}>
             <Card
               size="small"
               title={
-                <Space>
+                <Space onClick={handleToggleView} className="cursor-pointer">
                   <b>{product.product_info?.name}</b>
                   {isComplete ? (
                     <Tag color="success">Complete</Tag>
@@ -141,7 +154,7 @@ function CampaignManager(props) {
                 </Space>
               }
               className={`mb-3 ${isFirstProduct ? 'mt-2' : ''}`}
-              bodyStyle={isComplete ? { padding: 0 } : {}}
+              bodyStyle={isComplete || !isActive ? { padding: 0 } : {}}
               extra={
                 <Space size="middle">
                   <AsyncDeleteButton
@@ -149,10 +162,21 @@ function CampaignManager(props) {
                     endpoint={productEp}
                     onFinish={() => deleteProduct(productId)}
                   />
+                  {!isComplete && (
+                    <Tooltip title={isActive ? 'Click to hide' : 'Click to view'}>
+                      <Button
+                        size="small"
+                        icon={isActive ? <DownOutlined /> : <UpOutlined />}
+                        onClick={handleToggleView}
+                      />
+                    </Tooltip>
+                  )}
                 </Space>
               }
             >
-              {isComplete ? null : <>{getProductComponent({ ...product, common_disable, productEp })}</>}
+              {isComplete || !isActive ? null : (
+                <Fade>{getProductComponent({ ...product, common_disable, productEp })}</Fade>
+              )}
             </Card>
           </Fade>
         )
