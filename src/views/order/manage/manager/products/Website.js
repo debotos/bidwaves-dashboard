@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSafeState } from 'ahooks'
-import { Alert, Button, Col, Form, Input, Row, Tooltip, message } from 'antd'
+import { Alert, Button, Card, Col, Form, Input, Row, Space, Tooltip, Typography, message } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
 
 import { getCssVar, isEmpty } from 'helpers/utility'
@@ -11,7 +11,7 @@ function Website(props) {
   const [form] = Form.useForm()
   const { product, asyncUpdateProduct } = props
   const { data_obj } = product || {}
-  const { qa } = data_obj || {}
+  const { qa, records } = data_obj || {}
   const [loading, setLoading] = useSafeState(false)
   const [saving, setSaving] = useSafeState(false)
 
@@ -50,7 +50,13 @@ function Website(props) {
       {data_obj.cms_comment && <Alert className="my-3" message={data_obj.cms_comment} type="info" showIcon />}
 
       {!isEmpty(qa) && (
-        <Form form={form} layout="vertical" onFinish={handleSave} initialValues={product.data_obj ?? {}}>
+        <Form
+          form={form}
+          disabled={product.common_disable}
+          layout="vertical"
+          onFinish={handleSave}
+          initialValues={product.data_obj ?? {}}
+        >
           <Form.List name="qa">
             {fields => (
               <>
@@ -69,6 +75,12 @@ function Website(props) {
                             className="relative whitespace-pre-wrap rounded-lg border border-solid border-[--body-bg-color] bg-[--body-bg-color] px-4 py-3"
                           >
                             <Col flex={1}>
+                              {item.q ? (
+                                <p
+                                  className="m-0 text-center text-sm font-thin"
+                                  dangerouslySetInnerHTML={{ __html: item.q }}
+                                />
+                              ) : null}
                               <p className="m-0 font-semibold" dangerouslySetInnerHTML={{ __html: item.a }} />
                             </Col>
                             {item.copyable && (
@@ -166,21 +178,67 @@ function Website(props) {
         </Form>
       )}
 
-      <Row justify="center" className="mt-4">
-        <Col>
-          <Button
-            loading={loading}
-            disabled={product.common_disable}
-            shape="round"
-            onClick={handleSubmit}
-            type="primary"
-            size="large"
-            className="cta-btn"
-          >
-            I&apos;ve Done It
-          </Button>
-        </Col>
-      </Row>
+      {!isEmpty(records) && (
+        <Space direction="vertical" size="middle" className="w-100">
+          {records.map((record, index) => {
+            if (isEmpty(record) || isEmpty(record.rows)) return null
+            const cols = 24 / (Number(record.cols) || 3)
+            return (
+              <Card key={index} size="small" title={record.title ?? ''}>
+                {record.description && (
+                  <p className="text-sm" dangerouslySetInnerHTML={{ __html: record.description }} />
+                )}
+                <Space direction="vertical" className="w-100">
+                  {record.rows.map((row, rowIndex) => {
+                    if (isEmpty(row)) return null
+                    return (
+                      <Row key={rowIndex} gutter={[10, 10]} align={`middle`} wrap={true}>
+                        {row.map((col, colIndex) => {
+                          if (isEmpty(col) || isEmpty(col.value)) return null
+                          return (
+                            <Col key={colIndex} span={24} md={cols}>
+                              <Row wrap={false}>
+                                {col.label && (
+                                  <Col>
+                                    <p className="m-0 pr-2 font-bold">{col.label}:</p>
+                                  </Col>
+                                )}
+                                <Col flex={1}>
+                                  <Typography.Text copyable={!!col.copyable} code={!!col.code}>
+                                    {col.value}
+                                  </Typography.Text>
+                                </Col>
+                              </Row>
+                            </Col>
+                          )
+                        })}
+                      </Row>
+                    )
+                  })}
+                </Space>
+              </Card>
+            )
+          })}
+        </Space>
+      )}
+
+      {data_obj.show_cta && (
+        <Row justify="center" className="mt-4">
+          <Col>
+            <Button
+              loading={loading}
+              disabled={product.common_disable}
+              shape="round"
+              onClick={handleSubmit}
+              type="primary"
+              size="large"
+              className="cta-btn"
+            >
+              I&apos;ve Done It
+            </Button>
+          </Col>
+        </Row>
+      )}
 
       <p
         className="mb-3 mt-4 text-center text-lg font-medium"
@@ -191,7 +249,7 @@ function Website(props) {
         <Col>
           <CalenderLink
             asBtn={true}
-            qs={`?title=${encodeURIComponent('Let a Specialist Set Up Your Google Tags')}&subtitle=`}
+            qs={`?title=${encodeURIComponent('Great! Let Us Schedule a Call For Your Website')}&subtitle=`}
           />
         </Col>
       </Row>
