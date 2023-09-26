@@ -109,8 +109,7 @@ const Manage = props => {
 
   const asyncUpdateProduct = async (productId, values) => {
     try {
-      const req = await Axios.patch(orderEp + `/product/${productId}`, values)
-      const res = req.data
+      const { data: res } = await Axios.patch(orderEp + `/product/${productId}`, values)
       window.log(`Update order product response -> `, res)
       message.success('Action successful.')
       updateProduct(productId, res)

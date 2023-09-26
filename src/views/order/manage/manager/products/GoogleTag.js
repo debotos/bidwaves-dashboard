@@ -21,10 +21,10 @@ function GoogleTag(props) {
   const handleCopyClick = async () => {
     try {
       await navigator.clipboard.writeText(data_obj.script ?? '')
-      message.success('Script copied to clipboard.')
+      message.success('Script copied to the clipboard.')
     } catch (error) {
       console.error('Error copying script:', error)
-      message.error('Failed to copy script to clipboard.')
+      message.error('Failed to copy script to the clipboard.')
     }
   }
 

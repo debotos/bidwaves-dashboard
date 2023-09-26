@@ -24,7 +24,8 @@ const OrderQA = props => {
       const { id } = order
       const { data } = await Axios.patch(endpoints.order(id), values)
       window.log(`Update response -> `, data)
-      message.success('Action successful.')
+      const isSubmitAction = !!document.querySelector('.review-modal')
+      !isSubmitAction && message.success('Save successful.')
       updateOrder(data)
     } catch (error) {
       handleError(error, true)
@@ -34,8 +35,10 @@ const OrderQA = props => {
   }
 
   const confirmSubmitQA = () => {
+    form.submit()
     const { qa } = form.getFieldsValue(true)
     Modal.confirm({
+      className: 'review-modal',
       maskClosable: true,
       closable: true,
       title: 'Please review your answers',

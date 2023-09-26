@@ -13,6 +13,7 @@ import handleError from 'helpers/handleError'
 import { loadableOptions } from 'components/micro/Common'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
+const Website = loadable(() => import('./products/Website'), loadableOptions)
 const GoogleTag = loadable(() => import('./products/GoogleTag'), loadableOptions)
 
 function CampaignManager(props) {
@@ -103,6 +104,9 @@ function CampaignManager(props) {
     switch (type) {
       case keys.PRODUCT_TYPES.google_tag:
         return <GoogleTag {...props} {...cProps} />
+
+      case keys.PRODUCT_TYPES.website:
+        return <Website {...props} {...cProps} />
 
       default:
         return <Alert showIcon type="error" message="Not implemented yet." />
