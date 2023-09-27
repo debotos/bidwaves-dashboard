@@ -1,5 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
+import moment from 'moment'
 import Fade from 'react-reveal/Fade'
 import { useSelector } from 'react-redux'
 import loadable from '@loadable/component'
@@ -11,7 +12,7 @@ import keys from 'config/keys'
 import { socketIO } from 'App'
 import { isEmpty } from 'helpers/utility'
 import handleError from 'helpers/handleError'
-import { loadableOptions } from 'components/micro/Common'
+import { CalenderLink, loadableOptions } from 'components/micro/Common'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
 const Website = loadable(() => import('./products/Website'), loadableOptions)
@@ -119,6 +120,36 @@ function CampaignManager(props) {
       case keys.PRODUCT_TYPES.custom_graphics:
         return <CustomGraphics {...props} {...cProps} />
 
+      case keys.PRODUCT_TYPES.call_account_manager:
+      case keys.PRODUCT_TYPES.analytics_setup:
+      case keys.PRODUCT_TYPES.google_shop_campaigns_setup:
+      case keys.PRODUCT_TYPES.crm_integration_with_unbounce:
+      case keys.PRODUCT_TYPES.bing_import_from_google: {
+        let label = 'Schedule a Meeting'
+        let title = 'Schedule a Call With'
+        let subtitle = ''
+
+        switch (type) {
+          case keys.PRODUCT_TYPES.call_account_manager:
+            title = 'Schedule a Monthly Reoccurring Meeting'
+            subtitle = 'This will be sent to the calendar on the same day every month.'
+            break
+
+          default:
+            break
+        }
+
+        return (
+          <div className="my-3 flex justify-center">
+            <CalenderLink
+              asBtn={true}
+              label={label}
+              qs={`?title=${encodeURIComponent(title)}&subtitle=${encodeURIComponent(subtitle)}`}
+            />
+          </div>
+        )
+      }
+
       default:
         return <Alert showIcon type="error" message="Not implemented yet." />
     }
@@ -165,19 +196,24 @@ function CampaignManager(props) {
               bodyStyle={isComplete || !isActive ? { padding: 0 } : {}}
               extra={
                 <Space size="middle">
-                  <AsyncDeleteButton
-                    disabled={common_disable}
-                    endpoint={productEp}
-                    onFinish={() => deleteProduct(productId)}
-                  />
+                  <Tooltip title="Added">
+                    <p className="m-0 text-sm font-medium">{moment(product.createdAt).fromNow()}</p>
+                  </Tooltip>
                   {!isComplete && (
-                    <Tooltip title={isActive ? 'Click to hide' : 'Click to view'}>
-                      <Button
-                        size="small"
-                        icon={isActive ? <DownOutlined /> : <UpOutlined />}
-                        onClick={handleToggleView}
+                    <>
+                      <AsyncDeleteButton
+                        disabled={common_disable}
+                        endpoint={productEp}
+                        onFinish={() => deleteProduct(productId)}
                       />
-                    </Tooltip>
+                      <Tooltip title={isActive ? 'Click to hide' : 'Click to view'}>
+                        <Button
+                          size="small"
+                          icon={isActive ? <DownOutlined /> : <UpOutlined />}
+                          onClick={handleToggleView}
+                        />
+                      </Tooltip>
+                    </>
                   )}
                 </Space>
               }

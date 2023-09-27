@@ -1,8 +1,7 @@
 import Axios from 'axios'
 import React from 'react'
-import Fade from 'react-reveal/Fade'
-import { useSafeState } from 'ahooks'
-import { Alert, Button, Checkbox, Modal, Row, Upload, message } from 'antd'
+import { useSafeState, useSet, useUnmount } from 'ahooks'
+import { Alert, Button, Checkbox, Col, Modal, Row, Upload, message } from 'antd'
 import { CloudUploadOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 
 import handleError from 'helpers/handleError'
@@ -15,7 +14,6 @@ const getPhotosSkeletonObject = photos => {
     name: ``,
     status: 'done',
     url: photo.secure_url,
-    isFeature: !!photo.isFeature,
     public_id: photo.public_id
   }))
 }
@@ -23,17 +21,33 @@ const getPhotosSkeletonObject = photos => {
 function CustomGraphics(props) {
   const { orderEp, order, product, asyncUpdateProduct } = props
   const { data_obj } = product || {}
+  const { templates = [] } = data_obj || {}
   const [saving, setSaving] = useSafeState(false)
   const [preview, setPreview] = useSafeState(null)
   const [uploading, setUploading] = useSafeState(false)
   const [deletingId, setDeletingId] = useSafeState(null)
+  const [set, { add, remove, reset }] = useSet([])
+  const [selectedTemplate, { add: addTemplate, remove: removeTemplate, reset: resetTemplate }] = useSet([])
   const [fileList, setFileList] = useSafeState(getPhotosSkeletonObject(order.assets ?? []).reverse())
   const totalPhotos = fileList.length
 
-  const handleSave = async values => {
+  useUnmount(() => {
+    resetTemplate()
+    reset()
+  })
+
+  const handleSave = async () => {
     try {
       setSaving(true)
-      await asyncUpdateProduct(product.id, { submitted: true, data_obj: { ...data_obj, ...values } })
+      let cms_graphics = []
+      selectedTemplate.forEach(index => cms_graphics.push(templates[index]))
+      const selectedCustomUploadsKeyArr = Array.from(set)
+      const client_graphics = fileList.filter(x => selectedCustomUploadsKeyArr.includes(x.public_id))
+
+      await asyncUpdateProduct(product.id, {
+        submitted: true,
+        data_obj: { ...(data_obj ?? {}), final_graphics: { cms_graphics, client_graphics } }
+      })
     } finally {
       setSaving(false)
     }
@@ -51,18 +65,22 @@ function CustomGraphics(props) {
         const isLt = image.size / 1024 / 1024 <= 10
         if (!isLt) {
           error = `Image "${image.name}" size must be smaller than 10 MB.`
+        } else {
+          formData.append('assets', image)
         }
       })
 
       if (error) return message.error(error, 6)
 
-      formData.append('assets', images)
       const { data } = await Axios.post(orderEp + '/assets', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
       window.log(`Upload response -> `, data)
       setFileList(prevList => {
-        return [...prevList.filter(x => x.status !== 'uploading'), ...getPhotosSkeletonObject(data)]
+        return [
+          ...prevList.filter(x => x.status !== 'uploading'),
+          ...getPhotosSkeletonObject(data.filter(x => x.success).map(y => y.info))
+        ]
       })
       message.success('Upload successful.')
     } catch (error) {
@@ -75,10 +93,10 @@ function CustomGraphics(props) {
   const deleteImage = async public_id => {
     try {
       setDeletingId(public_id)
-      message.loading('Deleting file...', 0)
-      const { data } = await Axios.delete(orderEp + `/asset/${public_id}`)
+      const { data } = await Axios.delete(orderEp + `/asset/${encodeURIComponent(public_id)}`)
       window.log(`Delete response -> `, data)
-      setFileList(prevList => prevList.filter(x => x.uid !== deletingId))
+      setFileList(prevList => prevList.filter(x => x.uid !== public_id))
+      remove(public_id)
       message.success('Delete successful.')
     } catch (error) {
       handleError(error, true)
@@ -103,18 +121,21 @@ function CustomGraphics(props) {
   }
 
   const handlePreview = async file => {
-    if (!file.url && !file.preview) file.preview = await getBase64(file.originFileObj)
-    setPreview({ name: file.url || file.preview, url: file.name || file.url.substring(file.url.lastIndexOf('/') + 1) })
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj)
+    }
+    setPreview({ url: file.url || file.preview, name: file.name || file.url.substring(file.url.lastIndexOf('/') + 1) })
   }
 
-  const handleRemove = file => {
+  const handleRemove = async file => {
     if (!file?.uid) return
-    deleteImage(file.uid)
+    await deleteImage(file.uid)
   }
 
   const showConfirm = file => {
-    confirm({
-      title: 'Are you sure?',
+    return Modal.confirm({
+      title: `Are you sure it's not associated?`,
+      content: `Inside this campaign if this file is used in other places or associated with other products then those will be affect.`,
       icon: <QuestionCircleOutlined style={{ color: 'red' }} />,
       onOk: () => handleRemove(file),
       okType: 'danger',
@@ -123,16 +144,52 @@ function CustomGraphics(props) {
     })
   }
 
+  const totalSelected = set.size + selectedTemplate.size
+
   return (
     <>
       {data_obj.instruction_text && <p dangerouslySetInnerHTML={{ __html: data_obj.instruction_text }} />}
 
       {data_obj.cms_comment && <Alert className="mb-3" message={data_obj.cms_comment} type="info" showIcon />}
 
-      {totalPhotos ? <h3 className="mb-3 text-lg font-bold">Total ({totalPhotos})</h3> : null}
+      {!isEmpty(templates) && (
+        <>
+          <h3 className="mb-3 text-lg font-bold">Selectable Templates From CMS</h3>
+          <Row gutter={[16, 16]} className="mb-4">
+            {templates.map((template, index) => {
+              return (
+                <Col key={index}>
+                  <div>
+                    <a href={template.url} target="_blank" rel="noreferrer">
+                      <div className="relative h-28 w-28 cursor-pointer rounded-lg bg-gray-200">
+                        <img src={template.url} className="absolute h-full w-full rounded-lg object-cover" />
+                      </div>
+                    </a>
+                    <div className="mt-2 flex justify-center">
+                      <Checkbox
+                        disabled={product.common_disable}
+                        defaultChecked={selectedTemplate.has(index)}
+                        onChange={e => {
+                          e.stopPropagation()
+                          if (e.target.checked) {
+                            addTemplate(index)
+                          } else {
+                            removeTemplate(index)
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Col>
+              )
+            })}
+          </Row>
+        </>
+      )}
 
+      <h3 className="mb-3 text-lg font-bold">Your Uploads{totalPhotos ? <> ({totalPhotos})</> : null}</h3>
       <Upload
-        disabled={uploading}
+        disabled={product.common_disable || uploading}
         accept=".jpg, .jpeg, .png"
         listType="picture-card"
         fileList={fileList}
@@ -142,36 +199,50 @@ function CustomGraphics(props) {
         progress={{ status: 'active', showInfo: false, strokeWidth: 6 }}
         beforeUpload={() => false} /* To stop the default upload behavior */
         itemRender={(originNode, file) => {
+          const deleting = deletingId === file.uid
           return (
             <div>
-              <div style={{ width: 104, height: 104 }}>{originNode}</div>
+              <div className={`h-28`}>{originNode}</div>
               {file.status !== 'uploading' && (
-                <Row justify="center" className="mt-2">
-                  <Checkbox disabled={deletingId === file.uid} />
-                </Row>
+                <div className="mt-2 flex justify-center">
+                  <Checkbox
+                    disabled={deleting || product.common_disable}
+                    defaultChecked={set.has(file.uid)}
+                    onChange={e => {
+                      e.stopPropagation()
+                      if (e.target.checked) {
+                        add(file.uid)
+                      } else {
+                        remove(file.uid)
+                      }
+                    }}
+                  />
+                </div>
               )}
             </div>
           )
         }}
       >
-        <div>
-          <CloudUploadOutlined style={{ fontSize: 30 }} />
-          <div className="mt-2 font-bold">Upload</div>
-        </div>
+        {fileList.length >= 30 ? null : (
+          <div>
+            <CloudUploadOutlined style={{ fontSize: 30 }} />
+            <div className="mt-2 font-bold">Upload</div>
+          </div>
+        )}
       </Upload>
 
-      <Row justify={`center mb-2`}>
+      <Row justify={`center mt-5 mb-2`}>
         <Button
           shape="round"
           type="primary"
           htmlType="button"
           size="large"
           className="cta-btn"
-          disabled={product.common_disable}
+          disabled={product.common_disable || uploading || !totalSelected}
           loading={saving}
           onClick={handleSave}
         >
-          I&apos;ve Done It
+          I&apos;ve Selected {totalSelected ? totalSelected : ''}
         </Button>
       </Row>
 
@@ -179,13 +250,21 @@ function CustomGraphics(props) {
         <p className="text-center text-lg font-medium" dangerouslySetInnerHTML={{ __html: data_obj.help_text }} />
       )}
 
-      <Modal width="80%" open={!isEmpty(preview)} title="Image Preview" footer={null} onCancel={() => setPreview(null)}>
-        {!isEmpty(preview) && (
-          <Fade>
+      <Modal
+        style={{ top: 20 }}
+        width="80%"
+        open={!isEmpty(preview?.url)}
+        title="Image Preview"
+        footer={null}
+        destroyOnClose
+        onCancel={() => setPreview(null)}
+      >
+        {!isEmpty(preview?.url) && (
+          <>
             <Row justify="center" align="middle">
               <img alt={preview.name} style={{ maxWidth: '100%', height: 'auto' }} src={preview.url} />
             </Row>
-          </Fade>
+          </>
         )}
       </Modal>
     </>

@@ -80,7 +80,7 @@ function ListComponent({ reRender }) {
       let _ep = endpoints.orderBase
       // For pagination | After this portion '?' is always present
       const page = currentPage || state.paginationCurrentPage
-      const paginationQuery = `size=${state.paginationPageSize}&page=${page}`
+      const paginationQuery = `size=${state.paginationPageSize}&page=${page}&${keys.BOOL_COL_PREFIX}active=true`
       const paginationQueryPrefix = _ep.includes('?') ? '&' : '?'
       _ep += paginationQueryPrefix + paginationQuery
 
