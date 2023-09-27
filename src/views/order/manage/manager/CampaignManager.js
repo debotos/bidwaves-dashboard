@@ -15,7 +15,9 @@ import { loadableOptions } from 'components/micro/Common'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
 const Website = loadable(() => import('./products/Website'), loadableOptions)
+const CallRail = loadable(() => import('./products/CallRail'), loadableOptions)
 const GoogleTag = loadable(() => import('./products/GoogleTag'), loadableOptions)
+const CustomGraphics = loadable(() => import('./products/CustomGraphics'), loadableOptions)
 
 function CampaignManager(props) {
   const { orderEp, fetching, fetchingProducts, refetchProducts, products, deleteProduct, updateProduct } = props
@@ -110,6 +112,12 @@ function CampaignManager(props) {
 
       case keys.PRODUCT_TYPES.website:
         return <Website {...props} {...cProps} />
+
+      case keys.PRODUCT_TYPES.call_rail:
+        return <CallRail {...props} {...cProps} />
+
+      case keys.PRODUCT_TYPES.custom_graphics:
+        return <CustomGraphics {...props} {...cProps} />
 
       default:
         return <Alert showIcon type="error" message="Not implemented yet." />
