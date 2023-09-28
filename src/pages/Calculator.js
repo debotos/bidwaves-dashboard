@@ -256,12 +256,12 @@ const Calculator = ({ embed }) => {
                           )}
 
                           {cta_el}
-
-                          <p className="px-5 text-white">
-                            Are you spending more than $10,000 a month? <CalenderLink />
-                          </p>
                         </>
                       )}
+
+                      <p className="px-5 text-white">
+                        Are you spending more than $10,000 a month? <CalenderLink />
+                      </p>
                     </Space>
                   </div>
                 </div>
@@ -274,7 +274,7 @@ const Calculator = ({ embed }) => {
                 {enterpriseSelected ? (
                   <>
                     <h2 className="text-center">
-                      You spending more than $10,000 a month? <CalenderLink />
+                      You spending more than $10,000 a month? <CalenderLink anchorClassName="" />
                     </h2>
                   </>
                 ) : (

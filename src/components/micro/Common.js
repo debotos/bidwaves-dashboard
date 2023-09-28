@@ -106,7 +106,14 @@ export const Logo = ({ light = false, width = 320, rowProps = {}, onClick }) => 
   )
 }
 
-export const CalenderLink = ({ label, href = links.calendar.to, qs = '', asBtn, btnProps = {} }) => {
+export const CalenderLink = ({
+  label,
+  href = links.calendar.to,
+  qs = '',
+  asBtn,
+  btnProps = {},
+  anchorClassName = 'within text-[--secondary-color]'
+}) => {
   const path = href + qs
 
   if (asBtn) {
@@ -120,7 +127,7 @@ export const CalenderLink = ({ label, href = links.calendar.to, qs = '', asBtn, 
   }
 
   return (
-    <a href={path} target="_blank" rel="noreferrer" className="within font-semibold text-[--secondary-color]">
+    <a href={path} target="_blank" rel="noreferrer" className={`font-semibold ${anchorClassName || ''}`}>
       {label || 'Click This'}
     </a>
   )
