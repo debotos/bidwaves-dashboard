@@ -17,6 +17,7 @@ import { ctaLabel } from './OrderQA'
 
 const OrderNote = loadable(() => import('./note'), loadableOptions)
 const OrderQA = loadable(() => import('./OrderQA'), loadableOptions)
+const PaymentUI = loadable(() => import('./PaymentUI'), loadableOptions)
 const OrderEdit = loadable(() => import('./OrderEdit'), loadableOptions)
 const Video = loadable(() => import('components/micro/Video'), loadableOptions)
 // const OrderAssetList = loadable(() => import('./OrderAssetList'), loadableOptions)
@@ -137,8 +138,18 @@ const Manage = props => {
     getCurrentProductIds: () => products.map(x => x.productId)
   }
 
-  if (order.done) {
+  if (order.complete) {
     return <Alert message="This campaign has already been marked as complete!" type="success" showIcon />
+  } else if (!order.active) {
+    return <Alert message="This campaign is not active." type="warning" showIcon />
+  }
+
+  if (!isEmpty(order.pending_payment_info)) {
+    return (
+      <Fade>
+        <PaymentUI key={key} {...props} {...cProps} />
+      </Fade>
+    )
   }
 
   const noQA = isEmpty(order.qa)
