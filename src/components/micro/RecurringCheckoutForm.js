@@ -1,23 +1,39 @@
-import Axios from 'axios'
-import { useMount, useSafeState } from 'ahooks'
 import { useSelector } from 'react-redux'
 import { loadStripe } from '@stripe/stripe-js'
+import { useMount, useSafeState } from 'ahooks'
+import { Alert, Button, Row, Space } from 'antd'
 import { useStripe, useElements, Elements, PaymentElement, LinkAuthenticationElement } from '@stripe/react-stripe-js'
 
-import endpoints from 'config/endpoints'
+import keys from 'config/keys'
+import { links } from 'config/vars'
 import handleError from 'helpers/handleError'
-import { getCssVar, getErrorAlert, getReadableCurrency, renderLoading } from 'helpers/utility'
-import { Alert, Button, Row, Space } from 'antd'
+import { getCssVar, getErrorAlert, getReadableCurrency, renderLoading, sleep } from 'helpers/utility'
 
 // eslint-disable-next-line no-undef
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK)
 
-const PaymentForm = ({ onComplete, amount, clientSecret }) => {
+const PaymentForm = ({ onComplete, total, amount }) => {
   const stripe = useStripe()
   const elements = useElements()
+  const [fetching, setFetching] = useSafeState(true)
   const { user } = useSelector(state => state.auth)
   const [errorMsg, setErrorMsg] = useSafeState('')
   const [loading, setLoading] = useSafeState(false)
+
+  const getData = async () => {
+    try {
+      setFetching(true)
+      await sleep(2500)
+    } catch (error) {
+      handleError(error, true)
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  useMount(() => {
+    getData()
+  })
 
   const handleSubmit = async event => {
     try {
@@ -25,51 +41,26 @@ const PaymentForm = ({ onComplete, amount, clientSecret }) => {
       setLoading(true)
       setErrorMsg('')
 
-      if (!stripe || !elements) {
-        // Stripe.js has not yet loaded.
-        // Make sure to disable form submission until Stripe.js has loaded.
-        return
-      }
+      if (!stripe || !elements) return
 
-      // Create a PaymentMethod using the details
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
+      // Confirm the Payment
+      localStorage.setItem(keys.SHOW_PAYMENT_SUCCESS_PAGE, 'TRUE')
+      const { error } = await stripe.confirmPayment({
         elements,
-        params: {
-          billing_details: {
-            name: `${user.first_name} ${user.last_name} (ID: ${user.id})`
-          }
+        confirmParams: {
+          return_url: window.location.origin + links.paymentSuccess.to
         }
       })
 
       if (error) {
-        // This point is only reached if there's an immediate error when
-        // creating the PaymentMethod. Show the error to your customer (for example, payment details incomplete)
+        console.log({ error })
         setErrorMsg(error.message)
       } else {
-        console.log({ paymentMethod })
-      }
-
-      // Send the PaymentMethod ID to your server for additional logic and attach the PaymentMethod
-
-      // Confirm the PaymentIntent
-      const { error: confirmError } = await stripe.confirmPayment({
-        clientSecret,
-        confirmParams: {
-          return_url: 'https://example.com/order/123/complete'
-        }
-      })
-
-      if (confirmError) {
-        // This point is only reached if there's an immediate error when
-        // confirming the payment. Show the error to your customer (for example, payment details incomplete)
-        setErrorMsg(confirmError.message)
-      } else {
-        // The payment UI automatically closes with a success animation.
-        // Your customer is redirected to your `return_url`.
         onComplete?.()
       }
     } catch (error) {
-      handleError(error)
+      const { finalMsg } = handleError(error)
+      finalMsg && setErrorMsg(finalMsg)
     } finally {
       setLoading(false)
     }
@@ -78,62 +69,42 @@ const PaymentForm = ({ onComplete, amount, clientSecret }) => {
   const free = amount <= 0
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3">
-      <Space direction="vertical" size="middle" className="w-100">
-        <LinkAuthenticationElement options={{ defaultValues: { email: user.email } }} />
-        <PaymentElement
-          options={{
-            layout: { type: 'auto', defaultCollapsed: false, radios: false, spacedAccordionItems: true }
-          }}
-        />
-        <Row justify="center" className="mt-2">
-          <Button
-            block
-            type="primary"
-            htmlType="submit"
-            size="large"
-            // shape="round"
-            disabled={!stripe || !elements || free}
-            loading={loading}
-          >
-            <b>Pay&nbsp;&nbsp;{getReadableCurrency(amount)}</b>
-          </Button>
-        </Row>
-        {errorMsg && <Alert showIcon message={errorMsg} closable />}
-      </Space>
-    </form>
+    <>
+      {fetching && renderLoading({ className: 'mt-4 mb-2', tip: 'Loading Stripe...' })}
+      <form onSubmit={handleSubmit} className="mt-3">
+        <Space direction="vertical" size="middle" className="w-100">
+          <LinkAuthenticationElement options={{ defaultValues: { email: user.email } }} />
+          <PaymentElement
+            options={{
+              layout: { type: 'auto', defaultCollapsed: false, radios: false, spacedAccordionItems: true }
+            }}
+          />
+          {errorMsg && <Alert showIcon closable message={errorMsg} type="warning" />}
+          <Row justify="center" className="mt-2">
+            <Button
+              block
+              type="primary"
+              htmlType="submit"
+              size="large"
+              // shape="round"
+              disabled={!stripe || !elements || free}
+              loading={loading}
+            >
+              <b>Pay&nbsp;&nbsp;{getReadableCurrency(total)}</b>
+            </Button>
+          </Row>
+        </Space>
+      </form>
+    </>
   )
 }
 
 const RecurringCheckoutForm = props => {
-  const { order, total, list } = props
-  const amount = Number(total)
-  const [loading, setLoading] = useSafeState(true)
-  const [clientSecret, setClientSecret] = useSafeState(true)
+  const { order, total } = props
+  const amount = Number(total) * 100
+  const [clientSecret] = useSafeState(order.pending_payment_info?.clientSecret)
 
-  const getData = async () => {
-    try {
-      setLoading(true)
-      const { data: paymentIntentData } = await Axios.post(endpoints.orderBase + '/payment-intent', {
-        amount: amount * 100,
-        description: `${order.name} (ID: ${order.id})`,
-        details: list
-      })
-      const { client_secret } = paymentIntentData
-      setClientSecret(client_secret)
-    } catch (error) {
-      handleError(error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useMount(() => {
-    getData()
-  })
-
-  if (loading) return renderLoading({ className: 'my-5', tip: 'Loading Stripe...' })
-  if (!clientSecret) return getErrorAlert({ onRetry: getData })
+  if (!clientSecret) return getErrorAlert()
 
   return (
     <Elements
@@ -152,7 +123,7 @@ const RecurringCheckoutForm = props => {
         }
       }}
     >
-      <PaymentForm {...props} clientSecret={clientSecret} amount={amount} />
+      <PaymentForm {...props} amount={amount} />
     </Elements>
   )
 }

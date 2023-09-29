@@ -1,11 +1,11 @@
 import React from 'react'
 import { useSafeState } from 'ahooks'
-import { Alert, Button, Col, Empty, Modal, Row, Table } from 'antd'
+import { Alert, Button, Col, Empty, Modal, Row, Table, message } from 'antd'
 
 import { getReadableCurrency, isEmpty } from 'helpers/utility'
 import RecurringCheckoutForm from 'components/micro/RecurringCheckoutForm'
 
-function PaymentUI({ order }) {
+function PaymentUI({ refetch, order }) {
   const { pending_payment_info } = order || {}
   const [modal, showModal] = useSafeState(false)
   if (isEmpty(pending_payment_info)) return <Empty />
@@ -70,7 +70,16 @@ function PaymentUI({ order }) {
         footer={null}
         onCancel={() => showModal(false)}
       >
-        <RecurringCheckoutForm total={total} order={order} list={list} onComplete={() => {}} />
+        <RecurringCheckoutForm
+          total={total}
+          order={order}
+          list={list}
+          onComplete={() => {
+            message.success('Payment successful!')
+            showModal(false)
+            refetch()
+          }}
+        />
       </Modal>
     </>
   )
