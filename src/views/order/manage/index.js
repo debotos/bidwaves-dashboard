@@ -20,7 +20,6 @@ const OrderQA = loadable(() => import('./OrderQA'), loadableOptions)
 const PaymentUI = loadable(() => import('./PaymentUI'), loadableOptions)
 const OrderEdit = loadable(() => import('./OrderEdit'), loadableOptions)
 const Video = loadable(() => import('components/micro/Video'), loadableOptions)
-// const OrderAssetList = loadable(() => import('./OrderAssetList'), loadableOptions)
 const CampaignManager = loadable(() => import('./manager/CampaignManager'), loadableOptions)
 const ProductSuggestion = loadable(() => import('./suggestion/ProductSuggestion'), loadableOptions)
 

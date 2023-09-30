@@ -49,14 +49,5 @@ export default {
   },
   orderNote: function (orderId, id) {
     return `${this.orderNoteBase(orderId)}/${id}`
-  },
-  // Order Payment
-  orderPaymentBase: function (orderId) {
-    return `${this.order(orderId)}/payment`
-  },
-  // Coupon
-  couponBase: `${API_ENDPOINT_PREFIX}/coupon`,
-  coupon: function (id) {
-    return `${this.couponBase}/${id}`
   }
 }
