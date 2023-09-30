@@ -12,7 +12,7 @@ import { getCssVar, getErrorAlert, getReadableCurrency, renderLoading, sleep } f
 // eslint-disable-next-line no-undef
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PK)
 
-const PaymentForm = ({ onComplete, total, amount }) => {
+const PaymentForm = ({ order, onComplete, total, amount }) => {
   const stripe = useStripe()
   const elements = useElements()
   const [fetching, setFetching] = useSafeState(true)
@@ -48,12 +48,12 @@ const PaymentForm = ({ onComplete, total, amount }) => {
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + links.paymentSuccess.to
+          return_url: window.location.origin + links.paymentSuccess.to + `?orderId=${encodeURIComponent(order.id)}`
         }
       })
 
       if (error) {
-        console.log({ error })
+        window.log(error)
         setErrorMsg(error.message)
       } else {
         onComplete?.()
