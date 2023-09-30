@@ -1,16 +1,15 @@
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
 import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button } from 'antd'
+import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 
 import Manage from './manage'
 import keys from 'config/keys'
 import { message } from 'App'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
-import OrderPayment from './OrderPayment'
 import handleError from 'helpers/handleError'
 // import generateExcel from 'helpers/generateExcel'
 // import AsyncSwitch from 'components/micro/fields/AsyncSwitch'
@@ -25,7 +24,8 @@ import {
   defaultPaginationConfig,
   readableTime,
   // commonBoolColProps,
-  getOrderStatusColProps
+  getOrderStatusColProps,
+  sleep
 } from 'helpers/utility'
 
 const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
@@ -40,6 +40,9 @@ const defaultSearchField = searchableColumns[0].key
 function ListComponent({ reRender }) {
   const _isMounted = useRef(false)
   const navigate = useNavigate()
+  const { search } = useLocation()
+  const searchParams = new URLSearchParams(search)
+  const openOrderId = searchParams.get('open')
   const [state, setState] = useSetState({
     searchText: '',
     activeStatus: '',
@@ -120,6 +123,17 @@ function ListComponent({ reRender }) {
     }
   })
 
+  useUpdateEffect(() => {
+    ;(async () => {
+      if (!state.fetching && openOrderId) {
+        // After fetching finish
+        await sleep(500)
+        const el = document.getElementById(`order-${openOrderId}-config-btn`)
+        if (el) el.click()
+      }
+    })()
+  }, [state.fetching])
+
   useEffect(() => {
     if (_isMounted.current) getMainData()
   }, [state.paginationCurrentPage, state.paginationPageSize])
@@ -181,21 +195,9 @@ function ListComponent({ reRender }) {
     }
   }
 
-  const updateLocalStateDataList = (updates = {}) => {
-    setState(prevState => ({
-      ...prevState,
-      dataResponse: {
-        ...prevState.dataResponse,
-        list: prevState.dataResponse.list.map(x => {
-          if (x.id === updates.id) return { ...x, ...updates }
-          return x
-        })
-      }
-    }))
-  }
-
   const closeManageUI = () => {
     setState({ editingItem: null })
+    navigate(links.orders.to)
     getMainData()
   }
 
@@ -218,7 +220,7 @@ function ListComponent({ reRender }) {
     },
     { title: 'Added', dataIndex: 'createdAt', width: 140, render: value => readableTime(value), sorter: true },
     {
-      width: showOnlyCompleted ? 80 : 100,
+      width: showOnlyCompleted ? 70 : 90,
       fixed: 'right',
       title: 'Action',
       align: 'center',
@@ -234,12 +236,9 @@ function ListComponent({ reRender }) {
                 onClick={() => deleteListItem(id)}
               />
             </Col>
-            <Col>
-              <OrderPayment order={record} onOrderUpdate={updateLocalStateDataList} />
-            </Col>
             {!showOnlyCompleted && (
               <Col>
-                <ConfigButton onClick={() => setState({ editingItem: record })} />
+                <ConfigButton id={`order-${id}-config-btn`} onClick={() => setState({ editingItem: record })} />
               </Col>
             )}
           </Row>

@@ -3,7 +3,6 @@ import { Button, Col, Result, Row, message } from 'antd'
 import { useMount, useSafeState } from 'ahooks'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import keys from 'config/keys'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
 import { Page } from 'components/micro/Common'
@@ -21,8 +20,8 @@ export default function PaymentSuccess() {
   const [response, setResponse] = useSafeState(null)
   const [processing, setProcessing] = useSafeState(true)
 
-  const goToOrders = () => {
-    navigate(links.orders.to, { replace: true })
+  const goToOrders = (qs = '', state) => {
+    navigate(links.orders.to + qs, { replace: true, state })
   }
 
   const checkPaymentDone = async () => {
@@ -32,6 +31,11 @@ export default function PaymentSuccess() {
       const { data } = await Axios.post(ep + '/payment-success', { paymentIntent, clientSecret })
       window.log(`Payment success res:`, data)
       setResponse(data)
+      if (data.success) {
+        setTimeout(() => {
+          goToOrders(`?open=${encodeURIComponent(orderId)}`)
+        }, 2000)
+      }
     } catch (error) {
       handleError(error, true)
     } finally {
@@ -40,8 +44,7 @@ export default function PaymentSuccess() {
   }
 
   useMount(() => {
-    if (localStorage.getItem(keys.SHOW_PAYMENT_SUCCESS_PAGE) && orderId && clientSecret) {
-      // localStorage.removeItem(keys.SHOW_PAYMENT_SUCCESS_PAGE)
+    if (paymentIntent && clientSecret && orderId) {
       checkPaymentDone()
     } else {
       message.warning(`You're trying to access a restricted page with invalid data.`)
@@ -96,7 +99,7 @@ export default function PaymentSuccess() {
       return (
         <Result
           status="warning"
-          title="Try Again"
+          title="Try Again Or Contact CMS"
           subTitle={response.message}
           extra={[
             <Button type="primary" key="orders" onClick={() => goToOrders()}>

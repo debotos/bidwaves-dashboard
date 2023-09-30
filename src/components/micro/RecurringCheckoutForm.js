@@ -4,7 +4,6 @@ import { useMount, useSafeState } from 'ahooks'
 import { Alert, Button, Row, Space } from 'antd'
 import { useStripe, useElements, Elements, PaymentElement, LinkAuthenticationElement } from '@stripe/react-stripe-js'
 
-import keys from 'config/keys'
 import { links } from 'config/vars'
 import handleError from 'helpers/handleError'
 import { getCssVar, getErrorAlert, getReadableCurrency, renderLoading, sleep } from 'helpers/utility'
@@ -44,7 +43,6 @@ const PaymentForm = ({ order, onComplete, total, amount }) => {
       if (!stripe || !elements) return
 
       // Confirm the Payment
-      localStorage.setItem(keys.SHOW_PAYMENT_SUCCESS_PAGE, 'TRUE')
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -56,7 +54,7 @@ const PaymentForm = ({ order, onComplete, total, amount }) => {
         window.log(error)
         setErrorMsg(error.message)
       } else {
-        onComplete?.()
+        onComplete?.() // Will never reach here because of return_url
       }
     } catch (error) {
       const { finalMsg } = handleError(error)
@@ -80,19 +78,21 @@ const PaymentForm = ({ order, onComplete, total, amount }) => {
             }}
           />
           {errorMsg && <Alert showIcon closable message={errorMsg} type="warning" />}
-          <Row justify="center" className="mt-2">
-            <Button
-              block
-              type="primary"
-              htmlType="submit"
-              size="large"
-              // shape="round"
-              disabled={!stripe || !elements || free}
-              loading={loading}
-            >
-              <b>Pay&nbsp;&nbsp;{getReadableCurrency(total)}</b>
-            </Button>
-          </Row>
+          {!fetching && (
+            <Row justify="center" className="mt-2">
+              <Button
+                block
+                type="primary"
+                htmlType="submit"
+                size="large"
+                // shape="round"
+                disabled={!stripe || !elements || free}
+                loading={loading}
+              >
+                <b>Pay&nbsp;&nbsp;{getReadableCurrency(total)}</b>
+              </Button>
+            </Row>
+          )}
         </Space>
       </form>
     </>
