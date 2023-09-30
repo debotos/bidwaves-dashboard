@@ -64,12 +64,12 @@ function CampaignManager(props) {
   })
 
   if (fetching || fetchingProducts) {
-    return Array(8)
+    return Array(9)
       .fill()
       .map((_, i) => (
         <Fade key={i}>
           <Card size="small" className={`mb-3 ${i === 0 ? 'mt-2' : ''}`}>
-            <Skeleton.Button active={true} size="large" block={true} style={{ height: 100 }} />
+            <Skeleton.Button active={true} size="large" block={true} style={{ height: 20 }} />
           </Card>
         </Fade>
       ))
