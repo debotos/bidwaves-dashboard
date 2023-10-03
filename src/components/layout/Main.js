@@ -7,6 +7,7 @@ import Footer from './Footer'
 import Sidenav from './Sidenav'
 
 import { toggleSidebar } from 'redux/slices/themeSlice'
+import { renderPublicLinks } from 'components/micro/PublicHeader'
 
 function Main() {
   const dispatch = useDispatch()
@@ -27,16 +28,16 @@ function Main() {
     <>
       {renderBackdrop()}
       <Layout hasSider className="app-bg">
-        <div className="absolute z-50 md:relative md:shadow">
+        <div className="absolute z-50 md:relative">
           <Affix offsetTop={0}>
             <Layout.Sider
               collapsible
-              width={250}
+              width={270}
               theme="light"
               trigger={null}
               collapsedWidth="0"
               collapsed={!showSidebar}
-              className="app-bg"
+              className="bg-white"
             >
               <Sidenav />
             </Layout.Sider>
@@ -45,14 +46,17 @@ function Main() {
 
         <Layout className="app-bg flex min-h-screen flex-col">
           <Affix offsetTop={0}>
-            <Layout.Header theme="light" className="app-bg h-16 px-4 shadow">
+            <Layout.Header theme="light" className="h-16 bg-[--secondary-color] px-5">
               <Header />
             </Layout.Header>
           </Affix>
-          <Layout.Content className="app-bg flex-grow px-4 py-2">
+          <Layout.Content className="app-bg flex-grow px-5 py-2">
             <Outlet />
           </Layout.Content>
-          <Layout.Footer className="app-bg h-[48px] w-full px-4 py-3">
+          <div className="flex justify-center bg-[--secondary-color] p-6 lg:hidden">
+            {renderPublicLinks({ spaceProps: { direction: 'vertical', size: 16, align: 'center' }, showAlways: true })}
+          </div>
+          <Layout.Footer className="app-bg h-[48px] w-full px-5 py-3">
             <Footer />
           </Layout.Footer>
         </Layout>

@@ -260,6 +260,17 @@ body::-webkit-scrollbar {
   border-inline-end: none !important;
 }
 
+.ant-menu-item {
+  padding: 22px 0;
+}
+
+.ant-menu-item:hover,
+.ant-menu-item:active,
+.ant-menu-item.ant-menu-item-selected {
+  background-color: transparent !important;
+  font-weight: 500 !important;
+}
+
 .custom-dragger .ant-upload-wrapper {
   width: 100% !important;
 }

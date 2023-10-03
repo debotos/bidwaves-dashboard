@@ -210,7 +210,7 @@ function ListComponent({ reRender }) {
       sorter: true,
       render: val => <span className="font-bold text-[--primary-color]">{val}</span>
     },
-    { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: undefined },
+    { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: 300, align: undefined },
     {
       title: 'Last Updated',
       dataIndex: 'updatedAt',
@@ -253,7 +253,7 @@ function ListComponent({ reRender }) {
   return (
     <>
       <h2 className="mb-1">Here Are Your Open Campaigns</h2>
-      <p className="mb-4">Manage all your campaigns from here</p>
+      <p className="mb-4">Manage all your campaigns from here.</p>
       <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4">
         <Col>
           <Space>

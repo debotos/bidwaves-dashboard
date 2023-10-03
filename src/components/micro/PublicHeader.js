@@ -16,6 +16,22 @@ const anchors = [
   { label: 'Book a Demo', link: linkHome + `/book-a-demo` }
 ]
 
+export const renderPublicLinks = ({ screens, direction, showAlways, size, spaceProps = {} } = {}) => {
+  return (
+    <Col className={showAlways ? '' : 'hidden lg:block'}>
+      <Space size={size ?? (screens?.lg ? 50 : 30)} direction={direction} {...spaceProps}>
+        {anchors.map((anchor, i) => {
+          return (
+            <a key={i} rel="noreferrer" target="_blank" href={anchor.link} className="within">
+              {anchor.label}
+            </a>
+          )
+        })}
+      </Space>
+    </Col>
+  )
+}
+
 const PublicHeader = () => {
   const navigate = useNavigate()
   const screens = useBreakpoint()
@@ -34,17 +50,7 @@ const PublicHeader = () => {
             <Col>
               <Logo light={true} width={150} rowProps={{ className: '' }} onClick={() => navigate(links.orders.to)} />
             </Col>
-            <Col className="hidden lg:block">
-              <Space size={screens.lg ? 50 : 30}>
-                {anchors.map((anchor, i) => {
-                  return (
-                    <a key={i} rel="noreferrer" target="_blank" href={anchor.link} className="within">
-                      {anchor.label}
-                    </a>
-                  )
-                })}
-              </Space>
-            </Col>
+            {renderPublicLinks({ screens })}
             {isAuthenticated ? (
               <ProfileDropdown />
             ) : (

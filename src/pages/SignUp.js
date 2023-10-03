@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Link, useLocation } from 'react-router-dom'
-import { Row, Button, Form, Input, Typography, Col, Steps, Space, message, Tooltip } from 'antd'
+import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip } from 'antd'
 import {
   LockOutlined,
   SendOutlined,
@@ -239,61 +239,74 @@ function SignUp() {
 
   return (
     <Page>
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="w-full max-w-4xl p-4">
-          <Row justify="center" className="mt-4 py-4">
-            <Logo />
+      <div className="flex min-h-screen items-center justify-center py-5">
+        <div className="mx-5 flex w-full max-w-5xl flex-col justify-center rounded-lg bg-[--secondary-color] p-8 align-middle text-white lg:mb-10">
+          <Row justify="center" className="my-0">
+            <Logo light rowProps={{ className: 'my-0' }} />
           </Row>
 
-          <Typography.Title level={1}>Sign Up</Typography.Title>
+          <h1 className="mb-4 text-center">Sign Up</h1>
 
-          <Form
-            form={form}
-            size="large"
-            className="mt-4"
-            name="signup-form"
-            onFinish={onFinish}
-            onValuesChange={(_, _values) => {
-              setValues(_values)
-            }}
-          >
+          <div className="rounded-xl bg-white px-4 py-3">
             <Steps current={current} items={items} />
-            <div className="min-h-300 my-5">{steps[current].content}</div>
-            <Row align="middle" justify="center" className="mt-4">
-              <Space>
-                {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
+          </div>
 
-                {current < steps.length - 1 && (
-                  <Button
-                    type="primary"
-                    onClick={async () => {
-                      const { errorFields } = await form.validateFields()
-                      const hasError = errorFields?.filter(({ errors }) => errors.length).length
-                      if (!hasError) next()
-                    }}
-                  >
-                    Next
-                  </Button>
-                )}
+          <div className="w-100 flex justify-center">
+            <div className="w-full max-w-3xl text-white">
+              <Form
+                form={form}
+                size="large"
+                className="mt-3"
+                name="signup-form"
+                onFinish={onFinish}
+                onValuesChange={(_, _values) => {
+                  setValues(_values)
+                }}
+              >
+                <div className="min-h-300 my-5">{steps[current].content}</div>
+                <Row align="middle" justify="center" className="mt-4">
+                  <Space>
+                    {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
 
-                {current === steps.length - 1 && (
-                  <Button block type="primary" htmlType="submit" icon={<SendOutlined rotate={-40} />} loading={loading}>
-                    Submit
-                  </Button>
-                )}
-              </Space>
-            </Row>
-          </Form>
+                    {current < steps.length - 1 && (
+                      <Button
+                        type="primary"
+                        onClick={async () => {
+                          const { errorFields } = await form.validateFields()
+                          const hasError = errorFields?.filter(({ errors }) => errors.length).length
+                          if (!hasError) next()
+                        }}
+                      >
+                        Next
+                      </Button>
+                    )}
 
-          <Row justify="center" className="mt-3">
-            <Col>
-              <Link to={links.login.to} state={state}>
-                <Button type="link" className="pl-0">
-                  Already have an account?
-                </Button>
-              </Link>
-            </Col>
-          </Row>
+                    {current === steps.length - 1 && (
+                      <Button
+                        block
+                        type="primary"
+                        htmlType="submit"
+                        icon={<SendOutlined rotate={-40} />}
+                        loading={loading}
+                      >
+                        Submit
+                      </Button>
+                    )}
+                  </Space>
+                </Row>
+              </Form>
+
+              <Row justify="center" className="mt-3">
+                <Col>
+                  <Link to={links.login.to} state={state}>
+                    <Button type="link" className="within pl-0">
+                      Already have an account?
+                    </Button>
+                  </Link>
+                </Col>
+              </Row>
+            </div>
+          </div>
         </div>
       </div>
     </Page>

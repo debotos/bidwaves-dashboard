@@ -270,7 +270,7 @@ const Calculator = ({ embed }) => {
           </Col>
           <Col span={24} lg={embed ? 13 : 12}>
             <div className={`${embed ? '' : 'pt-6 lg:pt-16'}`}>
-              <div className={`px-4 py-5 pb-16 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
+              <div className={`px-0 py-5 pb-16 md:px-4 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
                 {enterpriseSelected ? (
                   <>
                     <h2 className="text-center">

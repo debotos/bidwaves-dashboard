@@ -201,7 +201,7 @@ const Manage = props => {
     },
     ...(noQA ? [] : [{ label: 'Campaign QA', key: 'campaign_qa', children: QA_UI }]),
     {
-      label: 'Product Suggestion',
+      label: 'Add Product To This Campaign',
       key: suggestion_tab_key,
       children: (
         <Fade>
@@ -210,7 +210,7 @@ const Manage = props => {
       )
     },
     {
-      label: 'Campaign Update',
+      label: 'Update Campaign',
       key: 'campaign_update',
       children: (
         <Fade>
