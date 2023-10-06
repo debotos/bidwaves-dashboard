@@ -4,6 +4,7 @@ import { Button, Empty, Popconfirm, Row, Spin, Tooltip } from 'antd'
 import {
   DeleteOutlined,
   EditOutlined,
+  EyeOutlined,
   FileExcelFilled,
   QuestionCircleOutlined,
   SettingOutlined,
@@ -28,30 +29,42 @@ export const DeleteIcon = props => {
   } = props
   const btn = <Button loading={loading} disabled={disabled} danger size="small" icon={icon ?? <DeleteOutlined />} />
   return (
-    <Popconfirm
-      icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-      title={title}
-      placement={placement}
-      okText="Yes"
-      cancelText="No"
-      onConfirm={onClick}
-      disabled={loading || disabled}
-    >
-      {tooltip ? (
-        <Tooltip placement={placement} title={tooltip}>
-          {btn}
-        </Tooltip>
-      ) : (
-        btn
-      )}
-    </Popconfirm>
+    <div onClick={e => e.stopPropagation()}>
+      <Popconfirm
+        icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+        title={title}
+        placement={placement}
+        okText="Yes"
+        cancelText="No"
+        onConfirm={onClick}
+        disabled={loading || disabled}
+      >
+        {tooltip ? (
+          <Tooltip placement={placement} title={tooltip}>
+            {btn}
+          </Tooltip>
+        ) : (
+          btn
+        )}
+      </Popconfirm>
+    </div>
   )
 }
 
-export const ConfigButton = ({ title = 'Manage', ...restProps }) => {
+export const ConfigButton = ({ title = 'Manage', viewIcon = false, ...restProps }) => {
   return (
     <Tooltip title={title}>
-      <Button size="small" icon={<SettingOutlined />} {...restProps} />
+      <Button size="small" icon={viewIcon ? <EyeOutlined /> : <SettingOutlined />} {...restProps} />
+    </Tooltip>
+  )
+}
+
+export const ViewButton = ({ title = 'View to manage this campaign', label = 'View', ...restProps }) => {
+  return (
+    <Tooltip title={title} placement="left">
+      <Button size="small" icon={<EyeOutlined />} {...restProps}>
+        {label}
+      </Button>
     </Tooltip>
   )
 }

@@ -1,8 +1,8 @@
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button } from 'antd'
+import { BellOutlined, CaretDownFilled, InfoCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button, Tooltip, Badge } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 
 import Manage from './manage'
@@ -15,7 +15,7 @@ import handleError from 'helpers/handleError'
 // import AsyncSwitch from 'components/micro/fields/AsyncSwitch'
 import {
   DeleteIcon,
-  ConfigButton,
+  ViewButton,
   // ExportButton,
   RefreshButton
 } from 'components/micro/Common'
@@ -208,7 +208,16 @@ function ListComponent({ reRender }) {
       title: 'Name',
       dataIndex: 'name',
       sorter: true,
-      render: val => <span className="font-bold text-[--primary-color]">{val}</span>
+      render: (val, record) => {
+        return (
+          <Space>
+            <span className={`${!record.approved ? '' : 'cursor-pointer'} font-bold text-[--primary-color]`}>
+              {val}
+            </span>
+            {getOrderNotification(record)}
+          </Space>
+        )
+      }
     },
     { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: 300, align: undefined },
     {
@@ -220,12 +229,19 @@ function ListComponent({ reRender }) {
     },
     { title: 'Added', dataIndex: 'createdAt', width: 140, render: value => readableTime(value), sorter: true },
     {
-      width: showOnlyCompleted ? 70 : 90,
+      width: showOnlyCompleted ? 70 : 130,
       fixed: 'right',
       title: 'Action',
       align: 'center',
       dataIndex: 'action',
       render: (_, record) => {
+        if (!record.approved) {
+          return (
+            <Tooltip title="Please wait for CMS to review." placement="left">
+              <InfoCircleOutlined className="cursor-pointer" />
+            </Tooltip>
+          )
+        }
         const { id } = record
         return (
           <Row justify="space-around">
@@ -238,7 +254,12 @@ function ListComponent({ reRender }) {
             </Col>
             {!showOnlyCompleted && (
               <Col>
-                <ConfigButton id={`order-${id}-config-btn`} onClick={() => setState({ editingItem: record })} />
+                <ViewButton
+                  type="primary"
+                  disabled={!record.approved}
+                  id={record.approved ? `order-${id}-config-btn` : ''}
+                  onClick={() => setState({ editingItem: record })}
+                />
               </Col>
             )}
           </Row>
@@ -336,6 +357,13 @@ function ListComponent({ reRender }) {
         size="small"
         className="mb-4"
         onChange={onTableChange}
+        onRow={record => {
+          if (!record.approved) return { className: 'cursor-not-allowed opacity-50' }
+          return {
+            className: 'cursor-pointer',
+            onClick: () => setState({ editingItem: record })
+          }
+        }}
         pagination={{
           ...defaultPaginationConfig,
           hideOnSinglePage: true,
@@ -375,3 +403,29 @@ function ListComponent({ reRender }) {
 }
 
 export default ListComponent
+
+const getOrderNotification = order => {
+  if (!order) return null
+  if (!order.approved) return null
+
+  let title
+
+  if (!order.qa_submitted && !isEmpty(order.qa)) {
+    title = 'Please review the questionnaire and submit.'
+  } else if (order.qa_approved && isEmpty(order.products)) {
+    title = 'Please add at least one product in this campaign to continue.'
+  } else if (order.qa_approved && !isEmpty(order.products)) {
+    if (order.products.some(x => x.setup_ready && !x.submitted)) {
+      title = 'CMS added necessary configuration for this campaign product(s). Please review and take action.'
+    }
+  }
+
+  if (!title) return null
+  return (
+    <Tooltip title={title}>
+      <Badge dot={true}>
+        <BellOutlined />
+      </Badge>
+    </Tooltip>
+  )
+}

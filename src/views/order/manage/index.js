@@ -137,6 +137,25 @@ const Manage = props => {
     getCurrentProductIds: () => products.map(x => x.productId)
   }
 
+  const noQA = isEmpty(order.qa)
+  const showOnlyQaUI = !order.qa_approved && !noQA
+
+  const refreshBtnEl = (
+    <RefreshButton>
+      <Button
+        type="dashed"
+        onClick={() => {
+          getData()
+          !showOnlyQaUI && getOrderProducts()
+        }}
+        loading={fetching}
+        icon={<ReloadOutlined />}
+      >
+        Refresh
+      </Button>
+    </RefreshButton>
+  )
+
   if (order.complete) {
     return <Alert message="This campaign has already been marked as complete!" type="success" showIcon />
   } else if (!order.active) {
@@ -151,16 +170,16 @@ const Manage = props => {
     )
   }
 
-  const noQA = isEmpty(order.qa)
   const QA_UI = (
     <Fade>
-      <OrderQA {...props} {...cProps} />
+      <OrderQA key={key} {...props} {...cProps} />
     </Fade>
   )
 
-  if (!order.qa_approved && !noQA) {
+  if (showOnlyQaUI) {
     return (
       <>
+        {refreshBtnEl}
         <Alert
           className="mb-3 mt-2"
           message={
@@ -199,7 +218,7 @@ const Manage = props => {
         </>
       )
     },
-    ...(noQA ? [] : [{ label: 'Campaign QA', key: 'campaign_qa', children: QA_UI }]),
+    // ...(noQA ? [] : [{ label: 'Campaign QA', key: 'campaign_qa', children: QA_UI }]),
     {
       label: 'Add Product To This Campaign',
       key: suggestion_tab_key,
@@ -210,7 +229,7 @@ const Manage = props => {
       )
     },
     {
-      label: 'Update Campaign Request',
+      label: 'Update Campaign Information',
       key: 'campaign_update',
       children: (
         <Fade>
@@ -232,19 +251,7 @@ const Manage = props => {
         items={items}
       />
 
-      <RefreshButton>
-        <Button
-          type="dashed"
-          onClick={() => {
-            getData()
-            getOrderProducts()
-          }}
-          loading={fetching}
-          icon={<ReloadOutlined />}
-        >
-          Refresh
-        </Button>
-      </RefreshButton>
+      {refreshBtnEl}
 
       {order.video_guide ? <Video url={order.video_guide} /> : null}
     </>

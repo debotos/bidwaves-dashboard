@@ -195,7 +195,7 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
                       }
                     }}
                   >
-                    Add
+                    Add This Product
                   </Button>
                 </Tooltip>
               </Col>
@@ -204,7 +204,7 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
               <>
                 <Col>
                   <DeleteIcon
-                    tooltip="Remove Recommendation"
+                    tooltip="Remove this recommendation"
                     icon={<ClearOutlined />}
                     loading={state.idDeleting === id}
                     title={`Sure to remove this product recommendation?`}

@@ -2,7 +2,7 @@ import Axios from 'axios'
 import styled from 'styled-components'
 import { useSafeState } from 'ahooks'
 import { SendOutlined } from '@ant-design/icons'
-import { Alert, Avatar, Button, Col, Form, Input, Popconfirm, Row, Slider, Space, Tooltip } from 'antd'
+import { Alert, Avatar, Button, Col, Collapse, Form, Input, Popconfirm, Row, Slider, Space, Tooltip } from 'antd'
 
 import { message } from 'App'
 import keys from 'config/keys'
@@ -12,6 +12,7 @@ import RichTextEditor from 'components/micro/fields/TextEditor'
 import { getCssVar, getReadableCurrency, isEmpty } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
+const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 3}`
 const valClass = 'm-0 whitespace-nowrap font-bold text-[--primary-color] lg:text-2xl'
 
 const OrderEdit = props => {
@@ -59,16 +60,16 @@ const OrderEdit = props => {
         />
       )}
 
+      <Row justify={`center`} className="my-3">
+        <Space align="center">
+          <Avatar size="large" src={order.advertisement_info?.image?.secure_url} />
+          <h5 className="m-0 text-4xl font-bold">{order.advertisement_info?.name}</h5>
+        </Space>
+      </Row>
+
       <Form disabled={cDisabled} form={form} layout="vertical" initialValues={{ ...order }} onFinish={onEditFinish}>
         <Row gutter={[30, 20]}>
           <Col span={24} lg={14}>
-            <Form.Item className="mt-4 flex justify-center">
-              <Space align="center">
-                <Avatar size="large" src={order.advertisement_info?.image?.secure_url} />
-                <h5 className="m-0 text-4xl font-bold">{order.advertisement_info?.name}</h5>
-              </Space>
-            </Form.Item>
-
             <Form.Item
               label="Name"
               name="name"
@@ -257,11 +258,78 @@ const OrderEdit = props => {
                 )
               }}
             </Form.Item>
+
+            {!isEmpty(order.qa) && (
+              <Collapse>
+                <Collapse.Panel
+                  header={<>Questionnaire</>}
+                  key="qa"
+                  style={{ borderRadius: 6 }}
+                  className={getCPanelClass(false)}
+                >
+                  <Form.List name="qa">
+                    {fields => (
+                      <>
+                        {fields.map(({ key, name, ...restField }, index) => {
+                          const q = order.qa[index].q
+                          return (
+                            <Row
+                              key={key}
+                              align="middle"
+                              className="mb-3 rounded-lg border-2 border-solid border-[--body-bg-color] px-2 py-3"
+                              wrap={false}
+                              gutter={[10, 0]}
+                            >
+                              <Col flex={1}>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'q']}
+                                  rules={[{ whitespace: true, message: 'Space not allowed!' }]}
+                                  noStyle
+                                >
+                                  <Input.TextArea
+                                    readOnly={true}
+                                    disabled={true}
+                                    hidden={true}
+                                    style={{ height: 0, width: 0, opacity: 0 }}
+                                    className="pointer-events-none"
+                                    rows={1}
+                                    allowClear
+                                    maxLength={500}
+                                    showCount
+                                    placeholder="Question"
+                                  />
+                                </Form.Item>
+                                <h4>{q}</h4>
+                                <Form.Item
+                                  {...restField}
+                                  name={[name, 'a']}
+                                  rules={[{ whitespace: true, message: 'Space not allowed!' }]}
+                                >
+                                  <Input.TextArea
+                                    className="mt-2"
+                                    rows={1}
+                                    allowClear
+                                    maxLength={1000}
+                                    showCount
+                                    placeholder="Answer"
+                                  />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          )
+                        })}
+                      </>
+                    )}
+                  </Form.List>
+                </Collapse.Panel>
+              </Collapse>
+            )}
           </Col>
 
           <Col span={24} lg={10}>
             <Form.Item
-              label="Comment/Note Regarding This Update"
+              label="Comment/Note Regarding This Update Request"
               name="comment_note"
               rules={[{ whitespace: true, message: 'Provide Comment/Note!' }]}
             >

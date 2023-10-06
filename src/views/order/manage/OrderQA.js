@@ -51,10 +51,10 @@ const OrderQA = props => {
               const serial = i + 1
               return (
                 <div key={i} className="rounded bg-gray-100 px-3 py-2">
-                  <div className="text-sm font-medium text-gray-500">
+                  <div className="text-xs font-medium text-gray-500">
                     Question {serial}: <div dangerouslySetInnerHTML={{ __html: x.q }} />
                   </div>
-                  <div className={`mt-1 text-sm font-semibold ${x.a ? 'text-gray-500' : 'text-red-600'}`}>
+                  <div className={`mt-1 text-xs font-semibold ${x.a ? 'text-gray-600' : 'text-red-600'}`}>
                     Answer {serial}: <div dangerouslySetInnerHTML={{ __html: x.a ?? 'Not answered.' }} />
                   </div>
                 </div>
