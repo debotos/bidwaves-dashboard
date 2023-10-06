@@ -210,7 +210,7 @@ const Manage = props => {
       )
     },
     {
-      label: 'Update Campaign',
+      label: 'Update Campaign Request',
       key: 'campaign_update',
       children: (
         <Fade>

@@ -1,13 +1,14 @@
 import Axios from 'axios'
 import styled from 'styled-components'
 import { useSafeState } from 'ahooks'
-import { SaveOutlined } from '@ant-design/icons'
-import { Avatar, Button, Col, Form, Input, Row, Slider, Space, Tooltip } from 'antd'
+import { SendOutlined } from '@ant-design/icons'
+import { Alert, Avatar, Button, Col, Form, Input, Popconfirm, Row, Slider, Space, Tooltip } from 'antd'
 
 import { message } from 'App'
 import keys from 'config/keys'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
+import RichTextEditor from 'components/micro/fields/TextEditor'
 import { getCssVar, getReadableCurrency, isEmpty } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
@@ -24,8 +25,14 @@ const OrderEdit = props => {
     try {
       setUpdating(true)
       const { id } = order
-      window.log(`Update postData -> `, values)
-      const { data } = await Axios.patch(endpoints.order(id), values)
+
+      const comment_note = values.comment_note
+      delete values.comment_note
+      const postData = {
+        pending_updates: { comment_note, update: values, details: { budget, industry } }
+      }
+      window.log(`Update postData -> `, postData)
+      const { data } = await Axios.patch(endpoints.order(id), postData)
       window.log(`Update response -> `, data)
       refetch()
       message.success('Action successful.')
@@ -38,17 +45,30 @@ const OrderEdit = props => {
 
   if (!order) return null
 
+  const reqExist = !isEmpty(order.pending_updates)
+  const cDisabled = reqExist || fetching
+
   return (
     <>
-      <Row justify="center">
-        <Col span={24} md={14} xl={10} xxl={9}>
-          <Form disabled={fetching} form={form} layout="vertical" initialValues={{ ...order }} onFinish={onEditFinish}>
+      {reqExist && (
+        <Alert
+          className="mb-3"
+          message="You already have a pending update request. Please wait until CMS take the necessary actions."
+          type="info"
+          showIcon
+        />
+      )}
+
+      <Form disabled={cDisabled} form={form} layout="vertical" initialValues={{ ...order }} onFinish={onEditFinish}>
+        <Row gutter={[30, 20]}>
+          <Col span={24} lg={14}>
             <Form.Item className="mt-4 flex justify-center">
               <Space align="center">
                 <Avatar size="large" src={order.advertisement_info?.image?.secure_url} />
                 <h5 className="m-0 text-4xl font-bold">{order.advertisement_info?.name}</h5>
               </Space>
             </Form.Item>
+
             <Form.Item
               label="Name"
               name="name"
@@ -237,41 +257,47 @@ const OrderEdit = props => {
                 )
               }}
             </Form.Item>
+          </Col>
 
-            {/* <Row justify="space-around" align="middle" className="mt-4" gutter={[10, 0]} wrap={false}>
-              <Col span={12}>
-                <Form.Item className="mb-0" name="allow_qa_edit" label="Allow QA Edit" valuePropName="checked">
-                  <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item className="mb-0" name="qa_approved" label="QA Approved" valuePropName="checked">
-                  <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row justify="space-around" align="middle" className="mt-4" gutter={[10, 0]} wrap={false}>
-              <Col span={12}>
-                <Form.Item className="mb-0" name="active" label="Active" valuePropName="checked">
-                  <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item className="mb-0" name="complete" label="Complete" valuePropName="checked">
-                  <Switch checkedChildren={<CheckOutlined />} unCheckedChildren={<CloseOutlined />} />
-                </Form.Item>
-              </Col>
-            </Row> */}
-
-            <Form.Item className="mt-4">
-              <Button block type="primary" htmlType="submit" icon={<SaveOutlined />} loading={updating}>
-                Save
-              </Button>
+          <Col span={24} lg={10}>
+            <Form.Item
+              label="Comment/Note Regarding This Update"
+              name="comment_note"
+              rules={[{ whitespace: true, message: 'Provide Comment/Note!' }]}
+            >
+              <RichTextEditor
+                disabled={cDisabled}
+                id={`order-update-req-comment`}
+                placeholder="Comment/Note regarding this update request."
+                simple={true}
+              />
             </Form.Item>
-          </Form>
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+
+        <Row justify={`center`}>
+          <Col>
+            <Form.Item className="mt-4">
+              <Popconfirm
+                okText="Yes, Submit"
+                title="Are you sure? Please review the updates carefully as you can't submit again until CMS resolve this request."
+                onConfirm={() => form.submit()}
+              >
+                <Button
+                  shape="round"
+                  size="large"
+                  type="primary"
+                  htmlType="button"
+                  icon={<SendOutlined />}
+                  loading={updating}
+                >
+                  Submit Update Request
+                </Button>
+              </Popconfirm>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
     </>
   )
 }
