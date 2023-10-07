@@ -1,32 +1,19 @@
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { BellOutlined, CaretDownFilled, InfoCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button, Tooltip, Badge } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
+import { BellOutlined, CaretDownFilled, InfoCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 
 import Manage from './manage'
 import keys from 'config/keys'
 import { message } from 'App'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
+import PaymentInfo from './PaymentInfo'
 import handleError from 'helpers/handleError'
-// import generateExcel from 'helpers/generateExcel'
-// import AsyncSwitch from 'components/micro/fields/AsyncSwitch'
-import {
-  DeleteIcon,
-  ViewButton,
-  // ExportButton,
-  RefreshButton
-} from 'components/micro/Common'
-import {
-  isEmpty,
-  defaultPaginationConfig,
-  readableTime,
-  // commonBoolColProps,
-  getOrderStatusColProps,
-  sleep
-} from 'helpers/utility'
+import { DeleteIcon, ViewButton, RefreshButton } from 'components/micro/Common'
+import { isEmpty, defaultPaginationConfig, readableTime, getOrderStatusColProps, sleep } from 'helpers/utility'
 
 const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
 const FULLFIL_STATUS = { COMPLETE: 'Complete', NOT_COMPLETE: 'Not Complete' }
@@ -35,7 +22,6 @@ const searchableColumns = [
   { key: 'status', label: 'Status' }
 ]
 const defaultSearchField = searchableColumns[0].key
-// const exportColumns = [...searchableColumns.map(x => x.key), 'status', 'assets', 'complete', 'paid']
 
 function ListComponent({ reRender }) {
   const _isMounted = useRef(false)
@@ -221,6 +207,22 @@ function ListComponent({ reRender }) {
     },
     { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: 300, align: undefined },
     {
+      title: 'Payment',
+      dataIndex: 'stripeSubscriptionId',
+      align: 'center',
+      sorter: true,
+      width: 70,
+      render: (val, record) => {
+        if (!val) return null
+
+        return (
+          <div onClick={e => e.stopPropagation()}>
+            <PaymentInfo order={record} />
+          </div>
+        )
+      }
+    },
+    {
       title: 'Last Updated',
       dataIndex: 'updatedAt',
       width: 210,
@@ -245,13 +247,15 @@ function ListComponent({ reRender }) {
         const { id } = record
         return (
           <Row justify="space-around">
-            <Col>
-              <DeleteIcon
-                loading={state.idDeleting === id}
-                title={`Sure to delete?`}
-                onClick={() => deleteListItem(id)}
-              />
-            </Col>
+            {record.complete && (
+              <Col>
+                <DeleteIcon
+                  loading={state.idDeleting === id}
+                  title={`Sure to delete?`}
+                  onClick={() => deleteListItem(id)}
+                />
+              </Col>
+            )}
             {!showOnlyCompleted && (
               <Col>
                 <ViewButton
@@ -412,6 +416,8 @@ const getOrderNotification = order => {
 
   if (!order.qa_submitted && !isEmpty(order.qa)) {
     title = 'Please review the questionnaire and submit.'
+  } else if (order.pending_payment_info) {
+    title = 'Please click to review the payment details & pay to continue.'
   } else if (order.qa_approved && isEmpty(order.products)) {
     title = 'Please add at least one product in this campaign to continue.'
   } else if (order.qa_approved && !isEmpty(order.products)) {
