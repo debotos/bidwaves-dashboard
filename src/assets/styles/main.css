@@ -360,3 +360,10 @@ a.within:hover {
 .min-w-93 {
   min-width: 93px;
 }
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+.bg-secondary .ant-form-item-explain-error {
+  color: #fff !important;
+}
