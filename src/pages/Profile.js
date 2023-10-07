@@ -1,18 +1,18 @@
 import Axios from 'axios'
 import { useSafeState } from 'ahooks'
 import { useSelector, useDispatch } from 'react-redux'
-import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space } from 'antd'
+import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space, Tooltip } from 'antd'
 import { CaretLeftOutlined, CheckOutlined, CloseOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons'
 
+import keys from 'config/keys'
 import endpoints from 'config/endpoints'
 import { companyFields } from './SignUp'
 import handleError from 'helpers/handleError'
 import { Page } from 'components/micro/Common'
-import { basePasswordRule, validateUrl } from 'helpers/utility'
 import ChangeAvatar from 'components/micro/fields/ChangeAvatar'
 import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
+import { basePasswordRule, getCssVar, validateUrl } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
-import keys from 'config/keys'
 
 const cPanelStyles = { border: 'none', borderRadius: 6 }
 const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 2}`
@@ -120,9 +120,19 @@ const Profile = () => {
                 <Input allowClear placeholder="LinkedIn" />
               </Form.Item>
 
-              <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
-                <Input allowClear placeholder="Website" />
-              </Form.Item>
+              <Tooltip
+                key="url-tooltip"
+                color={getCssVar('primary-color')}
+                trigger={['focus']}
+                title={
+                  "The URL must include either 'http://' or 'https://' as a prefix. For example: 'https://example.com'."
+                }
+                placement="topLeft"
+              >
+                <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
+                  <Input allowClear placeholder="Website" />
+                </Form.Item>
+              </Tooltip>
 
               <Form.Item
                 label="Address"
