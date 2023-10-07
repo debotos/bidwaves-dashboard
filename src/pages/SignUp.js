@@ -21,7 +21,7 @@ import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
-import { basePasswordRule, isEmpty, validateUrl } from 'helpers/utility'
+import { basePasswordRule, getCssVar, isEmpty, validateUrl } from 'helpers/utility'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
 export const companyFields = [
@@ -32,9 +32,17 @@ export const companyFields = [
   >
     <Input allowClear placeholder="Company Name" />
   </Form.Item>,
-  <Form.Item key="url" name={['company', 'url']} rules={[{ required: false, validator: validateUrl }]}>
-    <Input allowClear placeholder="Website URL" />
-  </Form.Item>,
+  <Tooltip
+    key="url-tooltip"
+    color={getCssVar('primary-color')}
+    trigger={['focus']}
+    title={"The URL must include either 'http://' or 'https://' as a prefix. For example: 'https://example.com'."}
+    placement="topLeft"
+  >
+    <Form.Item key="url" name={['company', 'url']} rules={[{ required: false, validator: validateUrl }]}>
+      <Input allowClear placeholder="Website URL" />
+    </Form.Item>
+  </Tooltip>,
   <Tooltip
     key="phone"
     trigger={['focus']}
@@ -176,9 +184,18 @@ function SignUp() {
               </Form.Item>
             </Col>
             <Col span={24} md={12}>
-              <Form.Item name="website" rules={[{ required: false, validator: validateUrl }]}>
-                <Input allowClear prefix={<GlobalOutlined />} placeholder="Website" />
-              </Form.Item>
+              <Tooltip
+                color={getCssVar('primary-color')}
+                trigger={['focus']}
+                title={
+                  "The URL must include either 'http://' or 'https://' as a prefix. For example: 'https://example.com'."
+                }
+                placement="topLeft"
+              >
+                <Form.Item name="website" rules={[{ required: false, validator: validateUrl }]}>
+                  <Input allowClear prefix={<GlobalOutlined />} placeholder="Website" />
+                </Form.Item>
+              </Tooltip>
             </Col>
           </Row>
           <Form.Item name="address" rules={[{ whitespace: true, message: 'Provide address!' }]}>
