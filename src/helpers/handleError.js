@@ -46,7 +46,7 @@ const handleError = (error, notify = false, filename, notificationProps = {}) =>
     // Kick to login page
     setTimeout(() => window.location.reload(), 2000)
   } else if (statusCode === 404) {
-    title = `Page Not Found`
+    title = `Not Found Error`
   }
 
   const finalMsg = msg.replace('ERROR Error:', '').replace('Error:', '')

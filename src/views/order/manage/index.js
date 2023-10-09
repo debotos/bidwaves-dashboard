@@ -261,7 +261,7 @@ const Manage = props => {
 export default Manage
 
 const RefreshButton = styled.div`
-  position: fixed;
+  position: absolute;
   top: 15px;
   right: 105px;
 `

@@ -214,6 +214,7 @@ function ListComponent({ reRender }) {
       width: 70,
       render: (val, record) => {
         if (!val) return null
+        if (!record.first_payment_date) return null
 
         return (
           <div onClick={e => e.stopPropagation()}>
@@ -385,7 +386,7 @@ function ListComponent({ reRender }) {
       />
 
       <Drawer
-        title={'Manage ' + state.editingItem?.name || 'Campaign'}
+        title={'Manage ' + (state.editingItem?.name || 'Campaign')}
         placement="right"
         size="large"
         width="100%"
