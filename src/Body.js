@@ -13,7 +13,6 @@ import endpoints from 'config/endpoints'
 import { getLoggedInUser } from 'redux/store'
 import handleError from 'helpers/handleError'
 import MainLayout from 'components/layout/Main'
-import { getErrorAlert } from 'helpers/utility'
 import Intercom from 'components/micro/Intercom'
 import PublicRoute from 'components/micro/PublicRoute'
 import PrivateRoute from 'components/micro/PrivateRoute'
@@ -21,17 +20,18 @@ import PageNotFound from 'components/micro/PageNotFound'
 import { FullScreenLoading } from 'components/micro/Loading'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 import { setCurrentUser, logoutUser } from 'redux/slices/authSlice'
+import { getErrorAlert, reloadOnVisibility } from 'helpers/utility'
 
 const Stats = React.lazy(() => import('pages/Stats'))
 const Profile = React.lazy(() => import('pages/Profile'))
 const SignIn = React.lazy(() => import('pages/SignIn'))
 const SignUp = React.lazy(() => import('pages/SignUp'))
+const Orders = React.lazy(() => import('pages/Orders'))
 const Calendar = React.lazy(() => import('pages/Calendar'))
 const Calculator = React.lazy(() => import('pages/Calculator'))
+const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
 const PaymentSuccess = React.lazy(() => import('pages/PaymentSuccess'))
 const ForgotPassword = React.lazy(() => import('pages/ForgotPassword'))
-const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
-const Orders = React.lazy(() => import('pages/Orders'))
 
 function Body() {
   const dispatch = useDispatch()
@@ -85,7 +85,7 @@ function Body() {
 
   const handleReload = info => {
     if (getLoggedInUser().id === info.id) {
-      window.location.reload()
+      reloadOnVisibility()
     }
   }
 

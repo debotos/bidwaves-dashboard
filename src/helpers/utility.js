@@ -424,3 +424,44 @@ export const UrlInputAddonBefore = (
     <Select.Option value="https://">https://</Select.Option>
   </Select>
 )
+
+/**
+ * Get all the URL parameters
+ * @param  {String} search  window.location.search
+ * @return {Object}         The URL parameters
+ */
+export const getAllQueryVariables = function (search, log = false) {
+  const params = new URLSearchParams(search)
+  let paramObj = {}
+  for (var value of params.keys()) {
+    paramObj[value] = params.get(value)
+  }
+  delete paramObj.refresh // It's for app refresh only
+  if (log) console.log('Query variables: ', paramObj)
+
+  return paramObj
+}
+
+// Function to reload the page when it becomes visible
+export function reloadOnVisibility() {
+  if (document.hidden) {
+    // Page is not visible, schedule another check
+    requestAnimationFrame(reloadOnVisibility)
+  } else {
+    setTimeout(() => {
+      const timestamp = Date.now()
+      let newUrl = window.location.origin + window.location.pathname
+      const queryVars = getAllQueryVariables(window.location.search)
+      for (let [index, key] of Object.keys(queryVars).entries()) {
+        const val = queryVars[key]
+        if (index === 0) {
+          newUrl += `?${key}=${val}`
+        } else {
+          newUrl += `&${key}=${val}`
+        }
+      }
+      const and = newUrl.includes('?') ? '&' : '?'
+      window.location.replace(`${newUrl}${and}refresh=${timestamp}`)
+    }, 200)
+  }
+}
