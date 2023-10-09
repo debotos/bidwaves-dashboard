@@ -1,7 +1,7 @@
 import { MdCampaign } from 'react-icons/md'
 import { BsCalculator } from 'react-icons/bs'
 import { FaUserCircle, FaRegCalendarAlt, FaCheckCircle } from 'react-icons/fa'
-import { LoginOutlined, UserAddOutlined, LockOutlined } from '@ant-design/icons'
+import { LoginOutlined, UserAddOutlined, LockOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icons'
 
 export const commonRoutes = {
   calculator: { to: '/', label: 'Calculator', icon: BsCalculator, iconSize: 22 },
@@ -9,6 +9,20 @@ export const commonRoutes = {
 }
 export const privateRoutes = {
   orders: { to: '/campaigns', label: 'Campaigns', icon: MdCampaign, iconSize: 22 },
+  stats: {
+    to: '/stats',
+    label: 'Statistics & Reports',
+    icon: LineChartOutlined,
+    iconSize: 22,
+    sidenav: user => !!user?.stats_iframe_url
+  },
+  private_calculator: {
+    ...commonRoutes.calculator,
+    label: 'New Campaign',
+    to: '/calculator',
+    icon: PlusOutlined,
+    iconSize: 20
+  },
   profile: { to: '/profile', label: 'My Profile', icon: FaUserCircle, iconSize: 22, sidenav: false },
   paymentSuccess: {
     to: '/payment-success',
@@ -16,8 +30,7 @@ export const privateRoutes = {
     icon: FaCheckCircle,
     iconSize: 22,
     sidenav: false
-  },
-  private_calculator: { ...commonRoutes.calculator, label: 'PPC Calculator', to: '/calculator' }
+  }
 }
 export const publicRoutes = {
   login: { to: '/sign-in', label: 'Login', icon: LoginOutlined },

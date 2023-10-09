@@ -9,6 +9,7 @@ import endpoints from 'config/endpoints'
 import { companyFields } from './SignUp'
 import handleError from 'helpers/handleError'
 import { Page } from 'components/micro/Common'
+import InputURL from 'components/micro/fields/InputURL'
 import ChangeAvatar from 'components/micro/fields/ChangeAvatar'
 import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
 import { basePasswordRule, getCssVar, validateUrl } from 'helpers/utility'
@@ -130,7 +131,7 @@ const Profile = () => {
                 placement="topLeft"
               >
                 <Form.Item label="Website" name="website" rules={[{ required: false, validator: validateUrl }]}>
-                  <Input allowClear placeholder="Website" />
+                  <InputURL allowClear placeholder="Website" />
                 </Form.Item>
               </Tooltip>
 
@@ -139,7 +140,7 @@ const Profile = () => {
                 name="address"
                 rules={[{ whitespace: true, message: 'Please provide address!' }]}
               >
-                <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
+                <Input.TextArea rows={2} allowClear placeholder="Your Business Address" />
               </Form.Item>
 
               <Form.Item name="budget" label="Select Budget">

@@ -268,8 +268,8 @@ const Calculator = ({ embed }) => {
               </div>
             </div>
           </Col>
-          <Col span={24} lg={embed ? 13 : 12}>
-            <div className={`${embed ? '' : 'pt-6 lg:pt-16'}`}>
+          <Col span={24} lg={embed ? 13 : 12} className={`${embed ? '' : ''}`}>
+            <div className={`flex h-full items-center justify-center ${embed ? '' : 'pt-6 lg:pt-16'}`}>
               <div className={`px-0 py-5 pb-16 md:px-4 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
                 {enterpriseSelected ? (
                   <>
@@ -283,7 +283,7 @@ const Calculator = ({ embed }) => {
                     {cta_el ? (
                       <>
                         <Row justify="center" className="my-6 lg:my-14">
-                          <Col span={24} lg={22} xl={18}>
+                          <Col span={24} lg={22} xl={24}>
                             <Space direction="vertical" className="w-100">
                               <Row align="middle" gutter={[10, 10]} wrap={false}>
                                 <ValCol className="flex justify-end">

@@ -19,6 +19,7 @@ import endpoints from 'config/endpoints'
 import { APP_ID, reloadChannel } from 'App'
 import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
+import InputURL from 'components/micro/fields/InputURL'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 import { basePasswordRule, getCssVar, isEmpty, validateUrl } from 'helpers/utility'
@@ -40,7 +41,7 @@ export const companyFields = [
     placement="topLeft"
   >
     <Form.Item key="url" name={['company', 'url']} rules={[{ required: false, validator: validateUrl }]}>
-      <Input allowClear placeholder="Website URL" />
+      <InputURL allowClear placeholder="Website URL" />
     </Form.Item>
   </Tooltip>,
   <Tooltip
@@ -193,13 +194,13 @@ function SignUp() {
                 placement="topLeft"
               >
                 <Form.Item name="website" rules={[{ required: false, validator: validateUrl }]}>
-                  <Input allowClear prefix={<GlobalOutlined />} placeholder="Website" />
+                  <InputURL allowClear prefix={<GlobalOutlined />} placeholder="Website" />
                 </Form.Item>
               </Tooltip>
             </Col>
           </Row>
           <Form.Item name="address" rules={[{ whitespace: true, message: 'Provide address!' }]}>
-            <Input.TextArea rows={2} allowClear placeholder="Address (e.g. Rodeo Drive)" />
+            <Input.TextArea rows={2} allowClear placeholder="Your Business Address" />
           </Form.Item>
         </>
       )
@@ -255,78 +256,80 @@ function SignUp() {
   const items = steps.map(item => ({ ...item, key: item.title, title: item.title }))
 
   return (
-    <Page>
-      <div className="flex min-h-screen items-center justify-center p-5">
-        <div className="bg-secondary mx-5 flex w-full max-w-5xl flex-col justify-center rounded-lg p-8 align-middle text-white lg:mb-10">
-          <Row justify="center" className="my-0">
-            <Logo light rowProps={{ className: 'my-0' }} />
-          </Row>
+    <div className="bg-secondary">
+      <Page>
+        <div className="flex min-h-screen items-center justify-center p-5">
+          <div className="mx-5 flex w-full max-w-5xl flex-col justify-center rounded-lg p-8 align-middle text-white lg:mb-10">
+            <Row justify="center" className="my-0">
+              <Logo light rowProps={{ className: 'my-0' }} />
+            </Row>
 
-          <h1 className="mb-4 text-center">Sign Up</h1>
+            <h1 className="mb-5 text-center">Sign Up</h1>
 
-          <div className="rounded-xl bg-white px-4 py-3">
-            <Steps current={current} items={items} />
-          </div>
+            <div className="w-100 flex justify-center">
+              <div className="w-full max-w-4xl text-white">
+                <div className="rounded-xl bg-white px-4 py-3">
+                  <Steps current={current} items={items} />
+                </div>
 
-          <div className="w-100 flex justify-center">
-            <div className="w-full max-w-3xl text-white">
-              <Form
-                form={form}
-                size="large"
-                className="mt-3"
-                name="signup-form"
-                onFinish={onFinish}
-                onValuesChange={(_, _values) => {
-                  setValues(_values)
-                }}
-              >
-                <div className="min-h-300 my-5">{steps[current].content}</div>
-                <Row align="middle" justify="center" className="mt-4">
-                  <Space>
-                    {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
+                <Form
+                  form={form}
+                  size="large"
+                  className="mt-0"
+                  name="signup-form"
+                  onFinish={onFinish}
+                  onValuesChange={(_, _values) => {
+                    setValues(_values)
+                  }}
+                >
+                  <div className="min-h-300 my-5">{steps[current].content}</div>
+                  <Row align="middle" justify="center" className="mt-4">
+                    <Space>
+                      {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
 
-                    {current < steps.length - 1 && (
-                      <Button
-                        type="primary"
-                        onClick={async () => {
-                          const { errorFields } = await form.validateFields()
-                          const hasError = errorFields?.filter(({ errors }) => errors.length).length
-                          if (!hasError) next()
-                        }}
-                      >
-                        Next
+                      {current < steps.length - 1 && (
+                        <Button
+                          type="primary"
+                          onClick={async () => {
+                            const { errorFields } = await form.validateFields()
+                            const hasError = errorFields?.filter(({ errors }) => errors.length).length
+                            if (!hasError) next()
+                          }}
+                        >
+                          Next
+                        </Button>
+                      )}
+
+                      {current === steps.length - 1 && (
+                        <Button
+                          block
+                          type="primary"
+                          htmlType="submit"
+                          icon={<SendOutlined rotate={-40} />}
+                          loading={loading}
+                        >
+                          Submit
+                        </Button>
+                      )}
+                    </Space>
+                  </Row>
+                </Form>
+
+                <Row justify="center" className="mt-3">
+                  <Col>
+                    <Link to={links.login.to} state={state}>
+                      <Button type="link" className="within pl-0">
+                        Already have an account?
                       </Button>
-                    )}
-
-                    {current === steps.length - 1 && (
-                      <Button
-                        block
-                        type="primary"
-                        htmlType="submit"
-                        icon={<SendOutlined rotate={-40} />}
-                        loading={loading}
-                      >
-                        Submit
-                      </Button>
-                    )}
-                  </Space>
+                    </Link>
+                  </Col>
                 </Row>
-              </Form>
-
-              <Row justify="center" className="mt-3">
-                <Col>
-                  <Link to={links.login.to} state={state}>
-                    <Button type="link" className="within pl-0">
-                      Already have an account?
-                    </Button>
-                  </Link>
-                </Col>
-              </Row>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Page>
+      </Page>
+    </div>
   )
 }
 

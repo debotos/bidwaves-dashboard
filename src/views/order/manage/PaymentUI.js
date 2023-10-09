@@ -56,10 +56,9 @@ function PaymentUI({ refetch, order }) {
               size="large"
               className="cta-btn"
             >
-              Connect To Stripe
+              Pay on Stripe
             </Button>
           </Row>
-          {isRecurring && <p className="text-center">Please note we charge on the 15th of every month.</p>}
         </Col>
       </Row>
       <Modal

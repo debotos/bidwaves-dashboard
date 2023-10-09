@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa'
 
+import { links } from 'config/vars'
 import { logoutUser } from 'redux/slices/authSlice'
 
 function ProfileDropdown() {
@@ -26,6 +27,7 @@ function ProfileDropdown() {
       key: 'logout',
       onClick: () => {
         dispatch(logoutUser())
+        navigate(links.login.to, { replace: true })
       }
     }
   ]

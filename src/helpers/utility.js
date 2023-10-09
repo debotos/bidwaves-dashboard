@@ -1,7 +1,7 @@
 import he from 'he'
 import moment from 'moment'
 import { htmlToText } from 'html-to-text'
-import { Alert, Button, Input, Modal, Popover, Result, Row, Spin, Tag } from 'antd'
+import { Alert, Button, Input, Modal, Popover, Result, Row, Select, Spin, Tag } from 'antd'
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -417,3 +417,10 @@ export const antdPreviewCommonProps = {
 export const getPlaceholderInput = (props = {}) => {
   return <Input disabled={true} {...props} />
 }
+
+export const UrlInputAddonBefore = (
+  <Select defaultValue="http://">
+    <Select.Option value="http://">http://</Select.Option>
+    <Select.Option value="https://">https://</Select.Option>
+  </Select>
+)

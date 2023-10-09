@@ -1,6 +1,6 @@
 import React from 'react'
 import { Menu } from 'antd'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { isMobile } from 'helpers/utility'
@@ -12,6 +12,8 @@ function Sidenav() {
   const dispatch = useDispatch()
   const location = useLocation()
   const navigate = useNavigate()
+
+  const { user } = useSelector(state => state.auth)
 
   const closeNav = () => {
     if (!isMobile()) return
@@ -35,6 +37,9 @@ function Sidenav() {
           items={Object.keys({ ...privateRoutes })
             .filter(key => {
               const route = privateRoutes[key]
+              if (typeof route.sidenav === 'function') {
+                return route.sidenav(user)
+              }
               return route.sidenav !== false
             })
             .map(key => {
