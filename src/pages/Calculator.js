@@ -14,6 +14,8 @@ import { CalenderLink, Page } from 'components/micro/Common'
 import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 import { getCssVar, getPlaceholderInput, getReadableCurrency, isEmpty } from 'helpers/utility'
 
+export const enterpriseCalenderLink = `https://calendly.com/bidwaves/bidwaves-enterprise?hide_gdpr_banner=1`
+
 const { useBreakpoint } = Grid
 const valClass = 'm-0 whitespace-nowrap font-bold text-[--primary-color] lg:text-2xl'
 const initialState = {
@@ -260,7 +262,8 @@ const Calculator = ({ embed }) => {
                       )}
 
                       <p className="px-5 text-white">
-                        Are you spending more than $10,000 a month? <CalenderLink />
+                        Are you spending more than $10,000 a month?{' '}
+                        <CalenderLink qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} />
                       </p>
                     </Space>
                   </div>
@@ -274,7 +277,8 @@ const Calculator = ({ embed }) => {
                 {enterpriseSelected ? (
                   <>
                     <h2 className="text-center">
-                      You spending more than $10,000 a month? <CalenderLink anchorClassName="" />
+                      You spending more than $10,000 a month?{' '}
+                      <CalenderLink qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} anchorClassName="" />
                     </h2>
                   </>
                 ) : (

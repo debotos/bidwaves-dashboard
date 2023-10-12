@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import loadable from '@loadable/component'
 import { useMount, useSet, useUnmount } from 'ahooks'
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Empty, Skeleton, Space, Tag, Tooltip } from 'antd'
+import { Alert, Button, Card, Empty, Popconfirm, Skeleton, Space, Tag, Tooltip } from 'antd'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
@@ -125,6 +125,12 @@ function CampaignManager(props) {
       case keys.PRODUCT_TYPES.google_shop_campaigns_setup:
       case keys.PRODUCT_TYPES.crm_integration_with_unbounce:
       case keys.PRODUCT_TYPES.bing_import_from_google: {
+        const calender_link = product.product_info?.calender_link
+        if (!calender_link) return <Alert showIcon type="info" message="Please contact CMS." />
+        if (product.common_disable) {
+          return <Alert showIcon type="success" message="Everything is good to go from your side. No action needed." />
+        }
+
         let label = 'Schedule a Meeting'
         let title = 'Schedule a Call With'
         let subtitle = ''
@@ -140,13 +146,32 @@ function CampaignManager(props) {
         }
 
         return (
-          <div className="my-3 flex justify-center">
-            <CalenderLink
-              asBtn={true}
-              label={label}
-              qs={`?title=${encodeURIComponent(title)}&subtitle=${encodeURIComponent(subtitle)}`}
-            />
-          </div>
+          <>
+            <div className="my-3 flex justify-center">
+              <CalenderLink
+                asBtn={true}
+                label={label}
+                qs={`?title=${encodeURIComponent(title)}&subtitle=${encodeURIComponent(
+                  subtitle
+                )}&src=${encodeURIComponent(calender_link)}`}
+              />
+            </div>
+            <div className="my-3 flex justify-center">
+              <Popconfirm
+                disabled={product.common_disable}
+                okText="Yes"
+                cancelText="No"
+                title="Are you sure? Please check your calendar first."
+                onConfirm={async () => {
+                  await props.asyncUpdateProduct?.(product.id, { submitted: true })
+                }}
+              >
+                <Button shape="round" type="primary" size="middle" className="cta-btn">
+                  I&apos;ve Done It
+                </Button>
+              </Popconfirm>
+            </div>
+          </>
         )
       }
 

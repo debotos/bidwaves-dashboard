@@ -11,7 +11,7 @@ function Stats({ url }) {
 
 export default Stats
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   iframe {
     width: 100%;
     height: 100%;

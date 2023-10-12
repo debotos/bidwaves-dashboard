@@ -6,6 +6,7 @@ import { CalenderLink } from 'components/micro/Common'
 
 function GoogleTag(props) {
   const { product, asyncUpdateProduct } = props
+  const calender_link = product.product_info?.calender_link
   const { data_obj } = product || {}
   const [loading, setLoading] = useSafeState(false)
 
@@ -60,14 +61,18 @@ function GoogleTag(props) {
         dangerouslySetInnerHTML={{ __html: data_obj.help_text }}
       />
 
-      <Row justify="center" className="mb-3">
-        <Col>
-          <CalenderLink
-            asBtn={true}
-            qs={`?title=${encodeURIComponent('Let a Specialist Set Up Your Google Tags')}&subtitle=`}
-          />
-        </Col>
-      </Row>
+      {calender_link && (
+        <Row justify="center" className="mb-3">
+          <Col>
+            <CalenderLink
+              asBtn={true}
+              qs={`?title=${encodeURIComponent(
+                'Let a Specialist Set Up Your Google Tags'
+              )}&subtitle=&src=${encodeURIComponent(calender_link)}`}
+            />
+          </Col>
+        </Row>
+      )}
     </>
   )
 }
