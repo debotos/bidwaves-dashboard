@@ -1,7 +1,7 @@
 import Axios from 'axios'
-import { Link, useLocation } from 'react-router-dom'
 import React, { useState, useRef, useEffect } from 'react'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Row, Button, Form, Input, message, Col, Modal } from 'antd'
 
 import { links } from 'config/vars'
@@ -10,6 +10,7 @@ import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
 
 function ForgotPassword() {
+  const navigate = useNavigate()
   const _isMounted = useRef(false)
   const { state } = useLocation() // Pending Campaign Creation Data
 
@@ -24,7 +25,10 @@ function ForgotPassword() {
       Modal.success({
         title: 'Please check your mailbox!',
         content:
-          'Password reset link sent successfully. Please remember, password reset link is only valid for 30 minutes after issuing.'
+          'Password reset link sent successfully. Please remember, password reset link is only valid for 30 minutes after issuing.',
+        onOk: () => {
+          navigate(links.login.to, { replace: true })
+        }
       })
     } catch (error) {
       handleError(error, true)
