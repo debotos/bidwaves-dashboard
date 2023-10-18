@@ -25,9 +25,10 @@ export const DeleteIcon = props => {
     icon,
     placement = 'left',
     tooltip,
-    disabled = false
+    disabled = false,
+    size = 'small'
   } = props
-  const btn = <Button loading={loading} disabled={disabled} danger size="small" icon={icon ?? <DeleteOutlined />} />
+  const btn = <Button loading={loading} disabled={disabled} danger size={size} icon={icon ?? <DeleteOutlined />} />
   return (
     <div onClick={e => e.stopPropagation()}>
       <Popconfirm

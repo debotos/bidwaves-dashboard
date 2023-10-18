@@ -19,6 +19,7 @@ import endpoints from 'config/endpoints'
 import { APP_ID, reloadChannel } from 'App'
 import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
+import { commonBudgetSelectProps } from './Calculator'
 import InputURL from 'components/micro/fields/InputURL'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
@@ -215,7 +216,11 @@ function SignUp() {
               allowClear={true}
               filterOption={false}
               handleGetOptions={val =>
-                genericSearchOptionsFunc(endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`, val)
+                genericSearchOptionsFunc(
+                  endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`,
+                  val,
+                  commonBudgetSelectProps
+                )
               }
               placeholder="Select your budget"
               className="w-100"

@@ -15,6 +15,27 @@ import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/A
 import { getCssVar, getPlaceholderInput, getReadableCurrency, isEmpty } from 'helpers/utility'
 
 export const enterpriseCalenderLink = `https://calendly.com/bidwaves/bidwaves-enterprise?hide_gdpr_banner=1`
+export const commonBudgetSelectProps = {
+  optionPropsOverrideCb: item => {
+    return {
+      label: (
+        <Space>
+          {item.advertisement?.image?.secure_url && (
+            <Tooltip title={item.advertisement?.name}>
+              <Avatar size="small" src={item.advertisement?.image?.secure_url} />
+            </Tooltip>
+          )}
+          {item.tag?.label} |
+          <b>
+            {getReadableCurrency(item.min).replace('.00', '')}&nbsp;-&nbsp;
+            {getReadableCurrency(item.max, { showUnlimited: true }).replace('.00', '')}
+          </b>
+        </Space>
+      ),
+      tag_label: item.tag?.label || ''
+    }
+  }
+}
 
 const { useBreakpoint } = Grid
 const valClass = 'm-0 whitespace-nowrap font-bold text-[--primary-color] lg:text-2xl'
@@ -161,27 +182,7 @@ const Calculator = ({ embed }) => {
                               endpoints.budgetBase +
                                 `?${keys.EQUAL_TO_COL_PREFIX}advertisementId=${state.advertisementId}`,
                               val,
-                              {
-                                optionPropsOverrideCb: item => {
-                                  return {
-                                    label: (
-                                      <Space>
-                                        {item.advertisement?.image?.secure_url && (
-                                          <Tooltip title={item.advertisement?.name}>
-                                            <Avatar size="small" src={item.advertisement?.image?.secure_url} />
-                                          </Tooltip>
-                                        )}
-                                        {item.tag?.label} |
-                                        <b>
-                                          {getReadableCurrency(item.min).replace('.00', '')}&nbsp;-&nbsp;
-                                          {getReadableCurrency(item.max, { showUnlimited: true }).replace('.00', '')}
-                                        </b>
-                                      </Space>
-                                    ),
-                                    tag_label: item.tag?.label || ''
-                                  }
-                                }
-                              }
+                              commonBudgetSelectProps
                             )
                           }}
                           onChange={(value, option) => {

@@ -15,7 +15,7 @@ import { message } from 'App'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
 import { DeleteIcon, RefreshButton } from 'components/micro/Common'
-import { defaultPaginationConfig, truncate } from 'helpers/utility'
+import { defaultPaginationConfig } from 'helpers/utility'
 
 const searchableColumns = [
   { key: 'name', label: 'Name' },
@@ -150,11 +150,17 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
   }
 
   const columns = [
-    { title: 'Name', dataIndex: 'name', sorter: true },
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+      render: val => <span className="font-bold text-[--primary-color]">{val}</span>
+    },
     {
       title: 'Description',
       dataIndex: 'description',
-      render: text => truncate(text, 'Description', suggestionUI ? 100 : 50)
+      // render: text => truncate(text, 'Description', suggestionUI ? 100 : 50)
+      render: text => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
     {
       width: 80,
@@ -170,7 +176,6 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
               <Col>
                 <Tooltip title={`Add To This Campaign`} placement="topRight">
                   <Button
-                    size="small"
                     type="primary"
                     icon={<PlusCircleOutlined />}
                     loading={state.idAdding === id}
@@ -204,6 +209,7 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
               <>
                 <Col>
                   <DeleteIcon
+                    size=""
                     tooltip="Remove this recommendation"
                     icon={<ClearOutlined />}
                     loading={state.idDeleting === id}
@@ -261,8 +267,9 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
 
       <Table
         rowKey="id"
-        size="small"
+        size={suggestionUI ? 'middle' : 'small'}
         className="mb-4"
+        bordered={suggestionUI ? true : false}
         onChange={onTableChange}
         pagination={{
           ...defaultPaginationConfig,
