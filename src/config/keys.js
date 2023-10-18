@@ -7,6 +7,7 @@ export const localStorageKeys = {
 }
 
 export const ORDER_STATUS = {
+  AWAITING_APPROVAL: 'Awaiting For Approval',
   PROGRESS: 'Setup In Progress',
   AWAITING_PAYMENT: 'Awaiting For Payment',
   CANCELLED: 'Cancelled',
