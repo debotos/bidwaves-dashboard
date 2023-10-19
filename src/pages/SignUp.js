@@ -1,9 +1,10 @@
 import Axios from 'axios'
+import ReactPlayer from 'react-player/lazy'
 import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Link, useLocation } from 'react-router-dom'
-import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip } from 'antd'
+import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip, Alert } from 'antd'
 import {
   LockOutlined,
   SendOutlined,
@@ -19,12 +20,10 @@ import endpoints from 'config/endpoints'
 import { APP_ID, reloadChannel } from 'App'
 import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
-import { commonBudgetSelectProps } from './Calculator'
 import InputURL from 'components/micro/fields/InputURL'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 import { basePasswordRule, getCssVar, isEmpty, validateUrl } from 'helpers/utility'
-import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
 export const companyFields = [
   <Form.Item
@@ -48,7 +47,7 @@ export const companyFields = [
   <Tooltip
     key="phone"
     trigger={['focus']}
-    title={`Please prefix the phone number with valid country code (eg. +88)`}
+    title={`Please prefix the phone number with valid country code (eg. +1)`}
     placement="topLeft"
   >
     <Form.Item
@@ -208,75 +207,47 @@ function SignUp() {
     },
     {
       ...getStepProps(1),
-      title: 'Your Budget',
-      content: (
-        <>
-          <Form.Item name="budget">
-            <AsyncSelect
-              allowClear={true}
-              filterOption={false}
-              handleGetOptions={val =>
-                genericSearchOptionsFunc(
-                  endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`,
-                  val,
-                  commonBudgetSelectProps
-                )
-              }
-              placeholder="Select your budget"
-              className="w-100"
-            />
-          </Form.Item>
-        </>
-      )
-    },
-    {
-      ...getStepProps(2),
-      title: 'Your Industries',
-      content: (
-        <>
-          <Form.Item name="industries">
-            <AsyncSelect
-              mode="multiple"
-              allowClear={true}
-              showSearch={true}
-              filterOption={true}
-              onlyInitialSearch={true}
-              optionFilterProp="label"
-              placeholder="Select your industries"
-              handleGetOptions={val =>
-                genericSearchOptionsFunc(endpoints.industryBase + `?${keys.NULL_COL_PREFIX}budgetId=`, val)
-              }
-              className="w-100"
-            />
-          </Form.Item>
-        </>
-      )
-    },
-    {
-      ...getStepProps(3),
       title: 'Your Company',
       content: <>{companyFields}</>
     }
   ]
   const items = steps.map(item => ({ ...item, key: item.title, title: item.title }))
+  // eslint-disable-next-line no-undef
+  const signupVideo = process.env.REACT_APP_SIGNUP_VIDEO
 
   return (
     <div className="bg-secondary">
       <Page>
         <div className="flex min-h-screen items-center justify-center p-5">
-          <div className="mx-5 flex w-full max-w-5xl flex-col justify-center rounded-lg p-8 align-middle text-white lg:mb-10">
+          <div className="mx-5 flex w-full flex-col justify-center rounded-lg p-8 align-middle text-white lg:mb-10">
             <Row justify="center" className="my-0">
               <Logo light rowProps={{ className: 'my-0' }} />
             </Row>
 
-            <h1 className="mb-5 text-center">Sign Up</h1>
+            {!isEmpty(state) && (
+              <div className="flex w-full justify-center">
+                <Alert
+                  showIcon
+                  type="info"
+                  className="my-3"
+                  message={
+                    <>
+                      Please <b>Sign Up</b> or <b>Login</b> to start a campaign with the information you just provided.
+                    </>
+                  }
+                />
+              </div>
+            )}
+            <h1 className="mb-4 text-center">Sign Up</h1>
 
-            <div className="w-100 flex justify-center">
+            <div className="w-100 flex flex-col items-center">
               <div className="w-full max-w-4xl text-white">
-                <div className="rounded-xl bg-white px-4 py-3">
+                <div className="rounded-xl bg-white px-4 py-3 lg:px-40">
                   <Steps current={current} items={items} />
                 </div>
+              </div>
 
+              <div className="w-full">
                 <Form
                   form={form}
                   size="large"
@@ -287,9 +258,35 @@ function SignUp() {
                     setValues(_values)
                   }}
                 >
-                  <div className="min-h-300 my-5">{steps[current].content}</div>
-                  <Row align="middle" justify="center" className="mt-4">
-                    <Space>
+                  <div className="min-h-300 mb-4 mt-5">
+                    {!current ? (
+                      <Page>
+                        <Row justify={`center`}>
+                          <Col span={24} lg={14}>
+                            {steps[current].content}
+                          </Col>
+                        </Row>
+                      </Page>
+                    ) : (
+                      <Page>
+                        <Row justify={`center`} gutter={[40, 30]} className="mb-4 lg:mb-0">
+                          <Col span={24} lg={signupVideo ? 12 : 14}>
+                            {steps[current].content}
+                          </Col>
+                          {signupVideo && (
+                            <Col span={24} lg={12}>
+                              <ReactPlayer url={signupVideo} width="100%" height="85%" />
+                              <h4 className="mb-2 mt-3 text-center text-2xl font-semibold text-white">
+                                While we setup the account, watch what will happen next.
+                              </h4>
+                            </Col>
+                          )}
+                        </Row>
+                      </Page>
+                    )}
+                  </div>
+                  <Row align="middle" justify="center">
+                    <Space className={current ? 'mt-8 lg:mt-1' : 'mt-1'}>
                       {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
 
                       {current < steps.length - 1 && (
@@ -324,7 +321,7 @@ function SignUp() {
                   <Col>
                     <Link to={links.login.to} state={state}>
                       <Button type="link" className="within pl-0">
-                        Already have an account?
+                        Already have an account?&nbsp;<b>Login</b>
                       </Button>
                     </Link>
                   </Col>

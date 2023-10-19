@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space, Tooltip } from 'antd'
 import { CaretLeftOutlined, CheckOutlined, CloseOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons'
 
-import keys from 'config/keys'
 import endpoints from 'config/endpoints'
 import { companyFields } from './SignUp'
 import handleError from 'helpers/handleError'
@@ -13,7 +12,6 @@ import InputURL from 'components/micro/fields/InputURL'
 import ChangeAvatar from 'components/micro/fields/ChangeAvatar'
 import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
 import { basePasswordRule, getCssVar, validateUrl } from 'helpers/utility'
-import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/AsyncSelect'
 
 const cPanelStyles = { border: 'none', borderRadius: 6 }
 const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 2}`
@@ -86,12 +84,7 @@ const Profile = () => {
 
         <Row justify="center" className="mt-5">
           <Col span={24} md={16} lg={14} xl={10}>
-            <Form
-              form={profileForm}
-              layout="vertical"
-              initialValues={{ ...user, budget: user.budget?.id, industries: user.industries?.map(x => x.id) }}
-              onFinish={handleProfileUpdate}
-            >
+            <Form form={profileForm} layout="vertical" initialValues={{ ...user }} onFinish={handleProfileUpdate}>
               <Row gutter={[10, 0]}>
                 <Col span={12}>
                   <Form.Item
@@ -141,34 +134,6 @@ const Profile = () => {
                 rules={[{ whitespace: true, message: 'Please provide address!' }]}
               >
                 <Input.TextArea rows={2} allowClear placeholder="Your Business Address" />
-              </Form.Item>
-
-              <Form.Item name="budget" label="Select Budget">
-                <AsyncSelect
-                  allowClear={true}
-                  filterOption={false}
-                  handleGetOptions={val =>
-                    genericSearchOptionsFunc(endpoints.budgetBase + `?${keys.NULL_COL_PREFIX}advertisementId=`, val)
-                  }
-                  placeholder="Select your budget"
-                  className="w-100"
-                />
-              </Form.Item>
-
-              <Form.Item name="industries" label="Select Industries">
-                <AsyncSelect
-                  mode="multiple"
-                  allowClear={true}
-                  showSearch={true}
-                  filterOption={true}
-                  onlyInitialSearch={true}
-                  optionFilterProp="label"
-                  placeholder="Select your industries"
-                  handleGetOptions={val =>
-                    genericSearchOptionsFunc(endpoints.industryBase + `?${keys.NULL_COL_PREFIX}budgetId=`, val)
-                  }
-                  className="w-100"
-                />
               </Form.Item>
 
               <div className="rounded-md bg-white p-2">

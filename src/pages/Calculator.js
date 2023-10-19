@@ -75,7 +75,7 @@ const Calculator = ({ embed }) => {
           keys.PENDING_CREATE_CAMPAIGN_DATA,
           JSON.stringify({ ...state, postData, timestamp: Date.now() })
         )
-        navigate(links.login.to, { state: postData })
+        navigate(links.register.to, { state: postData })
         return
       }
 
