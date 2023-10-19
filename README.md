@@ -1,6 +1,6 @@
-# Bidwaves Dashboard
+# BidWaves Dashboard
 
-Dashboard of bidwaves application.
+Dashboard of BidWaves application.
 
 ## Available Scripts
 

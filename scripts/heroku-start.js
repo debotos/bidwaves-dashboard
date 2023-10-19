@@ -25,5 +25,5 @@ app.get('*', function (req, res) {
 })
 
 app.listen(port, () => {
-  console.log('Bidwaves dashboard is running on port: ', port)
+  console.log('BidWaves dashboard is running on port: ', port)
 })

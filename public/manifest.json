@@ -1,6 +1,6 @@
 {
-  "short_name": "Bidwaves Dashboard",
-  "name": "Bidwaves Dashboard",
+  "short_name": "BidWaves Dashboard",
+  "name": "BidWaves Dashboard",
   "icons": [
     {
       "src": "favicon.png",
@@ -13,13 +13,13 @@
       "sizes": "192x192"
     },
     {
-      "src": "android-chrome-512x512.png",
+      "src": "android-chrome-384x384.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#2050ec",
+  "theme_color": "#2b9595",
   "background_color": "#ffffff"
 }

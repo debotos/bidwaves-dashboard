@@ -113,7 +113,7 @@ export const Logo = ({ light = false, width = 320, rowProps = {}, onClick }) => 
         className={onClick ? 'cursor-pointer' : ''}
         onClick={onClick}
         src={light ? '/bidwaves-logo-light.png' : '/bidwaves-logo-dark.png'}
-        alt="Bidwaves"
+        alt="BidWaves"
         width={width}
       />
     </Row>

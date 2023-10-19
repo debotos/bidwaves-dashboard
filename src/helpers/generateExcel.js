@@ -8,7 +8,7 @@ const generateExcel = (data, name, columns, sheetName) => {
 
   /* Set Workbook Properties */
   const workbook = new Excel.Workbook()
-  workbook.creator = 'Bidwaves Dashboard'
+  workbook.creator = 'BidWaves Dashboard'
   workbook.lastModifiedBy = store.getState().auth.user?.email || 'Unknown User'
   workbook.created = new Date()
   workbook.modified = new Date()
