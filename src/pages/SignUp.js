@@ -218,7 +218,7 @@ function SignUp() {
   return (
     <div className="bg-secondary">
       <Page>
-        <div className="flex min-h-screen items-center justify-center p-5">
+        <div className="flex min-h-screen items-center justify-center py-5">
           <div className="mx-5 flex w-full flex-col justify-center rounded-lg p-8 align-middle text-white lg:mb-10">
             <Row justify="center" className="my-0">
               <Logo light rowProps={{ className: 'my-0' }} />
@@ -241,8 +241,8 @@ function SignUp() {
             <h1 className="mb-4 text-center">Sign Up</h1>
 
             <div className="w-100 flex flex-col items-center">
-              <div className="w-full max-w-4xl text-white">
-                <div className="rounded-xl bg-white px-4 py-3 lg:px-40">
+              <div className="w-full max-w-3xl text-white">
+                <div className="rounded-xl bg-white px-4 py-3 lg:px-32">
                   <Steps current={current} items={items} />
                 </div>
               </div>
@@ -261,26 +261,28 @@ function SignUp() {
                   <div className="min-h-300 mb-4 mt-5">
                     {!current ? (
                       <Page>
-                        <Row justify={`center`}>
-                          <Col span={24} lg={14}>
-                            {steps[current].content}
-                          </Col>
+                        <Row justify="center">
+                          <div className="w-full max-w-3xl">{steps[current].content}</div>
                         </Row>
                       </Page>
                     ) : (
                       <Page>
-                        <Row justify={`center`} gutter={[40, 30]} className="mb-4 lg:mb-0">
-                          <Col span={24} lg={signupVideo ? 12 : 14}>
-                            {steps[current].content}
-                          </Col>
-                          {signupVideo && (
-                            <Col span={24} lg={12}>
-                              <ReactPlayer url={signupVideo} width="100%" height="85%" />
-                              <h4 className="mb-2 mt-3 text-center text-2xl font-semibold text-white">
-                                While we setup the account, watch what will happen next.
-                              </h4>
-                            </Col>
-                          )}
+                        <Row justify="center">
+                          <div className="container">
+                            <Row justify={`center`} gutter={[40, 30]} className="mb-4 lg:mb-0">
+                              <Col span={24} lg={signupVideo ? 12 : 14}>
+                                {steps[current].content}
+                              </Col>
+                              {signupVideo && (
+                                <Col span={24} lg={12}>
+                                  <ReactPlayer url={signupVideo} width="100%" height="85%" />
+                                  <h4 className="mb-2 mt-3 text-center text-2xl font-semibold text-white">
+                                    While we setup the account, watch what will happen next.
+                                  </h4>
+                                </Col>
+                              )}
+                            </Row>
+                          </div>
                         </Row>
                       </Page>
                     )}

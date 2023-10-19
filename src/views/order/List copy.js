@@ -1,20 +1,19 @@
 import Axios from 'axios'
-import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { Row, Col, Input, Table, Dropdown, Space, Select, Drawer, Button, Tooltip, Badge } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { Row, Col, Input, Dropdown, Space, Select, Drawer, Button, Empty, Card, Skeleton, Pagination } from 'antd'
+import { BellOutlined, CaretDownFilled, InfoCircleOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 
 import Manage from './manage'
 import keys from 'config/keys'
+import { message } from 'App'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
-import CampaignItem from './CampaignItem'
+import PaymentInfo from './PaymentInfo'
 import handleError from 'helpers/handleError'
-import emptyImage from 'assets/images/empty.svg'
-import { RefreshButton } from 'components/micro/Common'
-import { isEmpty, defaultPaginationConfig, sleep } from 'helpers/utility'
+import { DeleteIcon, ViewButton, RefreshButton } from 'components/micro/Common'
+import { isEmpty, defaultPaginationConfig, readableTime, getOrderStatusColProps, sleep } from 'helpers/utility'
 
 const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
 const FULLFIL_STATUS = { COMPLETE: 'Complete', NOT_COMPLETE: 'Not Complete' }
@@ -137,11 +136,49 @@ function ListComponent({ reRender }) {
     if (_isMounted.current && isShowOnlyCompleted()) setState({ paidStatus: '', activeStatus: '' })
   }, [state.fullfilStatus])
 
+  const deleteListItem = async id => {
+    try {
+      _isMounted.current && setState({ idDeleting: id })
+      const req = await Axios.delete(endpoints.order(id))
+      const res = req.data
+      window.log(`Delete response -> `, res)
+      message.success('Action successful.')
+      getMainData()
+    } catch (error) {
+      handleError(error, true)
+    } finally {
+      _isMounted.current && setState({ idDeleting: null })
+    }
+  }
+
+  // const handleExport = () => {
+  //   try {
+  //     _isMounted.current && setState({ exporting: true })
+  //     const list = state.dataResponse.list
+  //     if (isEmpty(list)) return message.info('Sorry, Data is empty.')
+  //     generateExcel(list, `Bidwaves Campaigns (Page ${state.paginationCurrentPage})`, exportColumns)
+  //     message.success('Data exported successfully!')
+  //   } catch (error) {
+  //     handleError(error, true)
+  //   } finally {
+  //     _isMounted.current && setState({ exporting: false })
+  //   }
+  // }
+
   const handleSearchInputChange = e => {
     e.persist()
     const value = e.target.value
     const update = { searchText: value }
     debounceSetState(update)
+  }
+
+  const onTableChange = (pagination, filters, sorter) => {
+    const { field, order } = sorter
+    if (order) {
+      setState({ sortByQuery: `${field}@${order.replace('end', '')}` })
+    } else {
+      setState({ sortByQuery: '' })
+    }
   }
 
   const closeManageUI = () => {
@@ -151,23 +188,108 @@ function ListComponent({ reRender }) {
   }
 
   const showOnlyCompleted = isShowOnlyCompleted()
-  const filterExist = state.activeStatus || state.searchText
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      sorter: true,
+      render: (val, record) => {
+        return (
+          <Space>
+            <span className={`${!record.approved ? '' : 'cursor-pointer'} font-bold text-[--primary-color]`}>
+              {val}
+            </span>
+            {getOrderNotification(record)}
+          </Space>
+        )
+      }
+    },
+    { title: 'Status', sorter: true, ...getOrderStatusColProps('status'), width: 300, align: undefined },
+    {
+      title: 'Payment',
+      dataIndex: 'stripeSubscriptionId',
+      align: 'center',
+      sorter: true,
+      width: 70,
+      render: (val, record) => {
+        if (!val) return null
+        if (!record.first_payment_date) return null
+
+        return (
+          <div onClick={e => e.stopPropagation()}>
+            <PaymentInfo order={record} />
+          </div>
+        )
+      }
+    },
+    {
+      title: 'Last Updated',
+      dataIndex: 'updatedAt',
+      width: 210,
+      render: value => readableTime(value, true),
+      sorter: true
+    },
+    { title: 'Added', dataIndex: 'createdAt', width: 140, render: value => readableTime(value), sorter: true },
+    {
+      width: showOnlyCompleted ? 70 : 130,
+      fixed: 'right',
+      title: 'Action',
+      align: 'center',
+      dataIndex: 'action',
+      render: (_, record) => {
+        if (!record.approved) {
+          return (
+            <Tooltip title="Please wait for CMS to review." placement="left">
+              <InfoCircleOutlined className="cursor-pointer" />
+            </Tooltip>
+          )
+        }
+        const { id } = record
+        return (
+          <Row justify="space-around">
+            {record.complete && (
+              <Col>
+                <DeleteIcon
+                  loading={state.idDeleting === id}
+                  title={`Sure to delete?`}
+                  onClick={() => deleteListItem(id)}
+                />
+              </Col>
+            )}
+            {!showOnlyCompleted && (
+              <Col>
+                <ViewButton
+                  type="primary"
+                  disabled={!record.approved}
+                  id={record.approved ? `order-${id}-config-btn` : ''}
+                  onClick={() => setState({ editingItem: record })}
+                />
+              </Col>
+            )}
+          </Row>
+        )
+      }
+    }
+  ]
 
   const list = state.dataResponse?.list ?? []
   // const noData = isEmpty(list)
 
-  const addBtnEl = (
-    <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(links.private_calculator.to)}>
-      Add A New Campaign
-    </Button>
-  )
-
   return (
     <>
-      <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4 mt-3">
+      <h2 className="mb-1">Here Are Your Open Campaigns</h2>
+      <p className="mb-4">Manage all your campaigns from here.</p>
+      <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4">
         <Col>
           <Space>
             <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={reRender} />
+            {/* <ExportButton
+              title="Export Page Data"
+              disabled={noData || state.fetching}
+              loading={state.exporting}
+              onClick={handleExport}
+            /> */}
           </Space>
         </Col>
         <Col flex={1}>
@@ -206,6 +328,15 @@ function ListComponent({ reRender }) {
                 options={Object.values(FULLFIL_STATUS).map(x => ({ value: x, label: x }))}
                 onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, fullfilStatus: val ?? '' })}
               />
+              {/* <Select
+              allowClear
+              placeholder="Payment"
+              style={{ width: 110 }}
+              disabled={showOnlyCompleted}
+              value={state.paidStatus || undefined}
+              options={Object.values(PAID_STATUS).map(x => ({ value: x, label: x }))}
+              onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, paidStatus: val ?? '' })}
+            /> */}
               <Select
                 allowClear
                 placeholder="Status"
@@ -219,86 +350,39 @@ function ListComponent({ reRender }) {
           </Row>
         </Col>
 
-        <Col>{addBtnEl}</Col>
+        <Col>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate(links.private_calculator.to)}>
+            Add A New Campaign
+          </Button>
+        </Col>
       </Row>
 
-      {state.fetching && (
-        <>
-          {Array(3)
-            .fill()
-            .map((_, i) => {
-              return (
-                <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
-                  <Space className="mb-3">
-                    <Skeleton.Avatar active size="large" shape={`circle`} />
-                    <Skeleton.Input active size="large" />
-                  </Space>
-                  <Row gutter={[40, 0]}>
-                    <Col span={12}>
-                      <Fade>
-                        <Card size="small" bodyStyle={{ padding: 0 }}>
-                          <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
-                        </Card>
-                      </Fade>
-                    </Col>
-                    <Col span={12}>
-                      {Array(3)
-                        .fill()
-                        .map((_, i) => {
-                          return (
-                            <Fade key={i}>
-                              <Card size="small" bodyStyle={{ padding: 0 }} className="mb-2">
-                                <Skeleton.Button active={true} size="large" block={true} style={{ height: 80 }} />
-                              </Card>
-                            </Fade>
-                          )
-                        })}
-                    </Col>
-                  </Row>
-                </div>
-              )
-            })}
-        </>
-      )}
-
-      {isEmpty(list) && !state.fetching && (
-        <Empty
-          image={emptyImage}
-          className="mb-5 mt-20"
-          imageStyle={{ height: 150, pointerEvents: 'none', userSelect: 'none' }}
-          description={
-            showOnlyCompleted ? (
-              <b>No campaigns have been marked as completed at this time.</b>
-            ) : (
-              <>
-                {filterExist ? (
-                  <b>No match found.</b>
-                ) : (
-                  <b className="text-yellow-600">
-                    You haven&apos;t added any campaigns yet. Please add a new campaign to get started!
-                  </b>
-                )}
-              </>
-            )
+      <Table
+        rowKey="id"
+        size="small"
+        className="mb-4"
+        onChange={onTableChange}
+        onRow={record => {
+          if (!record.approved) return { className: 'cursor-not-allowed opacity-50' }
+          return {
+            className: 'cursor-pointer',
+            onClick: () => setState({ editingItem: record })
           }
-        >
-          {showOnlyCompleted || filterExist ? null : addBtnEl}
-        </Empty>
-      )}
-
-      {list.map(item => {
-        return <CampaignItem key={item.id} item={item} />
-      })}
-
-      <Pagination
-        {...defaultPaginationConfig}
-        hideOnSinglePage={true}
-        total={state.dataResponse?.total ?? 0}
-        current={state.paginationCurrentPage}
-        pageSize={state.paginationPageSize}
-        onChange={(page, pageSize) => {
-          setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
         }}
+        pagination={{
+          ...defaultPaginationConfig,
+          hideOnSinglePage: true,
+          total: state.dataResponse?.total ?? 0,
+          current: state.paginationCurrentPage,
+          pageSize: state.paginationPageSize,
+          onChange: (page, pageSize) => {
+            setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
+          }
+        }}
+        scroll={{ x: 'max-content' }}
+        columns={columns}
+        loading={state.fetching}
+        dataSource={list}
       />
 
       <Drawer
@@ -324,3 +408,31 @@ function ListComponent({ reRender }) {
 }
 
 export default ListComponent
+
+const getOrderNotification = order => {
+  if (!order) return null
+  if (!order.approved) return null
+
+  let title
+
+  if (!order.qa_submitted && !isEmpty(order.qa)) {
+    title = 'Please review the questionnaire and submit.'
+  } else if (order.pending_payment_info) {
+    title = 'Please click to review the payment details & pay to continue.'
+  } else if (order.qa_approved && isEmpty(order.products)) {
+    title = 'Please add at least one product in this campaign to continue.'
+  } else if (order.qa_approved && !isEmpty(order.products)) {
+    if (order.products.some(x => x.setup_ready && !x.submitted)) {
+      title = 'CMS added necessary configuration for this campaign product(s). Please review and take action.'
+    }
+  }
+
+  if (!title) return null
+  return (
+    <Tooltip title={title}>
+      <Badge dot={true}>
+        <BellOutlined />
+      </Badge>
+    </Tooltip>
+  )
+}

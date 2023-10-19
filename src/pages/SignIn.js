@@ -64,7 +64,7 @@ function Login() {
   return (
     <div className="bg-secondary">
       <Page>
-        <div className="flex min-h-screen items-center justify-center p-5">
+        <div className="flex min-h-screen items-center justify-center py-5">
           <div className="bg-secondary mx-5 mb-6 flex w-full max-w-2xl flex-col justify-center rounded-lg p-8 align-middle lg:mb-16">
             <Row justify="center" className="my-0">
               <Logo light rowProps={{ className: 'my-0' }} />
