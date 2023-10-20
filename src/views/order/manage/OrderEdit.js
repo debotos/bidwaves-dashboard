@@ -16,7 +16,7 @@ const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 3}`
 const valClass = 'm-0 whitespace-nowrap font-bold text-[--primary-color] lg:text-2xl'
 
 const OrderEdit = props => {
-  const { order, refetch, fetching } = props
+  const { order, refetch, fetching, closeModal } = props
   const [form] = Form.useForm()
   const [budget, setBudget] = useSafeState(order.budget_info)
   const [industry, setIndustry] = useSafeState(order.industries_info?.[0])
@@ -37,6 +37,7 @@ const OrderEdit = props => {
       window.log(`Update response -> `, data)
       refetch()
       message.success('Action successful.')
+      closeModal?.()
     } catch (error) {
       handleError(error, true)
     } finally {
@@ -276,7 +277,7 @@ const OrderEdit = props => {
                             <Row
                               key={key}
                               align="middle"
-                              className="mb-3 rounded-lg border-2 border-solid border-[--body-bg-color] px-2 py-3"
+                              className="mb-3 rounded-lg border-2 border-solid border-[--body-bg-color] px-2 py-2"
                               wrap={false}
                               gutter={[10, 0]}
                             >
@@ -300,7 +301,7 @@ const OrderEdit = props => {
                                     placeholder="Question"
                                   />
                                 </Form.Item>
-                                <h4>{q}</h4>
+                                <h4 className="font-semibold">{q}</h4>
                                 <Form.Item
                                   {...restField}
                                   name={[name, 'a']}
@@ -308,7 +309,7 @@ const OrderEdit = props => {
                                 >
                                   <Input.TextArea
                                     className="mt-2"
-                                    rows={1}
+                                    rows={2}
                                     allowClear
                                     maxLength={1000}
                                     showCount

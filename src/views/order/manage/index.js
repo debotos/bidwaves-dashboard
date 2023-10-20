@@ -13,8 +13,6 @@ import handleError from 'helpers/handleError'
 import { getErrorAlert, isEmpty } from 'helpers/utility'
 import { loadableOptions } from 'components/micro/Common'
 
-import { ctaLabel } from './OrderQA'
-
 const OrderNote = loadable(() => import('./note'), loadableOptions)
 const OrderQA = loadable(() => import('./OrderQA'), loadableOptions)
 const PaymentUI = loadable(() => import('./PaymentUI'), loadableOptions)
@@ -188,7 +186,7 @@ const Manage = props => {
                 <>Please wait until CMS review the answers.</>
               ) : (
                 <>
-                  Please <b>{ctaLabel}</b> the answers of this below questions to get started.
+                  Please <b>Submit</b> the answers of this below questions to get started.
                 </>
               )}
             </>

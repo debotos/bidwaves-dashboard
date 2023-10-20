@@ -1,21 +1,16 @@
 import React from 'react'
 import Axios from 'axios'
+import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
-import { Row, Col, Input, Table, Dropdown, Tooltip, Button, Modal } from 'antd'
+import { Row, Col, Input, Table, Dropdown, Button, Modal, Card, Space } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
-import {
-  CaretDownFilled,
-  ClearOutlined,
-  PlusCircleOutlined,
-  QuestionCircleFilled,
-  SearchOutlined
-} from '@ant-design/icons'
+import { CaretDownFilled, ClearOutlined, QuestionCircleFilled, SearchOutlined } from '@ant-design/icons'
 
 import { message } from 'App'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
-import { DeleteIcon, RefreshButton } from 'components/micro/Common'
 import { defaultPaginationConfig } from 'helpers/utility'
+import { DeleteIcon, RefreshButton } from 'components/micro/Common'
 
 const searchableColumns = [
   { key: 'name', label: 'Name' },
@@ -23,7 +18,7 @@ const searchableColumns = [
 ]
 const defaultSearchField = searchableColumns[0].key
 
-function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, setProducts }) {
+function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, setProducts, refetchProducts }) {
   const _isMounted = useRef(false)
   const [state, setState] = useSetState({
     searchText: '',
@@ -58,8 +53,8 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
 
   const getMainData = useLockFn(async config => {
     try {
-      const { currentPage } = config || {}
-      _isMounted.current && setState({ fetching: true })
+      const { currentPage, silent = false } = config || {}
+      _isMounted.current && !silent && setState({ fetching: true })
       let _ep = endpoints.order(orderId) + '/product-suggestion'
       // For pagination | After this portion '?' is always present
       const page = currentPage || state.paginationCurrentPage
@@ -124,9 +119,11 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
       const postData = { productId }
       const { data } = await Axios.post(endpoints.orderBase + `/${orderId}/product`, postData)
       window.log(`Product add response -> `, data)
+      await deleteListItem(productId)
       setProducts(prevItems => [data, ...prevItems])
       message.success('Successfully added to the campaign.')
-      getMainData()
+      getMainData({ silent: suggestionUI })
+      suggestionUI && refetchProducts?.()
     } catch (error) {
       handleError(error, true)
     } finally {
@@ -172,39 +169,6 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
         const { id } = record
         return (
           <Row justify="space-around" gutter={[8, 0]} wrap={false}>
-            {suggestionUI && (
-              <Col>
-                <Tooltip title={`Add To This Campaign`} placement="topRight">
-                  <Button
-                    type="primary"
-                    icon={<PlusCircleOutlined />}
-                    loading={state.idAdding === id}
-                    onClick={() => {
-                      if (getCurrentProductIds().includes(id)) {
-                        Modal.confirm({
-                          title: 'Please confirm before proceeding?',
-                          icon: <QuestionCircleFilled />,
-                          okText: 'Yes, Add Again',
-                          cancelText: 'No',
-                          content: (
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html: `The product with the name "<b>${record.name}</b>" already exist in this campaign. You want to add again?<br/>Please carefully review and verify the changes before proceeding to ensure accuracy and prevent potential errors.`
-                              }}
-                            />
-                          ),
-                          onOk: () => handleAddProduct(record)
-                        })
-                      } else {
-                        handleAddProduct(record)
-                      }
-                    }}
-                  >
-                    Add This Product
-                  </Button>
-                </Tooltip>
-              </Col>
-            )}
             {state.dataResponse.suggested && (
               <>
                 <Col>
@@ -227,13 +191,85 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
 
   const list = state.dataResponse?.list ?? []
 
+  const refreshBtn = <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={() => getMainData()} />
+
+  if (suggestionUI) {
+    return (
+      <div className="relative">
+        <div className="absolute" style={{ top: -45, right: 0 }}>
+          {refreshBtn}
+        </div>
+        {list.map((row, i) => {
+          return (
+            <Fade key={i}>
+              <Card size="small" bodyStyle={{}} className="mb-2">
+                <Space direction="vertical" className="w-100">
+                  <Row gutter={[20, 10]} justify={`space-between`} align={`middle`}>
+                    <Col>
+                      <h4 className="font-bold text-[--primary-color]">{row.name}</h4>
+                    </Col>
+                    <Col>
+                      <Space>
+                        <Button
+                          type="primary"
+                          shape="round"
+                          size="small"
+                          loading={state.idAdding === row.id}
+                          onClick={() => {
+                            if (getCurrentProductIds().includes(row.id)) {
+                              Modal.confirm({
+                                title: 'Please confirm before proceeding?',
+                                icon: <QuestionCircleFilled />,
+                                okText: 'Yes, Add Again',
+                                cancelText: 'No',
+                                content: (
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: `The product with the name "<b>${row.name}</b>" already exist in this campaign. You want to add again?<br/>Please carefully review and verify the changes before proceeding to ensure accuracy and prevent potential errors.`
+                                    }}
+                                  />
+                                ),
+                                onOk: () => handleAddProduct(row)
+                              })
+                            } else {
+                              handleAddProduct(row)
+                            }
+                          }}
+                        >
+                          Add To My Campaign
+                        </Button>
+
+                        {state.dataResponse.suggested && (
+                          <Button
+                            danger
+                            type="primary"
+                            shape="round"
+                            size="small"
+                            loading={state.idDeleting === row.id}
+                            onClick={() => deleteListItem(row.id)}
+                          >
+                            No Thanks
+                          </Button>
+                        )}
+                      </Space>
+                    </Col>
+                  </Row>
+
+                  <div dangerouslySetInnerHTML={{ __html: row.description }} />
+                </Space>
+              </Card>
+            </Fade>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <>
-      {!suggestionUI && <h2 className={'mb-4'}>Here are the available products</h2>}
+      <h2 className={'mb-4'}>Here are the available products</h2>
       <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4">
-        <Col>
-          <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={() => getMainData()} />
-        </Col>
+        <Col>{refreshBtn}</Col>
         <Col span={24} md={12} xl={8}>
           <Input
             allowClear

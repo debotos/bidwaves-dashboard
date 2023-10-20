@@ -1,5 +1,3 @@
-import { Alert } from 'antd'
-
 import Products from './ProductsList'
 
 function ProductSuggestion(props) {
@@ -7,13 +5,6 @@ function ProductSuggestion(props) {
 
   return (
     <>
-      <Alert
-        className="mb-3"
-        message="List of product recommended below from CSM for this campaign."
-        type="info"
-        showIcon
-      />
-
       <Products suggestionUI={true} orderId={order.id} {...props} />
     </>
   )

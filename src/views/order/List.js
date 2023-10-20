@@ -286,8 +286,8 @@ function ListComponent({ reRender }) {
         </Empty>
       )}
 
-      {list.map(item => {
-        return <CampaignItem key={item.id} item={item} />
+      {list.map((item, i) => {
+        return <CampaignItem key={item.id} order={item} first={i === 0} />
       })}
 
       <Pagination
