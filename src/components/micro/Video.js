@@ -29,7 +29,7 @@ const Video = ({ url }) => {
         <MdClear size={22} className="close-video-btn" onClick={() => handleClose()} />
       </Row>
       <div className="bg-indigo-50">
-        <ReactPlayer url={url} />
+        <ReactPlayer url={url} style={{ maxWidth: '80vw' }} />
       </div>
     </Wrapper>
   )
@@ -38,7 +38,7 @@ const Video = ({ url }) => {
 export default React.memo(Video)
 
 const Wrapper = styled.div`
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   z-index: 9;

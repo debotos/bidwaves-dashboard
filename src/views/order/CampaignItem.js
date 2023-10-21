@@ -1,25 +1,50 @@
 import React from 'react'
 import Axios from 'axios'
 import Fade from 'react-reveal/Fade'
-import styled from 'styled-components'
 import loadable from '@loadable/component'
 import { useSafeState, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { Alert, Avatar, Button, Card, Col, Modal, Row, Space, Tag, Tooltip, message } from 'antd'
-import { CheckCircleOutlined, ClockCircleOutlined, EditOutlined, ReloadOutlined } from '@ant-design/icons'
+import {
+  Alert,
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Col,
+  Empty,
+  Modal,
+  Row,
+  Skeleton,
+  Space,
+  Tag,
+  Tooltip,
+  message
+} from 'antd'
+import {
+  BellOutlined,
+  CheckCircleOutlined,
+  CheckOutlined,
+  CheckSquareOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  ReloadOutlined,
+  WarningOutlined
+} from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
 import endpoints from 'config/endpoints'
+import PaymentInfo from './PaymentInfo'
 import handleError from 'helpers/handleError'
-import { getErrorAlert, isEmpty } from 'helpers/utility'
+import emptyImage from 'assets/images/empty.svg'
 import { loadableOptions } from 'components/micro/Common'
+import { getErrorAlert, getOrderStatusTag, isEmpty, renderLoading } from 'helpers/utility'
 
-// const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
+const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
 const OrderQA = loadable(() => import('./manage/OrderQA'), loadableOptions)
 const PaymentUI = loadable(() => import('./manage/PaymentUI'), loadableOptions)
 const OrderEdit = loadable(() => import('./manage/OrderEdit'), loadableOptions)
-// const Video = loadable(() => import('components/micro/Video'), loadableOptions)
-// const CampaignManager = loadable(() => import('./manage/manager/CampaignManager'), loadableOptions)
+const Video = loadable(() => import('components/micro/Video'), loadableOptions)
+const CampaignManager = loadable(() => import('./manage/manager/CampaignManager'), loadableOptions)
 const ProductSuggestion = loadable(() => import('./manage/suggestion/ProductSuggestion'), loadableOptions)
 
 function CampaignItem(props) {
@@ -33,6 +58,7 @@ function CampaignItem(props) {
   const [fetchingProducts, setFetchingProducts] = useSafeState(true)
   const [qaModal, setQAModal] = useSafeState(false)
   const [updateModal, setUpdateModal] = useSafeState(false)
+  const [activeProduct, setActiveProduct] = useSafeState(null)
 
   const reRender = () => setKey(new Date().valueOf())
   const updateOrder = (updates = {}) => setOrder(prevValues => ({ ...prevValues, ...updates }))
@@ -46,9 +72,9 @@ function CampaignItem(props) {
   }
   const deleteProduct = id => setProducts(prevValues => prevValues.filter(x => x.id !== id))
 
-  const getOrderProducts = async () => {
+  const getOrderProducts = async (silent = false) => {
     try {
-      setFetchingProducts(true)
+      !silent && setFetchingProducts(true)
       const { data } = await Axios.get(orderEp + `/product?all=true`)
       window.log(`Order/Campaign products response: `, data)
       const list = data?.list || []
@@ -60,16 +86,28 @@ function CampaignItem(props) {
     }
   }
 
-  const getData = async () => {
+  const getData = async ({ dependent, silent = true } = {}) => {
+    let dependentCalled = false
     try {
-      setFetching(true)
+      !silent && setFetching(true)
       const { data } = await Axios.get(orderEp)
       window.log(`Order/Campaign response: `, data)
       setOrder(data)
+      if (dependent) {
+        const noQA = isEmpty(data.qa)
+        const showOnlyQaUI = !data.qa_approved && !noQA
+        if (!showOnlyQaUI) {
+          await getOrderProducts(silent)
+          dependentCalled = true
+        } else {
+          setFetchingProducts(false)
+        }
+      }
     } catch (error) {
       handleError(error, true)
     } finally {
       setFetching(false)
+      dependentCalled && setFetchingProducts(false)
     }
   }
 
@@ -90,7 +128,7 @@ function CampaignItem(props) {
   }
 
   useMount(() => {
-    getData()
+    getData({ dependent: true })
     listenSocketIOEvents()
   })
 
@@ -119,6 +157,7 @@ function CampaignItem(props) {
     updateOrder,
     refetch: getData,
 
+    activeProduct,
     fetchingProducts,
     products,
     setProducts,
@@ -133,21 +172,44 @@ function CampaignItem(props) {
   const noQA = isEmpty(order.qa)
   const showOnlyQaUI = !order.qa_approved && !noQA
 
-  const refreshBtnEl = (
-    <RefreshButton>
-      <Tooltip title="Refresh">
-        <Button
-          type="dashed"
-          size="small"
-          onClick={() => {
-            getData()
-            !showOnlyQaUI && getOrderProducts()
-          }}
-          loading={fetching}
-          icon={<ReloadOutlined />}
-        />
+  const handleRefresh = () => {
+    getData()
+    !showOnlyQaUI && getOrderProducts(true)
+  }
+
+  const getPaymentInfoBtn = () => {
+    if (!order.first_payment_date) return null
+
+    return (
+      <div onClick={e => e.stopPropagation()}>
+        <PaymentInfo order={order} />
+      </div>
+    )
+  }
+
+  const getRefreshBtn = label => {
+    return (
+      <Tooltip title="Refresh Campaign">
+        <Button type="dashed" size="small" onClick={handleRefresh} loading={fetching} icon={<ReloadOutlined />}>
+          {label}
+        </Button>
       </Tooltip>
-    </RefreshButton>
+    )
+  }
+
+  const asyncActionRunning = fetching || fetchingProducts
+
+  const topBarEl = (
+    <Row key={key} justify={`space-between`} align={`middle`} gutter={[10, 10]}>
+      <Col>{getOrderStatusTag(order.status, order, 'm-0')}</Col>
+      <Col>
+        <Space size={`middle`} align="end">
+          {!asyncActionRunning && getOrderNotification({ ...order, products: products })}
+          {getPaymentInfoBtn()}
+          {getRefreshBtn()}
+        </Space>
+      </Col>
+    </Row>
   )
 
   const getBodyContent = () => {
@@ -156,8 +218,16 @@ function CampaignItem(props) {
         <Alert
           showIcon
           type="info"
-          message="Please wait until CMS review."
-          description="Please wait for the CMS to review the fundamental campaign details you've submitted and to set up the necessary questions for a more thorough understanding of your campaign requirements."
+          message={<b>Please wait until CMS set up your next step.</b>}
+          description={
+            <Space direction="vertical" align="end">
+              <p className="m-0 font-semibold">
+                CMS needs to review the fundamental campaign details you&apos;ve submitted and to set up the necessary
+                questions for a more thorough understanding of your campaign requirements.
+              </p>
+              {getRefreshBtn('Refresh')}
+            </Space>
+          }
         />
       )
     }
@@ -177,27 +247,29 @@ function CampaignItem(props) {
     }
 
     return (
-      <Space className="w-full" direction="vertical">
-        <Row gutter={[20, 10]} justify={`space-between`} align={`middle`}>
+      <Space className="w-full" direction="vertical" size={`middle`}>
+        <Row gutter={[20, 10]} justify={`space-between`} align={`middle`} wrap={false}>
           <Col className="">
-            Questionnaire{' '}
-            {order.qa_approved ? (
-              <Tag className="ml-2" color="success" icon={<CheckCircleOutlined />}>
-                Complete
-              </Tag>
-            ) : (
-              <>
-                {order.qa_submitted ? (
-                  <Tag className="ml-2" color="success" icon={<ClockCircleOutlined />}>
-                    Submitted
-                  </Tag>
-                ) : (
-                  <Tag className="ml-2" color="error">
-                    Incomplete
-                  </Tag>
-                )}
-              </>
-            )}
+            <Space size={`small`}>
+              <p className="m-0 font-semibold">Questionnaire</p>
+              {order.qa_approved ? (
+                <Tag className="ml-2" color="success" icon={<CheckCircleOutlined />}>
+                  Complete
+                </Tag>
+              ) : (
+                <>
+                  {order.qa_submitted ? (
+                    <Tag className="ml-2" color="processing" icon={<ClockCircleOutlined />}>
+                      Submitted
+                    </Tag>
+                  ) : (
+                    <Tag className="ml-2" color="error">
+                      Incomplete
+                    </Tag>
+                  )}
+                </>
+              )}
+            </Space>
           </Col>
           <Col>
             {!order.qa_approved && (
@@ -213,6 +285,96 @@ function CampaignItem(props) {
             )}
           </Col>
         </Row>
+
+        {fetchingProducts ? (
+          Array((order.products || []).length || 4)
+            .fill()
+            .map((_, i) => {
+              return (
+                <Row key={i} justify={`space-between`} align={`middle`} gutter={[30, 0]} wrap={false}>
+                  <Col span={16} lg={Math.floor(Math.random() * 7) + 14}>
+                    <Skeleton.Button active={true} size="large" block={true} style={{ height: 24 }} />
+                  </Col>
+                  <Col>
+                    <Skeleton.Button active={true} size="large" block={true} style={{ height: 24 }} />
+                  </Col>
+                </Row>
+              )
+            })
+        ) : (
+          <>
+            {isEmpty(products) && order.qa_approved ? (
+              <Empty
+                className="mt-4"
+                image={emptyImage}
+                description={<p className="m-0">Please add a recommended product to this campaign.</p>}
+              />
+            ) : (
+              products.map(product => {
+                const productId = product.id
+                const isComplete = product.complete
+                const isSubmitted = product.submitted
+                const isApproved = product.approved
+                const isReady = product.setup_ready
+                const common_disable = isComplete || isSubmitted || isApproved || !isReady
+
+                return (
+                  <Row gutter={[20, 10]} justify={`space-between`} align={`middle`} key={productId} wrap={false}>
+                    <Col className="">
+                      <Space wrap>
+                        <p className="m-0 font-semibold">{product.product_info?.name}</p>
+                        {isComplete ? (
+                          <Tag color="success" icon={<CheckCircleOutlined />}>
+                            Complete
+                          </Tag>
+                        ) : isApproved ? (
+                          <Tag color="success" icon={<CheckSquareOutlined />}>
+                            Approved
+                          </Tag>
+                        ) : (
+                          <>
+                            {isSubmitted ? (
+                              <Tag color="processing" icon={<CheckOutlined />}>
+                                Submitted
+                              </Tag>
+                            ) : (
+                              <>
+                                {!isReady ? (
+                                  <Tag color="cyan" icon={<ClockCircleOutlined />}>
+                                    CMS Reviewing
+                                  </Tag>
+                                ) : (
+                                  <>
+                                    <Tag color="warning" icon={<WarningOutlined />}>
+                                      Incomplete
+                                    </Tag>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </Space>
+                    </Col>
+                    <Col>
+                      {!common_disable && (
+                        <Button
+                          type="primary"
+                          disabled={common_disable}
+                          shape="round"
+                          size="small"
+                          onClick={() => setActiveProduct(product)}
+                        >
+                          Complete
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
+                )
+              })
+            )}
+          </>
+        )}
       </Space>
     )
   }
@@ -234,25 +396,27 @@ function CampaignItem(props) {
                 >
                   <h5 className="m-0 text-2xl font-bold">{order.name}</h5>
                 </Tooltip>
-                <Tooltip title="Edit">
-                  <Button type="link" size="large" icon={<EditOutlined />} onClick={() => setUpdateModal(true)} />
-                </Tooltip>
+                {order.approved && (
+                  <Tooltip title="Edit">
+                    <Button type="link" size="large" icon={<EditOutlined />} onClick={() => setUpdateModal(true)} />
+                  </Tooltip>
+                )}
               </Space>
-              <Card size="small" bodyStyle={{ position: 'relative' }}>
-                {refreshBtnEl}
-                <div className="px-4 py-3 lg:px-8 lg:py-8">{getBodyContent()}</div>
+              <Card size="small" title={order.approved && topBarEl} bodyStyle={{ position: 'relative' }}>
+                {fetching ? (
+                  renderLoading({ className: 'my-5' })
+                ) : (
+                  <>
+                    <div className="px-4 py-3 lg:px-6 lg:py-6">{getBodyContent()}</div>
+                  </>
+                )}
               </Card>
             </Fade>
           </Col>
           <Col span={24} lg={12}>
             {order.approved && order.active && order.qa_approved && !order.complete && (
               <Fade>
-                <Space className="mb-3">
-                  <h5 className="m-0 text-2xl font-bold">Recommended From Your CSM</h5>
-                </Space>
-                <div>
-                  <ProductSuggestion {...props} {...cProps} />
-                </div>
+                <ProductSuggestion {...props} {...cProps} />
               </Fade>
             )}
           </Col>
@@ -264,6 +428,7 @@ function CampaignItem(props) {
         title="Campaign Questions"
         open={qaModal}
         footer={null}
+        maskClosable={false}
         onCancel={() => setQAModal(false)}
         className="ant-modal-width-mid"
       >
@@ -276,10 +441,34 @@ function CampaignItem(props) {
         title="Campaign Information Update"
         open={updateModal}
         footer={null}
+        maskClosable={false}
         onCancel={() => setUpdateModal(false)}
         className="ant-modal-width-full"
       >
         <OrderEdit key={key} {...props} {...cProps} closeModal={() => setUpdateModal(false)} />
+      </Modal>
+
+      <Modal
+        destroyOnClose
+        // title=""
+        open={!isEmpty(activeProduct)}
+        footer={null}
+        maskClosable={false}
+        onCancel={() => setActiveProduct(null)}
+        className="ant-modal-width-full"
+        afterClose={() => getData({ dependent: true, silent: true })}
+      >
+        <div className="relative mt-4">
+          <Row gutter={[20, 20]}>
+            <Col span={24} md={14} lg={16} xl={17} xxl={18}>
+              <CampaignManager {...props} {...cProps} closeModal={() => setActiveProduct(null)} />
+            </Col>
+            <Col span={24} md={10} lg={8} xl={7} xxl={6}>
+              <OrderNote {...props} {...cProps} />
+            </Col>
+          </Row>
+          {order.video_guide ? <Video url={order.video_guide} /> : null}
+        </div>
       </Modal>
     </>
   )
@@ -287,8 +476,30 @@ function CampaignItem(props) {
 
 export default CampaignItem
 
-const RefreshButton = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-`
+const getOrderNotification = order => {
+  if (!order) return null
+  if (!order.approved) return null
+
+  let title
+
+  if (!order.qa_submitted && !isEmpty(order.qa)) {
+    title = 'Please review the questionnaire and submit.'
+  } else if (order.pending_payment_info) {
+    title = 'Please review the payment details & pay to continue.'
+  } else if (order.qa_approved && isEmpty(order.products)) {
+    title = 'Please add at least one product in this campaign to continue.'
+  } else if (order.qa_approved && !isEmpty(order.products)) {
+    if (order.products.some(x => x.setup_ready && !x.submitted)) {
+      title = 'CMS added necessary configuration for this campaign product(s). Please review and take action.'
+    }
+  }
+
+  if (!title) return null
+  return (
+    <Tooltip title={title}>
+      <Badge dot={true}>
+        <BellOutlined />
+      </Badge>
+    </Tooltip>
+  )
+}

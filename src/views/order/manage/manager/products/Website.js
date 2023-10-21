@@ -9,7 +9,7 @@ import { BsCheckCircleFill } from 'react-icons/bs'
 
 function Website(props) {
   const [form] = Form.useForm()
-  const { product, asyncUpdateProduct } = props
+  const { product, asyncUpdateProduct, closeModal } = props
   const calender_link = product.product_info?.calender_link
   const { data_obj } = product || {}
   const { qa, records } = data_obj || {}
@@ -29,6 +29,7 @@ function Website(props) {
     try {
       setLoading(true)
       await asyncUpdateProduct(product.id, { submitted: true })
+      closeModal?.()
     } finally {
       setLoading(false)
     }

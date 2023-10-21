@@ -4,13 +4,12 @@ import moment from 'moment'
 import Fade from 'react-reveal/Fade'
 import { useSelector } from 'react-redux'
 import loadable from '@loadable/component'
-import { useMount, useSet, useUnmount } from 'ahooks'
-import { DownOutlined, UpOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Empty, Popconfirm, Skeleton, Space, Tag, Tooltip } from 'antd'
+import { useMount, useUnmount } from 'ahooks'
+import { Alert, Button, Col, Divider, Popconfirm, Row, Space } from 'antd'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
-import { isEmpty } from 'helpers/utility'
+import { isEmpty, readableTime } from 'helpers/utility'
 import handleError from 'helpers/handleError'
 import { CalenderLink, loadableOptions } from 'components/micro/Common'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
@@ -21,9 +20,8 @@ const GoogleTag = loadable(() => import('./products/GoogleTag'), loadableOptions
 const CustomGraphics = loadable(() => import('./products/CustomGraphics'), loadableOptions)
 
 function CampaignManager(props) {
-  const { orderEp, fetching, fetchingProducts, refetchProducts, products, deleteProduct, updateProduct } = props
+  const { orderEp, deleteProduct, updateProduct, activeProduct, closeModal } = props
   const { user } = useSelector(state => state.auth)
-  const [set, { add, remove, reset }] = useSet([])
 
   const getSingleOrderProduct = async id => {
     try {
@@ -35,7 +33,10 @@ function CampaignManager(props) {
     }
   }
 
-  const handleDeleteProduct = info => deleteProduct(info.id)
+  const handleDeleteProduct = info => {
+    deleteProduct(info.id)
+    closeModal?.()
+  }
   const handleCommonBoolUpdate = info => updateProduct(info.id, { [info.property]: info.value })
   const refetchSingleOrderProduct = info => info.clientId === user.id && getSingleOrderProduct(info.id)
 
@@ -55,40 +56,11 @@ function CampaignManager(props) {
 
   useMount(() => {
     listenSocketIOEvents()
-    refetchProducts()
   })
 
   useUnmount(() => {
     stopListeningSocketIOEvents()
-    reset()
   })
-
-  if (fetching || fetchingProducts) {
-    return Array(9)
-      .fill()
-      .map((_, i) => (
-        <Fade key={i}>
-          <Card size="small" className={`mb-3 ${i === 0 ? 'mt-2' : ''}`}>
-            <Skeleton.Button active={true} size="large" block={true} style={{ height: 20 }} />
-          </Card>
-        </Fade>
-      ))
-  }
-
-  if (isEmpty(products)) {
-    return (
-      <Fade>
-        <Empty
-          className="mt-5"
-          description={
-            <Space direction="vertical" align="center">
-              <p className="m-0">{`You didn't added any product to this campaign.`}</p>
-            </Space>
-          }
-        />
-      </Fade>
-    )
-  }
 
   const getProductComponent = product => {
     if (!product.setup_ready) {
@@ -164,6 +136,7 @@ function CampaignManager(props) {
                 title="Are you sure? Please check your calendar first."
                 onConfirm={async () => {
                   await props.asyncUpdateProduct?.(product.id, { submitted: true })
+                  closeModal?.()
                 }}
               >
                 <Button shape="round" type="primary" size="middle" className="cta-btn">
@@ -180,78 +153,58 @@ function CampaignManager(props) {
     }
   }
 
-  return (
-    <>
-      {products.map((product, index) => {
-        const isActive = set.has(product.id)
-        const isFirstProduct = index === 0
-        const isComplete = product.complete
-        const isSubmitted = product.submitted
-        const isApproved = product.approved
-        const productId = product.id
-        const productEp = orderEp + `/product/${productId}`
-        const common_disable = isComplete || isSubmitted || isApproved
+  if (isEmpty(activeProduct)) return null
 
-        const handleToggleView = e => {
-          e.stopPropagation()
-          if (isActive) {
-            remove(productId)
-          } else {
-            add(productId)
-          }
-        }
+  const renderUI = () => {
+    const product = activeProduct
+    const isComplete = product.complete
+    const isSubmitted = product.submitted
+    const isApproved = product.approved
+    const productId = product.id
+    const productEp = orderEp + `/product/${productId}`
+    const common_disable = isComplete || isSubmitted || isApproved
 
-        return (
-          <Fade key={productId}>
-            <Card
-              size="small"
-              title={
-                <Space onClick={handleToggleView} className="cursor-pointer">
-                  <b>{product.product_info?.name}</b>
-                  {isComplete ? (
-                    <Tag color="success">Complete</Tag>
-                  ) : isApproved ? (
-                    <Tag color="success">Approved</Tag>
-                  ) : (
-                    <>{isSubmitted && <Tag color="processing">Submitted. Waiting for CMS to review.</Tag>}</>
-                  )}
+    return (
+      <Fade key={productId}>
+        <div>
+          <Divider>{product.product_info?.name}</Divider>
+
+          <Fade>{getProductComponent({ ...product, common_disable, productEp })}</Fade>
+
+          <Divider />
+          <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+            <Col>
+              <Space direction="vertical" size={`small`} align="end">
+                <Space>
+                  <p className="m-0 text-sm font-semibold">Last Updated:</p>
+                  <p className="m-0 text-sm font-medium">{readableTime(product.updatedAt)}</p>
+                  <p className="m-0 text-sm font-medium">({moment(product.updatedAt).fromNow()})</p>
                 </Space>
-              }
-              className={`mb-3 ${isFirstProduct ? 'mt-2' : ''}`}
-              bodyStyle={isComplete || !isActive ? { padding: 0 } : {}}
-              extra={
-                <Space size="middle">
-                  <Tooltip title="Added">
-                    <p className="m-0 text-sm font-medium">{moment(product.createdAt).fromNow()}</p>
-                  </Tooltip>
-                  {!isComplete && (
-                    <>
-                      <AsyncDeleteButton
-                        disabled={common_disable}
-                        endpoint={productEp}
-                        onFinish={() => deleteProduct(productId)}
-                      />
-                      <Tooltip title={isActive ? 'Click to hide' : 'Click to view'}>
-                        <Button
-                          size="small"
-                          icon={isActive ? <DownOutlined /> : <UpOutlined />}
-                          onClick={handleToggleView}
-                        />
-                      </Tooltip>
-                    </>
-                  )}
+                <Space>
+                  <p className="m-0 text-sm font-semibold">Added:</p>
+                  <p className="m-0 text-sm font-medium">{readableTime(product.createdAt)}</p>
+                  <p className="m-0 text-sm font-medium">({moment(product.createdAt).fromNow()})</p>
                 </Space>
-              }
-            >
-              {isComplete || !isActive ? null : (
-                <Fade>{getProductComponent({ ...product, common_disable, productEp })}</Fade>
-              )}
-            </Card>
-          </Fade>
-        )
-      })}
-    </>
-  )
+              </Space>
+            </Col>
+            {!isComplete && (
+              <Col>
+                <AsyncDeleteButton
+                  label="Remove From This Campaign"
+                  disabled={common_disable}
+                  endpoint={productEp}
+                  onFinish={() => deleteProduct(productId)}
+                  btnProps={{ size: 'middle' }}
+                />
+              </Col>
+            )}
+          </Row>
+        </div>
+      </Fade>
+    )
+  }
+
+  return <>{renderUI()}</>
 }
 
 export default CampaignManager

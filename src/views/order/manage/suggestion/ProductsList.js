@@ -119,7 +119,7 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
       const postData = { productId }
       const { data } = await Axios.post(endpoints.orderBase + `/${orderId}/product`, postData)
       window.log(`Product add response -> `, data)
-      await deleteListItem(productId)
+      await deleteListItem(productId, false)
       setProducts(prevItems => [data, ...prevItems])
       message.success('Successfully added to the campaign.')
       getMainData({ silent: suggestionUI })
@@ -131,13 +131,13 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
     }
   }
 
-  const deleteListItem = async id => {
+  const deleteListItem = async (id, notify = true) => {
     try {
       _isMounted.current && setState({ idDeleting: id })
       const req = await Axios.delete(endpoints.order(orderId) + `/product-suggestion/${id}`)
       const res = req.data
       window.log(`Product suggestion remove response -> `, res)
-      message.success('Action successful.')
+      if (notify) message.success('Action successful.')
       getMainData()
     } catch (error) {
       handleError(error, true)
@@ -194,11 +194,15 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
   const refreshBtn = <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={() => getMainData()} />
 
   if (suggestionUI) {
+    if (!state.dataResponse?.suggested) return null
     return (
-      <div className="relative">
-        <div className="absolute" style={{ top: -45, right: 0 }}>
-          {refreshBtn}
-        </div>
+      <div>
+        <Row className="mb-3" justify={`space-between`} align={`middle`} gutter={[20, 10]} wrap={false}>
+          <Col>
+            <h5 className="m-0 text-2xl font-bold">Recommended From Your CSM</h5>
+          </Col>
+          <Col>{refreshBtn}</Col>
+        </Row>
         {list.map((row, i) => {
           return (
             <Fade key={i}>

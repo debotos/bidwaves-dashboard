@@ -5,7 +5,7 @@ import { Button, Col, Row, message } from 'antd'
 import { CalenderLink } from 'components/micro/Common'
 
 function GoogleTag(props) {
-  const { product, asyncUpdateProduct } = props
+  const { product, asyncUpdateProduct, closeModal } = props
   const calender_link = product.product_info?.calender_link
   const { data_obj } = product || {}
   const [loading, setLoading] = useSafeState(false)
@@ -14,6 +14,7 @@ function GoogleTag(props) {
     try {
       setLoading(true)
       await asyncUpdateProduct(product.id, { submitted: true })
+      closeModal?.()
     } finally {
       setLoading(false)
     }

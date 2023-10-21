@@ -18,7 +18,7 @@ function PaymentUI({ refetch, order }) {
   return (
     <>
       <Row justify={`center`}>
-        <Col span={24} md={24} lg={18} xl={14} xxl={10}>
+        <Col span={24}>
           <h2 className="mt-3">{isRecurring ? 'Monthly Recurring Payment' : 'Payment'}</h2>
           <Table
             bordered

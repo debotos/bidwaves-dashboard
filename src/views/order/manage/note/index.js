@@ -137,7 +137,7 @@ function OrderNote({ order }) {
               <Fade key={item.id}>
                 <Card
                   size="small"
-                  title={item.from + ' | ' + readableTime(item.createdAt, true)}
+                  title={(csm ? item.from : 'You') + ' | ' + readableTime(item.createdAt, true)}
                   style={{ backgroundColor: csm ? 'beige' : '#edecff' }}
                   extra={
                     csm ? null : (

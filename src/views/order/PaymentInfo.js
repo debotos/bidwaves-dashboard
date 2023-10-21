@@ -44,7 +44,7 @@ function PaymentInfo({ order }) {
   if (isEmpty(order)) return null
   return (
     <>
-      <Tooltip title="Payment Info">
+      <Tooltip title="Campaign Payment Info">
         <Button icon={<FaRegCreditCard className="mt-1" />} size="small" onClick={showModal} />
       </Tooltip>
 

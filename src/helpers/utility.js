@@ -143,7 +143,7 @@ export const basePasswordRule = {
   message: 'Password minimum length is 10. Including one uppercase, lowercase, number and special character.'
 }
 
-const pageSizeOptions = [50, 100, 250, 500, 1000, 1500, 2000]
+const pageSizeOptions = [5, 10, 50, 100, 250]
 export const defaultPaginationConfig = {
   showSizeChanger: true,
   defaultPageSize: pageSizeOptions[0],
@@ -174,10 +174,10 @@ export const commonBoolColProps = dataIndex => ({
   render: val => renderBoolTag(val)
 })
 
-export const getOrderStatusTag = (status, record) => {
+export const getOrderStatusTag = (status, record, className = '') => {
   if (record.complete) {
     return (
-      <Tag color={getCssVar('success-color')} icon={<CheckCircleOutlined />}>
+      <Tag className={className} color={getCssVar('success-color')} icon={<CheckCircleOutlined />}>
         Complete
       </Tag>
     )
@@ -188,35 +188,35 @@ export const getOrderStatusTag = (status, record) => {
   switch (status) {
     case keys.ORDER_STATUS.CANCELLED:
       return (
-        <Tag icon={<CloseCircleOutlined />} color="error">
+        <Tag className={className} icon={<CloseCircleOutlined />} color="error">
           {status}
         </Tag>
       )
 
     case keys.ORDER_STATUS.PROGRESS:
       return (
-        <Tag icon={<SyncOutlined spin />} color="processing">
+        <Tag className={className} icon={<SyncOutlined spin />} color="processing">
           {status}
         </Tag>
       )
 
     case keys.ORDER_STATUS.WAITING:
       return (
-        <Tag icon={<ClockCircleOutlined />} color="cyan">
+        <Tag className={className} icon={<ClockCircleOutlined />} color="cyan">
           {status}
         </Tag>
       )
 
     case keys.ORDER_STATUS.REFUNDING:
       return (
-        <Tag icon={<ExclamationCircleOutlined />} color="warning">
+        <Tag className={className} icon={<ExclamationCircleOutlined />} color="warning">
           {status}
         </Tag>
       )
 
     case keys.ORDER_STATUS.AWAITING_PAYMENT:
       return (
-        <Tag icon={<ClockCircleOutlined />} color="warning">
+        <Tag className={className} icon={<ClockCircleOutlined />} color="warning">
           {status}
         </Tag>
       )
@@ -224,13 +224,17 @@ export const getOrderStatusTag = (status, record) => {
     case keys.ORDER_STATUS.ALL_GOOD:
     case keys.ORDER_STATUS.RUNNING:
       return (
-        <Tag icon={<CheckCircleOutlined />} color="success">
+        <Tag className={className} icon={<CheckCircleOutlined />} color="success">
           {status}
         </Tag>
       )
 
     default:
-      return <Tag color="default">{status}</Tag>
+      return (
+        <Tag className={className} color="default">
+          {status}
+        </Tag>
+      )
   }
 }
 

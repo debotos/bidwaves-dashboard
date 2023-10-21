@@ -19,7 +19,7 @@ const getPhotosSkeletonObject = photos => {
 }
 
 function CustomGraphics(props) {
-  const { orderEp, order, product, asyncUpdateProduct } = props
+  const { orderEp, order, product, asyncUpdateProduct, closeModal } = props
   const { data_obj } = product || {}
   const { templates = [] } = data_obj || {}
   const [saving, setSaving] = useSafeState(false)
@@ -48,6 +48,7 @@ function CustomGraphics(props) {
         submitted: true,
         data_obj: { ...(data_obj ?? {}), final_graphics: { cms_graphics, client_graphics } }
       })
+      closeModal?.()
     } finally {
       setSaving(false)
     }

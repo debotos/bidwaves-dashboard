@@ -4,9 +4,8 @@ import { useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { Row, Col, Input, Dropdown, Space, Select, Drawer, Button, Empty, Card, Skeleton, Pagination } from 'antd'
+import { Row, Col, Input, Dropdown, Space, Select, Button, Empty, Card, Skeleton, Pagination } from 'antd'
 
-import Manage from './manage'
 import keys from 'config/keys'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
@@ -14,7 +13,7 @@ import CampaignItem from './CampaignItem'
 import handleError from 'helpers/handleError'
 import emptyImage from 'assets/images/empty.svg'
 import { RefreshButton } from 'components/micro/Common'
-import { isEmpty, defaultPaginationConfig, sleep } from 'helpers/utility'
+import { isEmpty, defaultPaginationConfig } from 'helpers/utility'
 
 const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
 const FULLFIL_STATUS = { COMPLETE: 'Complete', NOT_COMPLETE: 'Not Complete' }
@@ -70,7 +69,9 @@ function ListComponent({ reRender }) {
       let _ep = endpoints.orderBase
       // For pagination | After this portion '?' is always present
       const page = currentPage || state.paginationCurrentPage
-      const paginationQuery = `size=${state.paginationPageSize}&page=${page}&${keys.BOOL_COL_PREFIX}active=true`
+      const paginationQuery = `size=${state.paginationPageSize}&page=${page}&${
+        keys.BOOL_COL_PREFIX
+      }active=true&simple=true&attributes=${encodeURIComponent('id, name')}`
       const paginationQueryPrefix = _ep.includes('?') ? '&' : '?'
       _ep += paginationQueryPrefix + paginationQuery
 
@@ -113,10 +114,7 @@ function ListComponent({ reRender }) {
   useUpdateEffect(() => {
     ;(async () => {
       if (!state.fetching && openOrderId) {
-        // After fetching finish
-        await sleep(500)
-        const el = document.getElementById(`order-${openOrderId}-config-btn`)
-        if (el) el.click()
+        // Do anything if needed
       }
     })()
   }, [state.fetching])
@@ -142,12 +140,6 @@ function ListComponent({ reRender }) {
     const value = e.target.value
     const update = { searchText: value }
     debounceSetState(update)
-  }
-
-  const closeManageUI = () => {
-    setState({ editingItem: null })
-    navigate(links.orders.to)
-    getMainData()
   }
 
   const showOnlyCompleted = isShowOnlyCompleted()
@@ -222,26 +214,51 @@ function ListComponent({ reRender }) {
         <Col>{addBtnEl}</Col>
       </Row>
 
-      {state.fetching && (
+      {state.fetching ? (
         <>
           {Array(3)
             .fill()
             .map((_, i) => {
               return (
                 <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
-                  <Space className="mb-3">
-                    <Skeleton.Avatar active size="large" shape={`circle`} />
-                    <Skeleton.Input active size="large" />
-                  </Space>
                   <Row gutter={[40, 0]}>
-                    <Col span={12}>
+                    <Col span={24} lg={12}>
+                      <Space className="mb-3">
+                        <Skeleton.Input active size="large" />
+                        <Skeleton.Avatar active size="large" shape="square" />
+                      </Space>
+                    </Col>
+                    <Col span={24} lg={12} className="hidden lg:block">
+                      <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+                        <Col>
+                          <Skeleton.Input active size="large" />
+                        </Col>
+                        <Col>
+                          <Skeleton.Avatar active size="large" shape="square" />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                  <Row gutter={[40, 30]}>
+                    <Col span={24} lg={12}>
                       <Fade>
                         <Card size="small" bodyStyle={{ padding: 0 }}>
                           <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
                         </Card>
                       </Fade>
                     </Col>
-                    <Col span={12}>
+                    <Col span={24} lg={12}>
+                      <div className="mb-3 block lg:mb-0 lg:hidden">
+                        <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+                          <Col>
+                            <Skeleton.Input active size="large" />
+                          </Col>
+                          <Col>
+                            <Skeleton.Avatar active size="large" shape="square" />
+                          </Col>
+                        </Row>
+                      </div>
+
                       {Array(3)
                         .fill()
                         .map((_, i) => {
@@ -259,31 +276,16 @@ function ListComponent({ reRender }) {
               )
             })}
         </>
-      )}
-
-      {isEmpty(list) && !state.fetching && (
-        <Empty
-          image={emptyImage}
-          className="mb-5 mt-20"
-          imageStyle={{ height: 150, pointerEvents: 'none', userSelect: 'none' }}
-          description={
-            showOnlyCompleted ? (
-              <b>No campaigns have been marked as completed at this time.</b>
-            ) : (
-              <>
-                {filterExist ? (
-                  <b>No match found.</b>
-                ) : (
-                  <b className="text-yellow-600">
-                    You haven&apos;t added any campaigns yet. Please add a new campaign to get started!
-                  </b>
-                )}
-              </>
-            )
-          }
-        >
-          {showOnlyCompleted || filterExist ? null : addBtnEl}
-        </Empty>
+      ) : (
+        <>
+          {isEmpty(state.dataResponse) ? null : (
+            <>
+              {isEmpty(list) && (
+                <EmptyUI showOnlyCompleted={showOnlyCompleted} filterExist={filterExist} addBtnEl={addBtnEl} />
+              )}
+            </>
+          )}
+        </>
       )}
 
       {list.map((item, i) => {
@@ -300,27 +302,37 @@ function ListComponent({ reRender }) {
           setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
         }}
       />
-
-      <Drawer
-        title={'Manage ' + (state.editingItem?.name || 'Campaign')}
-        placement="right"
-        size="large"
-        width="100%"
-        onClose={closeManageUI}
-        open={!isEmpty(state.editingItem)}
-        closable={false}
-        bodyStyle={{ paddingTop: 10 }}
-        destroyOnClose
-        extra={
-          <Space>
-            <Button onClick={closeManageUI}>Close</Button>
-          </Space>
-        }
-      >
-        {state.editingItem && <Manage order={state.editingItem} closeUI={closeManageUI} />}
-      </Drawer>
     </>
   )
 }
 
 export default ListComponent
+
+const EmptyUI = ({ showOnlyCompleted, filterExist, addBtnEl }) => {
+  return (
+    <Fade>
+      <Empty
+        image={emptyImage}
+        className="mb-5 mt-20"
+        imageStyle={{ height: 150, pointerEvents: 'none', userSelect: 'none' }}
+        description={
+          showOnlyCompleted ? (
+            <b>No campaigns have been marked as completed at this time.</b>
+          ) : (
+            <>
+              {filterExist ? (
+                <b>No match found.</b>
+              ) : (
+                <b className="text-yellow-600">
+                  You haven&apos;t added any campaigns yet. Please add a new campaign to get started!
+                </b>
+              )}
+            </>
+          )
+        }
+      >
+        {showOnlyCompleted || filterExist ? null : addBtnEl}
+      </Empty>
+    </Fade>
+  )
+}

@@ -6,7 +6,7 @@ import { DeleteOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import handleError from 'helpers/handleError'
 
 const AsyncDeleteButton = props => {
-  const { endpoint, onFinish, confirmModalProps = {}, disabled = false } = props
+  const { endpoint, onFinish, confirmModalProps = {}, disabled = false, label, btnProps = {} } = props
   const [loading, setLoading] = useSafeState(false)
 
   const onChange = async () => {
@@ -46,7 +46,10 @@ const AsyncDeleteButton = props => {
       size="small"
       icon={<DeleteOutlined />}
       onClick={onClick}
-    />
+      {...btnProps}
+    >
+      {label}
+    </Button>
   )
 }
 

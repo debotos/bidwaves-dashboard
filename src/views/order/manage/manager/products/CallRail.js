@@ -5,7 +5,7 @@ import { Alert, Button, Form, Input, Row, Tooltip } from 'antd'
 
 function CallRail(props) {
   const [form] = Form.useForm()
-  const { product, asyncUpdateProduct } = props
+  const { product, asyncUpdateProduct, closeModal } = props
   const { data_obj } = product || {}
   const [saving, setSaving] = useSafeState(false)
 
@@ -13,6 +13,7 @@ function CallRail(props) {
     try {
       setSaving(true)
       await asyncUpdateProduct(product.id, { submitted: true, data_obj: { ...data_obj, ...values } })
+      closeModal?.()
     } finally {
       setSaving(false)
     }
