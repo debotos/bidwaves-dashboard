@@ -1,17 +1,16 @@
 import Axios from 'axios'
 import { useSafeState } from 'ahooks'
 import { useSelector, useDispatch } from 'react-redux'
-import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space, Tooltip } from 'antd'
+import { Row, Button, Form, Input, Col, message, Collapse, Card, Switch, Space } from 'antd'
 import { CaretLeftOutlined, CheckOutlined, CloseOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons'
 
 import endpoints from 'config/endpoints'
 import { companyFields } from './SignUp'
 import handleError from 'helpers/handleError'
 import { Page } from 'components/micro/Common'
-import InputURL from 'components/micro/fields/InputURL'
+import { basePasswordRule } from 'helpers/utility'
 import ChangeAvatar from 'components/micro/fields/ChangeAvatar'
 import { logoutUser, setCurrentUser } from 'redux/slices/authSlice'
-import { basePasswordRule, getCssVar, validateUrl } from 'helpers/utility'
 
 const cPanelStyles = { border: 'none', borderRadius: 6 }
 const getCPanelClass = last => `bg-[--body-bg-color] mb-${last ? 0 : 2}`
@@ -106,7 +105,7 @@ const Profile = () => {
                 </Col>
               </Row>
 
-              <Form.Item
+              {/* <Form.Item
                 label="LinkedIn"
                 name="linkedin"
                 rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}
@@ -134,7 +133,7 @@ const Profile = () => {
                 rules={[{ whitespace: true, message: 'Please provide address!' }]}
               >
                 <Input.TextArea rows={2} allowClear placeholder="Your Business Address" />
-              </Form.Item>
+              </Form.Item> */}
 
               <div className="rounded-md bg-white p-2">
                 <Collapse

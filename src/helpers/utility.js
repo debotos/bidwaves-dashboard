@@ -1,3 +1,4 @@
+import React from 'react'
 import he from 'he'
 import moment from 'moment'
 import { htmlToText } from 'html-to-text'
@@ -468,4 +469,22 @@ export function reloadOnVisibility() {
       window.location.replace(`${newUrl}${and}refresh=${timestamp}`)
     }, 200)
   }
+}
+
+export function replaceTextWithComponent(text, searchText, component) {
+  if (!text) {
+    return text
+  }
+
+  const parts = text.split(searchText)
+  return parts.map((part, index) =>
+    index < parts.length - 1 ? (
+      <React.Fragment key={index}>
+        {part}
+        {component}
+      </React.Fragment>
+    ) : (
+      part
+    )
+  )
 }

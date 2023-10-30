@@ -2,6 +2,8 @@ import React from 'react'
 import { useSafeState } from 'ahooks'
 import { SendOutlined } from '@ant-design/icons'
 import { Alert, Button, Form, Input, Row, Tooltip } from 'antd'
+import { replaceTextWithComponent } from 'helpers/utility'
+import { CalenderLink } from 'components/micro/Common'
 
 function CallRail(props) {
   const [form] = Form.useForm()
@@ -60,10 +62,13 @@ function CallRail(props) {
             <Input allowClear placeholder="Additional number with country code" />
           </Form.Item>
         </Tooltip>
-        <p
-          className="mb-3 mt-4 text-center text-lg font-medium"
-          dangerouslySetInnerHTML={{ __html: data_obj.help_text }}
-        />
+        <p className="mb-3 mt-4 text-center text-lg font-medium">
+          {replaceTextWithComponent(
+            data_obj.help_text || '',
+            'book a call here',
+            <CalenderLink label={`book a call here`} anchorClassName="" />
+          )}
+        </p>
         <Row justify="center" align="middle" className="mt-2">
           <Form.Item>
             <Button

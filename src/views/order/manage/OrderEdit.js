@@ -55,7 +55,7 @@ const OrderEdit = props => {
       {reqExist && (
         <Alert
           className="mb-3"
-          message="You already have a pending update request. Please wait until CMS take the necessary actions."
+          message="You already have a pending update request. Please wait until BidWaves take the necessary actions."
           type="info"
           showIcon
         />
@@ -263,7 +263,7 @@ const OrderEdit = props => {
             {!isEmpty(order.qa) && (
               <Collapse>
                 <Collapse.Panel
-                  header={<>Questionnaire</>}
+                  header={<>Brief</>}
                   key="qa"
                   style={{ borderRadius: 6 }}
                   className={getCPanelClass(false)}
@@ -349,7 +349,7 @@ const OrderEdit = props => {
             <Form.Item className="mt-4">
               <Popconfirm
                 okText="Yes, Submit"
-                title="Are you sure? Please review the updates carefully as you can't submit again until CMS resolve this request."
+                title="Are you sure? Please review the updates carefully as you can't submit again until BidWaves resolve this request."
                 onConfirm={() => form.submit()}
               >
                 <Button

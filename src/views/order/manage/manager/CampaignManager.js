@@ -68,7 +68,7 @@ function CampaignManager(props) {
         <Alert
           showIcon
           type="info"
-          message="Please wait until CMS setup or update the necessary configuration for this product."
+          message="Please wait until BidWaves setup or update the necessary configuration for this product."
         />
       )
     }
@@ -98,7 +98,7 @@ function CampaignManager(props) {
       case keys.PRODUCT_TYPES.crm_integration_with_unbounce:
       case keys.PRODUCT_TYPES.bing_import_from_google: {
         const calender_link = product.product_info?.calender_link
-        if (!calender_link) return <Alert showIcon type="info" message="Please contact CMS." />
+        if (!calender_link) return <Alert showIcon type="info" message="Please contact BidWaves." />
         if (product.common_disable) {
           return <Alert showIcon type="success" message="Everything is good to go from your side. No action needed." />
         }

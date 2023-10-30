@@ -2,6 +2,7 @@ import React from 'react'
 import Axios from 'axios'
 import Fade from 'react-reveal/Fade'
 import loadable from '@loadable/component'
+import { BsArrowReturnRight } from 'react-icons/bs'
 import { useSafeState, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 import {
   Alert,
@@ -23,10 +24,10 @@ import {
   BellOutlined,
   CheckCircleOutlined,
   CheckOutlined,
-  CheckSquareOutlined,
   ClockCircleOutlined,
   EditOutlined,
   ReloadOutlined,
+  SyncOutlined,
   WarningOutlined
 } from '@ant-design/icons'
 
@@ -39,7 +40,7 @@ import emptyImage from 'assets/images/empty.svg'
 import { loadableOptions } from 'components/micro/Common'
 import { getErrorAlert, getOrderStatusTag, isEmpty, renderLoading } from 'helpers/utility'
 
-const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
+// const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
 const OrderQA = loadable(() => import('./manage/OrderQA'), loadableOptions)
 const PaymentUI = loadable(() => import('./manage/PaymentUI'), loadableOptions)
 const OrderEdit = loadable(() => import('./manage/OrderEdit'), loadableOptions)
@@ -206,7 +207,12 @@ function CampaignItem(props) {
         <Space size={`middle`} align="end">
           {!asyncActionRunning && getOrderNotification({ ...order, products: products })}
           {getPaymentInfoBtn()}
-          {getRefreshBtn()}
+          <Tooltip
+            title={<h5 className="m-0 text-2xl font-bold">{order.advertisement_info?.name}</h5>}
+            placement="left"
+          >
+            <Avatar size="small" src={order.advertisement_info?.image?.secure_url} />
+          </Tooltip>
         </Space>
       </Col>
     </Row>
@@ -218,12 +224,12 @@ function CampaignItem(props) {
         <Alert
           showIcon
           type="info"
-          message={<b>Please wait until CMS set up your next step.</b>}
+          message={<b>Please wait until BidWaves set up your next step.</b>}
           description={
             <Space direction="vertical" align="end">
               <p className="m-0 font-semibold">
-                CMS needs to review the fundamental campaign details you&apos;ve submitted and to set up the necessary
-                questions for a more thorough understanding of your campaign requirements.
+                BidWaves needs to review the fundamental campaign details you&apos;ve submitted and to set up the
+                necessary questions for a more thorough understanding of your campaign requirements.
               </p>
               {getRefreshBtn('Refresh')}
             </Space>
@@ -251,7 +257,7 @@ function CampaignItem(props) {
         <Row gutter={[20, 10]} justify={`space-between`} align={`middle`} wrap={false}>
           <Col className="">
             <Space size={`small`}>
-              <p className="m-0 font-semibold">Questionnaire</p>
+              <p className="m-0 font-semibold">Campaign Brief</p>
               {order.qa_approved ? (
                 <Tag className="ml-2" color="success" icon={<CheckCircleOutlined />}>
                   Complete
@@ -328,8 +334,8 @@ function CampaignItem(props) {
                             Complete
                           </Tag>
                         ) : isApproved ? (
-                          <Tag color="success" icon={<CheckSquareOutlined />}>
-                            Approved
+                          <Tag color="success" icon={<SyncOutlined spin />}>
+                            BidWaves Working On It
                           </Tag>
                         ) : (
                           <>
@@ -340,9 +346,15 @@ function CampaignItem(props) {
                             ) : (
                               <>
                                 {!isReady ? (
-                                  <Tag color="cyan" icon={<ClockCircleOutlined />}>
-                                    CMS Reviewing
-                                  </Tag>
+                                  <>
+                                    <Tag color="cyan" icon={<ClockCircleOutlined />}>
+                                      BidWaves Reviewing
+                                    </Tag>
+                                    <p className="m-0 text-base font-extralight text-cyan-600">
+                                      <BsArrowReturnRight className="align-middle" size={14} />
+                                      &nbsp;&nbsp;BidWaves will get back to you once it has finished the review.
+                                    </p>
+                                  </>
                                 ) : (
                                   <>
                                     <Tag color="warning" icon={<WarningOutlined />}>
@@ -386,16 +398,8 @@ function CampaignItem(props) {
           <Col span={24} lg={12}>
             <Fade>
               <Space className="mb-2">
-                <Tooltip
-                  title={
-                    <Space align="center">
-                      <Avatar size="large" src={order.advertisement_info?.image?.secure_url} />
-                      <h5 className="m-0 text-2xl font-bold">{order.advertisement_info?.name}</h5>
-                    </Space>
-                  }
-                >
-                  <h5 className="m-0 text-2xl font-bold">{order.name}</h5>
-                </Tooltip>
+                <h5 className="m-0 text-2xl font-bold">{order.name}</h5>
+
                 {order.approved && (
                   <Tooltip title="Edit">
                     <Button type="link" size="large" icon={<EditOutlined />} onClick={() => setUpdateModal(true)} />
@@ -460,12 +464,13 @@ function CampaignItem(props) {
       >
         <div className="relative mt-4">
           <Row gutter={[20, 20]}>
-            <Col span={24} md={14} lg={16} xl={17} xxl={18}>
+            {/* <Col span={24} md={14} lg={16} xl={17} xxl={18}> */}
+            <Col span={24}>
               <CampaignManager {...props} {...cProps} closeModal={() => setActiveProduct(null)} />
             </Col>
-            <Col span={24} md={10} lg={8} xl={7} xxl={6}>
+            {/* <Col span={24} md={10} lg={8} xl={7} xxl={6}>
               <OrderNote {...props} {...cProps} />
-            </Col>
+            </Col> */}
           </Row>
           {order.video_guide ? <Video url={order.video_guide} /> : null}
         </div>
@@ -483,20 +488,20 @@ const getOrderNotification = order => {
   let title
 
   if (!order.qa_submitted && !isEmpty(order.qa)) {
-    title = 'Please review the questionnaire and submit.'
+    title = 'Please review the brief and submit.'
   } else if (order.pending_payment_info) {
     title = 'Please review the payment details & pay to continue.'
   } else if (order.qa_approved && isEmpty(order.products)) {
     title = 'Please add at least one product in this campaign to continue.'
   } else if (order.qa_approved && !isEmpty(order.products)) {
     if (order.products.some(x => x.setup_ready && !x.submitted)) {
-      title = 'CMS added necessary configuration for this campaign product(s). Please review and take action.'
+      title = 'BidWaves added necessary configuration for this campaign product(s). Please review and take action.'
     }
   }
 
   if (!title) return null
   return (
-    <Tooltip title={title}>
+    <Tooltip title={title} placement="left">
       <Badge dot={true}>
         <BellOutlined />
       </Badge>

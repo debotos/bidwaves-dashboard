@@ -129,8 +129,9 @@ const Calculator = ({ embed }) => {
             <div className={`bg-[--primary-color] ${embed ? 'rounded-lg' : 'lg:min-h-screen'}`}>
               <div className={`${embed ? 'mt-4' : 'pt-14 lg:pt-16'}`}>
                 <div className={`px-4 py-5 pt-11 lg:pt-14 ${embed ? 'pb-11 lg:pb-14' : ''}`}>
-                  <h1 className="text-center text-white lg:text-5xl">BidWaves PPC Calculator</h1>
-                  <div className="mt-9 lg:mt-14">
+                  <h1 className="text-center text-white lg:text-5xl">BidWaves</h1>
+                  <h1 className="text-center text-white lg:text-5xl">PPC Calculator</h1>
+                  <div className="mt-9 lg:mt-10">
                     <Space direction="vertical" size={24} align="center" className="w-100">
                       <AsyncSelect
                         size="large"
@@ -141,7 +142,7 @@ const Calculator = ({ embed }) => {
                         defaultSelectFirstOption={true}
                         style={{ minWidth: inputMinWidth }}
                         optionFilterProp="tag_label"
-                        placeholder="Select Your Advertisement Type"
+                        placeholder="Select Your Media Channel"
                         handleGetOptions={val =>
                           genericSearchOptionsFunc(endpoints.advertisementBase, val, {
                             optionPropsOverrideCb: item => {
@@ -262,10 +263,16 @@ const Calculator = ({ embed }) => {
                         </>
                       )}
 
-                      <p className="px-5 text-white">
-                        Are you spending more than $10,000 a month?{' '}
-                        <CalenderLink qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} />
-                      </p>
+                      <div className="text-center">
+                        <p className="mb-1 px-5 text-white">
+                          Are you spending more than $20,000 a month?{' '}
+                          <CalenderLink qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} />
+                        </p>
+                        <p className="px-5 text-white">
+                          If you are an agency,{' '}
+                          <CalenderLink label="click here!" qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} />
+                        </p>
+                      </div>
                     </Space>
                   </div>
                 </div>
@@ -274,17 +281,18 @@ const Calculator = ({ embed }) => {
           </Col>
           <Col span={24} lg={embed ? 13 : 12} className={`${embed ? '' : ''}`}>
             <div className={`flex h-full items-center justify-center ${embed ? '' : 'pt-6 lg:pt-16'}`}>
-              <div className={`px-0 py-5 pb-16 md:px-4 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
+              <div className={`px-2 py-5 pb-16 md:px-4 lg:pt-14 ${embed ? 'lg:mt-5' : ''}`}>
                 {enterpriseSelected ? (
                   <>
                     <h2 className="text-center">
-                      You spending more than $10,000 a month?{' '}
+                      You are spending more than $20,000 a month?{' '}
                       <CalenderLink qs={`?src=${encodeURIComponent(enterpriseCalenderLink)}`} anchorClassName="" />
                     </h2>
                   </>
                 ) : (
                   <>
-                    <h1 className="text-center lg:text-4xl">The Expected Leads You Would Get</h1>
+                    <h1 className="mb-3 text-center text-3xl lg:text-4xl">Find Out What Results Our</h1>
+                    <h1 className="text-center text-3xl lg:text-4xl">System Can Generate For You</h1>
                     {cta_el ? (
                       <>
                         <Row justify="center" className="my-6 lg:my-14">
@@ -326,8 +334,9 @@ const Calculator = ({ embed }) => {
                       </>
                     ) : (
                       <>
-                        <p className="mb-4 text-center text-yellow-600 lg:mb-5">
-                          Please select your Advertisement Type, Budget and Industry.
+                        <p className="mb-4 max-w-xl text-center text-yellow-600 lg:mb-5">
+                          Please select the media channel, budget plan, your industry and your monthly budget to see
+                          potential campaign results.
                         </p>
                       </>
                     )}

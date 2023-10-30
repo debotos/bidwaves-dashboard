@@ -65,7 +65,7 @@ export const OrderPaymentCard = ({ info, refetch }) => {
   if (isEmpty(info)) {
     return (
       <>
-        <Empty description="Something is wrong. Contact CMS." />
+        <Empty description="Something is wrong. Contact BidWaves." />
         <Row justify="center" className="mt-3">
           <Button onClick={() => refetch()}>Refetch Payment Details</Button>
         </Row>

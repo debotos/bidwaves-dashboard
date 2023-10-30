@@ -99,7 +99,7 @@ export default function PaymentSuccess() {
       return (
         <Result
           status="warning"
-          title="Try Again Or Contact CMS"
+          title="Try Again Or Contact BidWaves"
           subTitle={response.message}
           extra={[
             <Button type="primary" key="orders" onClick={() => goToOrders()}>

@@ -155,100 +155,81 @@ function ListComponent({ reRender }) {
   )
 
   return (
-    <>
-      <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4 mt-3">
-        <Col>
-          <Space>
-            <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={reRender} />
-          </Space>
-        </Col>
-        <Col flex={1}>
-          <Row justify="center">
-            <Space align="middle" wrap={true}>
-              <Input
-                allowClear
-                placeholder="Search"
-                prefix={<SearchOutlined />}
-                onChange={handleSearchInputChange}
-                suffix={
-                  <Dropdown
-                    placement="bottomRight"
-                    menu={{
-                      items: searchableColumns.map(x => {
-                        return {
-                          key: x.key,
-                          label: x.label,
-                          className: `font-semibold`,
-                          onClick: () => setState({ searchField: x.key })
-                        }
-                      }),
-                      selectable: true,
-                      defaultSelectedKeys: [defaultSearchField]
-                    }}
-                    trigger={['click']}
-                  >
-                    <CaretDownFilled className="caret-icon" />
-                  </Dropdown>
-                }
-              />
-              <Select
-                placeholder="Complete"
-                style={{ width: 140 }}
-                value={state.fullfilStatus || undefined}
-                options={Object.values(FULLFIL_STATUS).map(x => ({ value: x, label: x }))}
-                onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, fullfilStatus: val ?? '' })}
-              />
-              <Select
-                allowClear
-                placeholder="Status"
-                style={{ width: 185 }}
-                disabled={showOnlyCompleted}
-                value={state.activeStatus || undefined}
-                options={Object.values(keys.ORDER_STATUS).map(x => ({ value: x, label: x }))}
-                onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, activeStatus: val ?? '' })}
-              />
+    <div className="flex justify-center">
+      <div className="container">
+        <Row gutter={[10, 10]} justify="space-between" align="middle" className="mb-4 mt-3">
+          <Col>
+            <Space>
+              <RefreshButton disabled={state.exporting} loading={state.fetching} onClick={reRender} label="Refresh" />
             </Space>
-          </Row>
-        </Col>
+          </Col>
+          <Col flex={1}>
+            <Row justify="center">
+              <Space align="middle" wrap={true}>
+                <Input
+                  allowClear
+                  placeholder="Search"
+                  prefix={<SearchOutlined />}
+                  onChange={handleSearchInputChange}
+                  suffix={
+                    <Dropdown
+                      placement="bottomRight"
+                      menu={{
+                        items: searchableColumns.map(x => {
+                          return {
+                            key: x.key,
+                            label: x.label,
+                            className: `font-semibold`,
+                            onClick: () => setState({ searchField: x.key })
+                          }
+                        }),
+                        selectable: true,
+                        defaultSelectedKeys: [defaultSearchField]
+                      }}
+                      trigger={['click']}
+                    >
+                      <CaretDownFilled className="caret-icon" />
+                    </Dropdown>
+                  }
+                />
+                <Select
+                  placeholder="Complete"
+                  style={{ width: 140 }}
+                  value={state.fullfilStatus || undefined}
+                  options={Object.values(FULLFIL_STATUS).map(x => ({ value: x, label: x }))}
+                  onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, fullfilStatus: val ?? '' })}
+                />
+                <Select
+                  allowClear
+                  placeholder="Status"
+                  style={{ width: 185 }}
+                  disabled={showOnlyCompleted}
+                  value={state.activeStatus || undefined}
+                  options={Object.values(keys.ORDER_STATUS).map(x => ({ value: x, label: x }))}
+                  onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, activeStatus: val ?? '' })}
+                />
+              </Space>
+            </Row>
+          </Col>
 
-        <Col>{addBtnEl}</Col>
-      </Row>
+          <Col>{addBtnEl}</Col>
+        </Row>
 
-      {state.fetching ? (
-        <>
-          {Array(3)
-            .fill()
-            .map((_, i) => {
-              return (
-                <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
-                  <Row gutter={[40, 0]}>
-                    <Col span={24} lg={12}>
-                      <Space className="mb-3">
-                        <Skeleton.Input active size="large" />
-                        <Skeleton.Avatar active size="large" shape="square" />
-                      </Space>
-                    </Col>
-                    <Col span={24} lg={12} className="hidden lg:block">
-                      <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
-                        <Col>
+        {state.fetching ? (
+          <>
+            {Array(3)
+              .fill()
+              .map((_, i) => {
+                return (
+                  <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
+                    <Row gutter={[40, 0]}>
+                      <Col span={24} lg={12}>
+                        <Space className="mb-3">
                           <Skeleton.Input active size="large" />
-                        </Col>
-                        <Col>
                           <Skeleton.Avatar active size="large" shape="square" />
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row gutter={[40, 30]}>
-                    <Col span={24} lg={12}>
-                      <Fade>
-                        <Card size="small" bodyStyle={{ padding: 0 }}>
-                          <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
-                        </Card>
-                      </Fade>
-                    </Col>
-                    <Col span={24} lg={12}>
-                      <div className="mb-3 block lg:mb-0 lg:hidden">
+                        </Space>
+                      </Col>
+                      <Col span={24} lg={12} className="hidden lg:block">
                         <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
                           <Col>
                             <Skeleton.Input active size="large" />
@@ -257,52 +238,76 @@ function ListComponent({ reRender }) {
                             <Skeleton.Avatar active size="large" shape="square" />
                           </Col>
                         </Row>
-                      </div>
+                      </Col>
+                    </Row>
+                    <Row gutter={[40, 30]}>
+                      <Col span={24} lg={12}>
+                        <Fade>
+                          <Card size="small" bodyStyle={{ padding: 0 }}>
+                            <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
+                          </Card>
+                        </Fade>
+                      </Col>
+                      <Col span={24} lg={12}>
+                        <div className="mb-3 block lg:mb-0 lg:hidden">
+                          <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+                            <Col>
+                              <Skeleton.Input active size="large" />
+                            </Col>
+                            <Col>
+                              <Skeleton.Avatar active size="large" shape="square" />
+                            </Col>
+                          </Row>
+                        </div>
 
-                      {Array(3)
-                        .fill()
-                        .map((_, i) => {
-                          return (
-                            <Fade key={i}>
-                              <Card size="small" bodyStyle={{ padding: 0 }} className="mb-2">
-                                <Skeleton.Button active={true} size="large" block={true} style={{ height: 80 }} />
-                              </Card>
-                            </Fade>
-                          )
-                        })}
-                    </Col>
-                  </Row>
-                </div>
-              )
-            })}
-        </>
-      ) : (
-        <>
-          {isEmpty(state.dataResponse) ? null : (
-            <>
-              {isEmpty(list) && (
-                <EmptyUI showOnlyCompleted={showOnlyCompleted} filterExist={filterExist} addBtnEl={addBtnEl} />
-              )}
-            </>
-          )}
-        </>
-      )}
+                        {Array(3)
+                          .fill()
+                          .map((_, i) => {
+                            return (
+                              <Fade key={i}>
+                                <Card size="small" bodyStyle={{ padding: 0 }} className="mb-2">
+                                  <Skeleton.Button active={true} size="large" block={true} style={{ height: 80 }} />
+                                </Card>
+                              </Fade>
+                            )
+                          })}
+                      </Col>
+                    </Row>
+                  </div>
+                )
+              })}
+          </>
+        ) : (
+          <>
+            {isEmpty(state.dataResponse) ? null : (
+              <>
+                {isEmpty(list) && (
+                  <EmptyUI showOnlyCompleted={showOnlyCompleted} filterExist={filterExist} addBtnEl={addBtnEl} />
+                )}
+              </>
+            )}
+          </>
+        )}
 
-      {list.map((item, i) => {
-        return <CampaignItem key={item.id} order={item} first={i === 0} />
-      })}
+        {list.map((item, i) => {
+          return <CampaignItem key={item.id} order={item} first={i === 0} />
+        })}
 
-      <Pagination
-        {...defaultPaginationConfig}
-        hideOnSinglePage={true}
-        total={state.dataResponse?.total ?? 0}
-        current={state.paginationCurrentPage}
-        pageSize={state.paginationPageSize}
-        onChange={(page, pageSize) => {
-          setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
-        }}
-      />
-    </>
+        <Row justify={`center`}>
+          <Pagination
+            {...defaultPaginationConfig}
+            showSizeChanger={false}
+            hideOnSinglePage={true}
+            total={state.dataResponse?.total ?? 0}
+            current={state.paginationCurrentPage}
+            pageSize={state.paginationPageSize}
+            onChange={(page, pageSize) => {
+              setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
+            }}
+          />
+        </Row>
+      </div>
+    </div>
   )
 }
 

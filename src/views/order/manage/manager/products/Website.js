@@ -3,7 +3,7 @@ import { useSafeState } from 'ahooks'
 import { SendOutlined } from '@ant-design/icons'
 import { Alert, Button, Card, Col, Form, Input, Row, Space, Tooltip, Typography, message } from 'antd'
 
-import { getCssVar, isEmpty } from 'helpers/utility'
+import { getCssVar, isEmpty, replaceTextWithComponent } from 'helpers/utility'
 import { CalenderLink } from 'components/micro/Common'
 import { BsCheckCircleFill } from 'react-icons/bs'
 
@@ -44,6 +44,10 @@ function Website(props) {
       message.error('Failed to copy to the clipboard.')
     }
   }
+
+  const qs = `?title=${encodeURIComponent(
+    'Great! Let Us Schedule a Call For Your Website'
+  )}&subtitle=&src=${encodeURIComponent(calender_link)}`
 
   return (
     <>
@@ -242,20 +246,18 @@ function Website(props) {
         </Row>
       )}
 
-      <p
-        className="mb-3 mt-4 text-center text-lg font-medium"
-        dangerouslySetInnerHTML={{ __html: data_obj.help_text }}
-      />
+      <p className="mb-3 mt-4 text-center text-lg font-medium">
+        {replaceTextWithComponent(
+          data_obj.help_text || '',
+          'book a call here',
+          <CalenderLink label={`book a call here`} qs={qs} anchorClassName="" />
+        )}
+      </p>
 
       {calender_link && (
         <Row justify="center" className="mb-3">
           <Col>
-            <CalenderLink
-              asBtn={true}
-              qs={`?title=${encodeURIComponent(
-                'Great! Let Us Schedule a Call For Your Website'
-              )}&subtitle=&src=${encodeURIComponent(calender_link)}`}
-            />
+            <CalenderLink asBtn={true} qs={qs} />
           </Col>
         </Row>
       )}

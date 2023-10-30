@@ -2,14 +2,14 @@ import React from 'react'
 import Axios from 'axios'
 import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
-import { Row, Col, Input, Table, Dropdown, Button, Modal, Card, Space } from 'antd'
+import { Row, Col, Input, Table, Dropdown, Button, Modal, Card, Space, Tag } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
 import { CaretDownFilled, ClearOutlined, QuestionCircleFilled, SearchOutlined } from '@ant-design/icons'
 
 import { message } from 'App'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
-import { defaultPaginationConfig } from 'helpers/utility'
+import { defaultPaginationConfig, getReadableCurrency } from 'helpers/utility'
 import { DeleteIcon, RefreshButton } from 'components/micro/Common'
 
 const searchableColumns = [
@@ -204,13 +204,24 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
           <Col>{refreshBtn}</Col>
         </Row>
         {list.map((row, i) => {
+          const price = Number(row.price ?? 0)
+
           return (
             <Fade key={i}>
               <Card size="small" bodyStyle={{}} className="mb-2">
                 <Space direction="vertical" className="w-100">
                   <Row gutter={[20, 10]} justify={`space-between`} align={`middle`}>
                     <Col>
-                      <h4 className="font-bold text-[--primary-color]">{row.name}</h4>
+                      <h4 className="font-bold text-[--primary-color]">
+                        {row.name}
+                        {price ? (
+                          <>
+                            <Tag className="ml-2 text-[--primary-color]">{getReadableCurrency(price)}</Tag>
+                          </>
+                        ) : (
+                          ''
+                        )}
+                      </h4>
                     </Col>
                     <Col>
                       <Space>

@@ -71,8 +71,8 @@ const OrderQA = props => {
       const { id } = order
       const postData = { qa_submitted: true }
       const { data } = await Axios.patch(endpoints.order(id), postData)
-      window.log(`QA submit response -> `, data)
-      message.success('Submit successful. Please wait until CMS review the answers.')
+      window.log(`QA/Brief submit response -> `, data)
+      message.success('Submit successful. Please wait until BidWaves review the answers.')
       updateOrder(data)
       closeModal?.()
     } catch (error) {

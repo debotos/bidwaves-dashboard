@@ -5,7 +5,8 @@ import { Alert, Button, Checkbox, Col, Modal, Row, Upload, message } from 'antd'
 import { CloudUploadOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 
 import handleError from 'helpers/handleError'
-import { getBase64, isEmpty } from 'helpers/utility'
+import { CalenderLink } from 'components/micro/Common'
+import { getBase64, isEmpty, replaceTextWithComponent } from 'helpers/utility'
 
 const getPhotosSkeletonObject = photos => {
   if (isEmpty(photos)) return []
@@ -155,7 +156,7 @@ function CustomGraphics(props) {
 
       {!isEmpty(templates) && (
         <>
-          <h3 className="mb-3 text-lg font-bold">Selectable Templates From CMS</h3>
+          <h3 className="mb-3 text-lg font-bold">Selectable Templates From BidWaves</h3>
           <Row gutter={[16, 16]} className="mb-4">
             {templates.map((template, index) => {
               return (
@@ -248,7 +249,13 @@ function CustomGraphics(props) {
       </Row>
 
       {data_obj.help_text && (
-        <p className="text-center text-lg font-medium" dangerouslySetInnerHTML={{ __html: data_obj.help_text }} />
+        <p className="text-center text-lg font-medium">
+          {replaceTextWithComponent(
+            data_obj.help_text || '',
+            'book a call here',
+            <CalenderLink label={`book a call here`} anchorClassName="" />
+          )}
+        </p>
       )}
 
       <Modal

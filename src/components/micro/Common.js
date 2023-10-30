@@ -86,10 +86,12 @@ export const ExportButton = ({ title = 'Export', ...restProps }) => {
   )
 }
 
-export const RefreshButton = ({ title = 'Refresh', ...restProps }) => {
+export const RefreshButton = ({ title = 'Refresh', label, ...restProps }) => {
   return (
     <Tooltip title={title}>
-      <Button type="dashed" icon={<SyncOutlined />} {...restProps} />
+      <Button type="dashed" icon={<SyncOutlined />} {...restProps}>
+        {label}
+      </Button>
     </Tooltip>
   )
 }
@@ -142,7 +144,7 @@ export const CalenderLink = ({
 
   return (
     <a href={path} target="_blank" rel="noreferrer" className={`font-semibold ${anchorClassName || ''}`}>
-      {label || 'Click This'}
+      {label || 'Click here!'}
     </a>
   )
 }

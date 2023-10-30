@@ -3,6 +3,7 @@ import { useSafeState } from 'ahooks'
 import { Button, Col, Row, message } from 'antd'
 
 import { CalenderLink } from 'components/micro/Common'
+import { replaceTextWithComponent } from 'helpers/utility'
 
 function GoogleTag(props) {
   const { product, asyncUpdateProduct, closeModal } = props
@@ -29,6 +30,10 @@ function GoogleTag(props) {
       message.error('Failed to copy script to the clipboard.')
     }
   }
+
+  const qs = `?title=${encodeURIComponent(
+    'Let a Specialist Set Up Your Google Tags'
+  )}&subtitle=&src=${encodeURIComponent(calender_link)}`
 
   return (
     <>
@@ -57,20 +62,18 @@ function GoogleTag(props) {
         </Col>
       </Row>
 
-      <p
-        className="mb-3 mt-4 text-center text-lg font-medium"
-        dangerouslySetInnerHTML={{ __html: data_obj.help_text }}
-      />
+      <p className="mb-3 mt-4 text-center text-lg font-medium">
+        {replaceTextWithComponent(
+          data_obj.help_text || '',
+          'book a call here',
+          <CalenderLink label={`book a call here`} qs={qs} anchorClassName="" />
+        )}
+      </p>
 
       {calender_link && (
         <Row justify="center" className="mb-3">
           <Col>
-            <CalenderLink
-              asBtn={true}
-              qs={`?title=${encodeURIComponent(
-                'Let a Specialist Set Up Your Google Tags'
-              )}&subtitle=&src=${encodeURIComponent(calender_link)}`}
-            />
+            <CalenderLink asBtn={true} qs={qs} />
           </Col>
         </Row>
       )}

@@ -5,14 +5,7 @@ import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Link, useLocation } from 'react-router-dom'
 import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip, Alert } from 'antd'
-import {
-  LockOutlined,
-  SendOutlined,
-  MailOutlined,
-  UserOutlined,
-  LinkedinOutlined,
-  GlobalOutlined
-} from '@ant-design/icons'
+import { LockOutlined, SendOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -23,7 +16,7 @@ import { Page, Logo } from 'components/micro/Common'
 import InputURL from 'components/micro/fields/InputURL'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
-import { basePasswordRule, getCssVar, isEmpty, validateUrl } from 'helpers/utility'
+import { basePasswordRule, getCssVar, isEmpty } from 'helpers/utility'
 
 export const companyFields = [
   <Form.Item
@@ -40,8 +33,12 @@ export const companyFields = [
     title={"The URL must include either 'http://' or 'https://' as a prefix. For example: 'https://example.com'."}
     placement="topLeft"
   >
-    <Form.Item key="url" name={['company', 'url']} rules={[{ required: false, validator: validateUrl }]}>
-      <InputURL allowClear placeholder="Website URL" />
+    <Form.Item
+      key="url"
+      name={['company', 'url']}
+      rules={[{ required: true, whitespace: true, message: 'Provide website URL!' }]}
+    >
+      <InputURL allowClear placeholder="Company Website" />
     </Form.Item>
   </Tooltip>,
   <Tooltip
@@ -52,7 +49,8 @@ export const companyFields = [
   >
     <Form.Item
       name={['company', 'phone']}
-      rules={[{ required: false, whitespace: true, message: 'Provide contact number with country code!' }]}
+      initialValue={'+1'}
+      rules={[{ required: true, whitespace: true, message: 'Provide contact number with country code!' }]}
     >
       <Input allowClear placeholder="Contact number with country code" />
     </Form.Item>
@@ -60,23 +58,28 @@ export const companyFields = [
   <Form.Item
     key="address"
     name={['company', 'address']}
-    rules={[{ required: false, whitespace: true, message: 'Provide address!' }]}
+    rules={[{ required: true, whitespace: true, message: 'Provide address!' }]}
   >
-    <Input.TextArea rows={1} allowClear placeholder="Address" />
+    <Input.TextArea rows={1} allowClear placeholder="Business Address" />
   </Form.Item>,
   <Form.Item
     key="goal"
     name={['company', 'goal']}
     rules={[{ required: false, whitespace: true, message: 'Provide goal info!' }]}
   >
-    <Input.TextArea rows={2} allowClear placeholder="Primary Goal" />
+    <Input.TextArea
+      rows={2}
+      allowClear
+      placeholder="Campaign Goal, e.g. Generate Site Visitors, Generate Leads, Generate Sales, etc."
+      maxLength={500}
+    />
   </Form.Item>,
   <Form.Item
     key="note"
     name={['company', 'note']}
-    rules={[{ required: false, whitespace: true, message: 'Provide notes & goals!' }]}
+    rules={[{ required: false, whitespace: true, message: 'Provide additional information!' }]}
   >
-    <Input.TextArea rows={3} allowClear placeholder="Notes & Goals" />
+    <Input.TextArea rows={3} allowClear placeholder="Additional Information" maxLength={500} />
   </Form.Item>
 ]
 
@@ -147,7 +150,7 @@ function SignUp() {
   const steps = [
     {
       ...getStepProps(0),
-      title: 'Your Information',
+      title: 'Your Personal Information',
       content: (
         <>
           <Row gutter={[10, 0]}>
@@ -178,7 +181,7 @@ function SignUp() {
           <Form.Item name="password" hasFeedback rules={[basePasswordRule]}>
             <Input.Password allowClear prefix={<LockOutlined />} type="password" placeholder="Password" />
           </Form.Item>
-          <Row gutter={[10, 0]}>
+          {/* <Row gutter={[10, 0]}>
             <Col span={24} md={12}>
               <Form.Item name="linkedin" rules={[{ whitespace: true, message: 'Please provide LinkedIn!' }]}>
                 <Input allowClear prefix={<LinkedinOutlined />} placeholder="LinkedIn" />
@@ -201,13 +204,13 @@ function SignUp() {
           </Row>
           <Form.Item name="address" rules={[{ whitespace: true, message: 'Provide address!' }]}>
             <Input.TextArea rows={2} allowClear placeholder="Your Business Address" />
-          </Form.Item>
+          </Form.Item> */}
         </>
       )
     },
     {
       ...getStepProps(1),
-      title: 'Your Company',
+      title: 'Your Company Information',
       content: <>{companyFields}</>
     }
   ]
@@ -242,7 +245,7 @@ function SignUp() {
 
             <div className="w-100 flex flex-col items-center">
               <div className="w-full max-w-3xl text-white">
-                <div className="rounded-xl bg-white px-4 py-3 lg:px-32">
+                <div className="rounded-xl bg-white px-4 py-3 lg:px-14">
                   <Steps current={current} items={items} />
                 </div>
               </div>
@@ -275,10 +278,10 @@ function SignUp() {
                               </Col>
                               {signupVideo && (
                                 <Col span={24} lg={12}>
-                                  <ReactPlayer url={signupVideo} width="100%" height="85%" />
-                                  <h4 className="mb-2 mt-3 text-center text-2xl font-semibold text-white">
+                                  <h4 className="mb-3 text-center text-2xl font-semibold text-white">
                                     While we setup the account, watch what will happen next.
                                   </h4>
+                                  <ReactPlayer url={signupVideo} width="100%" height="85%" />
                                 </Col>
                               )}
                             </Row>
