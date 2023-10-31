@@ -71,6 +71,8 @@ const Profile = () => {
   return (
     <>
       <Page>
+        <h3 className="mt-3 text-center font-semibold">{user.email}</h3>
+
         <Row justify="center" className="mt-4">
           <Col span={24} md={16} lg={12} xl={10}>
             <ChangeAvatar
