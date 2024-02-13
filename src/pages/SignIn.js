@@ -79,13 +79,13 @@ function Login() {
                     className="my-3"
                     message={
                       <>
-                        Please <b>Login</b> or <b>Create an account</b> to start a campaign with the information you
-                        just provided.
+                        Please <b>Log In</b> or <b>Sign Up</b> to start a campaign with the information you just
+                        provided.
                       </>
                     }
                   />
                 )}
-                <h1 className="mb-4 text-center">Login</h1>
+                <h1 className="mb-4 text-center">Log In</h1>
 
                 <Form size="large" layout="vertical" name="login-form" onFinish={onFinish}>
                   <Form.Item

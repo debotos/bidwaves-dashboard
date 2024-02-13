@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
 import { Link, useLocation } from 'react-router-dom'
-import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip, Alert } from 'antd'
 import { LockOutlined, SendOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
+import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip, Alert } from 'antd'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -16,6 +16,7 @@ import { Page, Logo } from 'components/micro/Common'
 import InputURL from 'components/micro/fields/InputURL'
 import { setCurrentUser } from 'redux/slices/authSlice'
 import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
+import CustomSelect from 'components/micro/fields/CustomSelect'
 import { basePasswordRule, getCssVar, isEmpty } from 'helpers/utility'
 
 export const companyFields = [
@@ -62,16 +63,18 @@ export const companyFields = [
   >
     <Input.TextArea rows={1} allowClear placeholder="Business Address" />
   </Form.Item>,
-  <Form.Item
-    key="goal"
-    name={['company', 'goal']}
-    rules={[{ required: false, whitespace: true, message: 'Provide goal info!' }]}
-  >
-    <Input.TextArea
+  <Form.Item key="goal" name={['company', 'goal']} rules={[{ required: false, message: 'Provide campaign goal!' }]}>
+    {/* <Input.TextArea
       rows={2}
       allowClear
       placeholder="Campaign Goal, e.g. Generate Site Visitors, Generate Leads, Generate Sales, etc."
       maxLength={500}
+    /> */}
+    <CustomSelect
+      initialOptions={['Generate Revenue (Online Shops)', 'Generate Leads', 'Generate Site Visitors'].map(item => ({
+        label: item,
+        value: item
+      }))}
     />
   </Form.Item>,
   <Form.Item
@@ -235,7 +238,7 @@ function SignUp() {
                   className="my-3"
                   message={
                     <>
-                      Please <b>Sign Up</b> or <b>Login</b> to start a campaign with the information you just provided.
+                      Please <b>Sign Up</b> or <b>Log In</b> to start a campaign with the information you just provided.
                     </>
                   }
                 />

@@ -17,26 +17,28 @@ import AsyncSelect, { genericSearchOptionsFunc } from 'components/micro/fields/A
 import { getCssVar, getPlaceholderInput, getReadableCurrency, isEmpty } from 'helpers/utility'
 
 export const enterpriseCalenderLink = `https://calendly.com/bidwaves/bidwaves-enterprise?hide_gdpr_banner=1`
-export const commonBudgetSelectProps = {
-  optionPropsOverrideCb: item => {
-    return {
-      label: (
-        <Space>
-          {item.advertisement?.image?.secure_url && (
-            <Tooltip title={item.advertisement?.name}>
-              <Avatar size="small" src={item.advertisement?.image?.secure_url} />
-            </Tooltip>
-          )}
-          {item.tag?.label} |
-          <b>
-            {getReadableCurrency(item.min).replace('.00', '')}&nbsp;-&nbsp;
-            {getReadableCurrency(item.max, { showUnlimited: true }).replace('.00', '')}
-          </b>
-        </Space>
-      ),
-      tag_label: item.tag?.label || ''
-    }
+
+const generateBudgetOptionLabel = item => {
+  return {
+    label: (
+      <Space>
+        {item.advertisement?.image?.secure_url && (
+          <Tooltip title={item.advertisement?.name}>
+            <Avatar size="small" src={item.advertisement?.image?.secure_url} />
+          </Tooltip>
+        )}
+        {item.tag?.label} |
+        <b>
+          {getReadableCurrency(item.min).replace('.00', '')}&nbsp;-&nbsp;
+          {getReadableCurrency(item.max, { showUnlimited: true }).replace('.00', '')}
+        </b>
+      </Space>
+    ),
+    tag_label: item.tag?.label || ''
   }
+}
+export const commonBudgetSelectProps = {
+  optionPropsOverrideCb: generateBudgetOptionLabel
 }
 
 const { useBreakpoint } = Grid
@@ -126,6 +128,9 @@ const Calculator = ({ embed }) => {
       icon: <EditOutlined />,
       content: (
         <>
+          <Row justify={`center`} className="mb-3 mt-2">
+            {generateBudgetOptionLabel(state.budget).label}
+          </Row>
           <InputNumber
             size="large"
             placeholder="Amount"

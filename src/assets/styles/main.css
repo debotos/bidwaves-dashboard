@@ -353,6 +353,12 @@ a.within {
 .ant-btn-link.within {
   color: var(--info-color) !important;
 }
+.ant-btn-link.within b {
+  color: rgb(114, 114, 251) !important;
+}
+.ant-btn-link.within:hover b {
+  color: var(--info-color) !important;
+}
 a.within:hover {
   color: var(--info-color) !important;
 }
