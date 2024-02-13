@@ -1,9 +1,11 @@
 import Axios from 'axios'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
+import { FaPencilAlt } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useSafeState, useSetState } from 'ahooks'
-import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button, message } from 'antd'
+import { EditOutlined } from '@ant-design/icons'
+import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button, message, Modal, InputNumber } from 'antd'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -116,6 +118,40 @@ const Calculator = ({ embed }) => {
     )
   }
 
+  const handleBudgetAmountEdit = () => {
+    Modal.info({
+      closable: true,
+      maskClosable: true,
+      title: 'Edit Budget Amount',
+      icon: <EditOutlined />,
+      content: (
+        <>
+          <InputNumber
+            size="large"
+            placeholder="Amount"
+            variant="filled"
+            min={Number(state.budget.min)}
+            max={Number(state.budget.max)}
+            defaultValue={state.budget_amount ?? 0}
+            onChange={val => {
+              let amount = val
+              if (!amount) amount = Number(state.budget.min)
+              setState({ budget_amount: amount })
+            }}
+            style={{ width: '100%', fontWeight: 600 }}
+            formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            parser={value => value.replace(/\$\s?|(,*)/g, '')}
+          />
+        </>
+      ),
+      footer: (_, { OkBtn }) => (
+        <>
+          <OkBtn />
+        </>
+      )
+    })
+  }
+
   return (
     <>
       {!embed && (
@@ -126,8 +162,12 @@ const Calculator = ({ embed }) => {
       <Page>
         <Row>
           <Col span={24} lg={embed ? 11 : 12}>
-            <div className={`bg-[--primary-color] ${embed ? 'rounded-lg' : 'lg:min-h-screen'}`}>
-              <div className={`${embed ? 'mt-4' : 'pt-14 lg:pt-16'}`}>
+            <div
+              className={`flex items-center justify-center bg-[--primary-color] ${
+                embed ? 'rounded-lg' : 'lg:min-h-screen'
+              }`}
+            >
+              <div className={`${embed ? 'mt-4' : 'pt-10 lg:pt-0'}`}>
                 <div className={`px-4 py-5 pt-11 lg:pt-14 ${embed ? 'pb-11 lg:pb-14' : ''}`}>
                   <h1 className="text-center text-white lg:text-5xl">BidWaves</h1>
                   <h1 className="text-center text-white lg:text-5xl">PPC Calculator</h1>
@@ -231,7 +271,8 @@ const Calculator = ({ embed }) => {
                             <Space direction="vertical" align="center">
                               <p className="mb-0 text-white">How much do you want to spend per month?</p>
                               <h1 className="m-0 text-center font-bold text-white lg:text-4xl">
-                                {getReadableCurrency(state.budget_amount).replace('.00', '')}
+                                {getReadableCurrency(state.budget_amount).replace('.00', '')}&nbsp;&nbsp;
+                                <FaPencilAlt className="cursor-pointer" size={22} onClick={handleBudgetAmountEdit} />
                               </h1>
                               <Slider
                                 style={{ minWidth: inputMinWidth - 5 }}
