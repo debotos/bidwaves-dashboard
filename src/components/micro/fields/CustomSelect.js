@@ -11,10 +11,11 @@ const CustomSelect = ({ onAddSelectToo = true, initialOptions, ...rest }) => {
   const addItem = e => {
     e.preventDefault()
     if (text) {
-      setOptions(prev => [...prev, { label: text, value: text }])
+      const _text = text.trim()
+      setOptions(prev => [...prev, { label: _text, value: _text }])
 
       if (onAddSelectToo) {
-        rest.onChange?.([...(rest.value ?? []), text])
+        rest.onChange?.([...(rest.value ?? []), _text])
       }
 
       setText('')

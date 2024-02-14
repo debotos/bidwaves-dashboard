@@ -7,11 +7,14 @@ import Footer from './Footer'
 import Sidenav from './Sidenav'
 
 import { toggleSidebar } from 'redux/slices/themeSlice'
-import { renderPublicLinks } from 'components/micro/PublicHeader'
+// import { renderPublicLinks } from 'components/micro/PublicHeader'
+import AccountNotActive from 'components/micro/AccountNotActive'
 
 function Main() {
   const dispatch = useDispatch()
   const { showSidebar } = useSelector(state => state.theme)
+  const { isAuthenticated, user } = useSelector(state => state.auth)
+  const { active } = user ?? {}
 
   const renderBackdrop = () => {
     return (
@@ -51,11 +54,11 @@ function Main() {
             </Layout.Header>
           </Affix>
           <Layout.Content className="app-bg flex-grow px-5 py-2">
-            <Outlet />
+            {isAuthenticated && !active ? <AccountNotActive /> : <Outlet />}
           </Layout.Content>
-          <div className="flex justify-center bg-[--secondary-color] p-6 lg:hidden">
+          {/* <div className="flex justify-center bg-[--secondary-color] p-6 lg:hidden">
             {renderPublicLinks({ spaceProps: { direction: 'vertical', size: 16, align: 'center' }, showAlways: true })}
-          </div>
+          </div> */}
           <Layout.Footer className="app-bg h-[48px] w-full px-5 py-3">
             <Footer />
           </Layout.Footer>

@@ -1,18 +1,22 @@
 import React from 'react'
-import { Col, Grid, Row } from 'antd'
+import {
+  Col,
+  // Grid,
+  Row
+} from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons'
 
 import { Logo } from 'components/micro/Common'
 import { toggleSidebar } from 'redux/slices/themeSlice'
 import ProfileDropdown from 'components/micro/ProfileDropdown'
-import { renderPublicLinks } from 'components/micro/PublicHeader'
+// import { renderPublicLinks } from 'components/micro/PublicHeader'
 
-const { useBreakpoint } = Grid
+// const { useBreakpoint } = Grid
 
 function Header() {
   const dispatch = useDispatch()
-  const screens = useBreakpoint()
+  // const screens = useBreakpoint()
   const { showSidebar } = useSelector(state => state.theme)
 
   return (
@@ -25,7 +29,7 @@ function Header() {
         })}
       </Col>
 
-      {renderPublicLinks({ screens })}
+      {/* {renderPublicLinks({ screens })} */}
 
       <Col className="lg:hidden">
         <Logo width={180} rowProps={{ className: '' }} light />

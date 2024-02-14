@@ -50,7 +50,7 @@ const PublicHeader = () => {
             <Col>
               <Logo light={true} width={150} rowProps={{ className: '' }} onClick={() => navigate(links.orders.to)} />
             </Col>
-            {renderPublicLinks({ screens })}
+            {/* {renderPublicLinks({ screens })} */}
             {isAuthenticated ? (
               <ProfileDropdown />
             ) : (
