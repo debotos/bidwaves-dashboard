@@ -1,5 +1,5 @@
-import Fade from 'react-reveal/Fade'
 import { Link } from 'react-router-dom'
+import { Fade } from 'react-awesome-reveal'
 import { Button, Empty, Popconfirm, Row, Spin, Tooltip } from 'antd'
 import {
   DeleteOutlined,

@@ -1,7 +1,7 @@
 import React from 'react'
 import Axios from 'axios'
-import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
+import { Fade } from 'react-awesome-reveal'
 import { Row, Col, Input, Table, Dropdown, Button, Modal, Card, Space, Tag } from 'antd'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount } from 'ahooks'
 import { CaretDownFilled, ClearOutlined, QuestionCircleFilled, SearchOutlined } from '@ant-design/icons'

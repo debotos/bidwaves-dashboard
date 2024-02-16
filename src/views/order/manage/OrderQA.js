@@ -1,15 +1,16 @@
 import Axios from 'axios'
 import { useSafeState } from 'ahooks'
-import { Button, Col, Empty, Form, Input, Modal, Row, Space } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
+import { Button, Col, Empty, Form, Input, Row } from 'antd'
 
 import { message } from 'App'
 import endpoints from 'config/endpoints'
-import handleError from 'helpers/handleError'
 import { isEmpty } from 'helpers/utility'
+import handleError from 'helpers/handleError'
 
 const OrderQA = props => {
   const { order, updateOrder, closeModal } = props
+
   const [form] = Form.useForm()
   const [updating, setUpdating] = useSafeState(false)
   const [submittingQA, setSubmittingQA] = useSafeState(false)
@@ -20,8 +21,6 @@ const OrderQA = props => {
       const { id } = order
       const { data } = await Axios.patch(endpoints.order(id), values)
       window.log(`Update response -> `, data)
-      // const isSubmitAction = !!document.querySelector('.review-modal')
-      // !isSubmitAction && message.success('Save successful.')
       updateOrder(data)
     } catch (error) {
       handleError(error, true)
@@ -30,43 +29,9 @@ const OrderQA = props => {
     }
   }
 
-  const confirmSubmitQA = () => {
-    form.submit()
-    const { qa } = form.getFieldsValue(true)
-    Modal.confirm({
-      className: 'review-modal',
-      maskClosable: true,
-      closable: true,
-      title: 'Please review your answers',
-      content: isEmpty(qa) ? (
-        <Empty />
-      ) : (
-        <>
-          <Space direction="vertical" className="w-100 my-2">
-            {qa.map((x, i) => {
-              const serial = i + 1
-              return (
-                <div key={i} className="rounded bg-gray-100 px-3 py-2">
-                  <div className="text-xs font-medium text-gray-500">
-                    Question {serial}: <div dangerouslySetInnerHTML={{ __html: x.q }} />
-                  </div>
-                  <div className={`mt-1 text-xs font-semibold ${x.a ? 'text-gray-600' : 'text-red-600'}`}>
-                    Answer {serial}: <div dangerouslySetInnerHTML={{ __html: x.a ?? 'Not answered.' }} />
-                  </div>
-                </div>
-              )
-            })}
-          </Space>
-        </>
-      ),
-      okText: 'Submit',
-      cancelText: 'Back To Edit',
-      onOk: handleSubmitQA
-    })
-  }
-
-  const handleSubmitQA = async () => {
+  const handleSubmit = async () => {
     try {
+      form.submit()
       setSubmittingQA(true)
       const { id } = order
       const postData = { qa_submitted: true }
@@ -166,7 +131,7 @@ const OrderQA = props => {
                     icon={<SendOutlined />}
                     disabled={updating || disabled}
                     loading={submittingQA}
-                    onClick={confirmSubmitQA}
+                    onClick={handleSubmit}
                   >
                     Submit
                   </Button>

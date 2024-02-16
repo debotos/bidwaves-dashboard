@@ -328,7 +328,7 @@ body::-webkit-scrollbar {
 .cta-btn:not(:disabled):focus,
 .cta-btn:not(:disabled):hover,
 .cta-btn:not(:disabled):active {
-  background-color: var(--secondary-color);
+  background: var(--secondary-color) !important;
   border-color: var(--secondary-color);
   transition: all 0.3s ease-in-out;
   color: #fff !important;

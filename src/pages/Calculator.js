@@ -5,7 +5,7 @@ import { FaPencilAlt } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import { useSafeState, useSetState } from 'ahooks'
 import { EditOutlined } from '@ant-design/icons'
-import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button, message, Modal, InputNumber } from 'antd'
+import { Col, Row, Space, Grid, Tooltip, Avatar, Slider, Button, notification, Modal, InputNumber } from 'antd'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -85,7 +85,10 @@ const Calculator = ({ embed }) => {
 
       const { data: order } = await Axios.post(endpoints.orderBase, postData)
       window.log(`Order response -> `, order)
-      message.success(`"${order.name}" created successfully!`)
+      notification.success({
+        message: 'Campaign created successfully!',
+        description: `"${order.name}" created successfully!`
+      })
       navigate(links.orders.to)
     } catch (error) {
       handleError(error, true)
@@ -165,7 +168,7 @@ const Calculator = ({ embed }) => {
         </div>
       )}
       <Page>
-        <Row>
+        <Row className={`${embed ? 'mt-3' : ''}`}>
           <Col span={24} lg={embed ? 11 : 12}>
             <div
               className={`flex items-center justify-center bg-[--primary-color] ${

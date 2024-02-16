@@ -1,9 +1,9 @@
 import React from 'react'
 import Axios from 'axios'
 import moment from 'moment'
-import Fade from 'react-reveal/Fade'
 import { useSelector } from 'react-redux'
 import loadable from '@loadable/component'
+import { Fade } from 'react-awesome-reveal'
 import { useMount, useUnmount } from 'ahooks'
 import { Alert, Button, Col, Divider, Popconfirm, Row, Space } from 'antd'
 

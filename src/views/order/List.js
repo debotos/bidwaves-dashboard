@@ -1,6 +1,6 @@
 import Axios from 'axios'
-import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
+import { Fade } from 'react-awesome-reveal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'

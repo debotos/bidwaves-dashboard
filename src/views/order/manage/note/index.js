@@ -1,6 +1,6 @@
 import Axios from 'axios'
-import Fade from 'react-reveal/Fade'
 import { useRef, useEffect } from 'react'
+import { Fade } from 'react-awesome-reveal'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { useLockFn, useMount, useSetState, useUnmount } from 'ahooks'
 import { Affix, Card, Empty, Form, Modal, Pagination, Row, Space, Spin } from 'antd'

@@ -1,7 +1,7 @@
 import React from 'react'
 import Axios from 'axios'
-import Fade from 'react-reveal/Fade'
 import loadable from '@loadable/component'
+import { Fade } from 'react-awesome-reveal'
 import { BsArrowReturnRight } from 'react-icons/bs'
 import { useSafeState, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 import {
