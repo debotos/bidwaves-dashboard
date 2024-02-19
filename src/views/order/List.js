@@ -4,7 +4,7 @@ import { Fade } from 'react-awesome-reveal'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CaretDownFilled, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { Row, Col, Input, Dropdown, Space, Select, Button, Empty, Card, Skeleton, Pagination } from 'antd'
+import { Row, Col, Input, Dropdown, Space, Button, Empty, Card, Skeleton, Pagination, Flex } from 'antd'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -15,11 +15,11 @@ import emptyImage from 'assets/images/empty.svg'
 import { RefreshButton } from 'components/micro/Common'
 import { isEmpty, defaultPaginationConfig } from 'helpers/utility'
 
-const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
+// const PAID_STATUS = { PAID: 'Paid', NOT_PAID: 'Not Paid' }
 const FULLFIL_STATUS = { COMPLETE: 'Complete', NOT_COMPLETE: 'Not Complete' }
 const searchableColumns = [
-  { key: 'name', label: 'Name' },
-  { key: 'status', label: 'Status' }
+  { key: 'name', label: 'Name' }
+  // { key: 'status', label: 'Status' }
 ]
 const defaultSearchField = searchableColumns[0].key
 
@@ -80,19 +80,19 @@ function ListComponent({ reRender }) {
         _ep += `&${state.searchField}=${encodeURIComponent(state.searchText)}`
       }
 
-      if (isShowOnlyCompleted()) {
-        _ep += `&${keys.BOOL_COL_PREFIX}complete=true`
-      } else {
-        _ep += `&${keys.BOOL_COL_PREFIX}complete=false`
+      // if (isShowOnlyCompleted()) {
+      //   _ep += `&${keys.BOOL_COL_PREFIX}complete=true`
+      // } else {
+      //   _ep += `&${keys.BOOL_COL_PREFIX}complete=false`
 
-        if (state.activeStatus) {
-          _ep += `&${keys.ENUM_COL_PREFIX}status=${encodeURIComponent(state.activeStatus)}`
-        }
+      //   if (state.activeStatus) {
+      //     _ep += `&${keys.ENUM_COL_PREFIX}status=${encodeURIComponent(state.activeStatus)}`
+      //   }
 
-        if (state.paidStatus) {
-          _ep += `&${keys.BOOL_COL_PREFIX}paid=${state.paidStatus === PAID_STATUS.PAID ? 'true' : 'false'}`
-        }
-      }
+      //   if (state.paidStatus) {
+      //     _ep += `&${keys.BOOL_COL_PREFIX}paid=${state.paidStatus === PAID_STATUS.PAID ? 'true' : 'false'}`
+      //   }
+      // }
 
       // For sorting
       if (state.sortByQuery) {
@@ -165,34 +165,35 @@ function ListComponent({ reRender }) {
           </Col>
           <Col flex={1}>
             <Row justify="center">
-              <Space align="middle" wrap={true}>
-                <Input
-                  allowClear
-                  placeholder="Search"
-                  prefix={<SearchOutlined />}
-                  onChange={handleSearchInputChange}
-                  suffix={
-                    <Dropdown
-                      placement="bottomRight"
-                      menu={{
-                        items: searchableColumns.map(x => {
-                          return {
-                            key: x.key,
-                            label: x.label,
-                            className: `font-semibold`,
-                            onClick: () => setState({ searchField: x.key })
-                          }
-                        }),
-                        selectable: true,
-                        defaultSelectedKeys: [defaultSearchField]
-                      }}
-                      trigger={['click']}
-                    >
-                      <CaretDownFilled className="caret-icon" />
-                    </Dropdown>
-                  }
-                />
-                <Select
+              <Col span={24} md={22} lg={12} xl={10}>
+                <Flex wrap={true} gap={14}>
+                  <Input
+                    allowClear
+                    placeholder="Search"
+                    prefix={<SearchOutlined />}
+                    onChange={handleSearchInputChange}
+                    suffix={
+                      <Dropdown
+                        placement="bottomRight"
+                        menu={{
+                          items: searchableColumns.map(x => {
+                            return {
+                              key: x.key,
+                              label: x.label,
+                              className: `font-semibold`,
+                              onClick: () => setState({ searchField: x.key })
+                            }
+                          }),
+                          selectable: true,
+                          defaultSelectedKeys: [defaultSearchField]
+                        }}
+                        trigger={['click']}
+                      >
+                        <CaretDownFilled className="caret-icon" />
+                      </Dropdown>
+                    }
+                  />
+                  {/* <Select
                   placeholder="Complete"
                   style={{ width: 140 }}
                   value={state.fullfilStatus || undefined}
@@ -207,8 +208,9 @@ function ListComponent({ reRender }) {
                   value={state.activeStatus || undefined}
                   options={Object.values(keys.ORDER_STATUS).map(x => ({ value: x, label: x }))}
                   onChange={val => setState({ dataResponse: null, paginationCurrentPage: 1, activeStatus: val ?? '' })}
-                />
-              </Space>
+                /> */}
+                </Flex>
+              </Col>
             </Row>
           </Col>
 
@@ -216,67 +218,7 @@ function ListComponent({ reRender }) {
         </Row>
 
         {state.fetching ? (
-          <>
-            {Array(3)
-              .fill()
-              .map((_, i) => {
-                return (
-                  <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
-                    <Row gutter={[40, 0]}>
-                      <Col span={24} lg={12}>
-                        <Space className="mb-3">
-                          <Skeleton.Input active size="large" />
-                          <Skeleton.Avatar active size="large" shape="square" />
-                        </Space>
-                      </Col>
-                      <Col span={24} lg={12} className="hidden lg:block">
-                        <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
-                          <Col>
-                            <Skeleton.Input active size="large" />
-                          </Col>
-                          <Col>
-                            <Skeleton.Avatar active size="large" shape="square" />
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
-                    <Row gutter={[40, 30]}>
-                      <Col span={24} lg={12}>
-                        <Fade>
-                          <Card size="small" bodyStyle={{ padding: 0 }}>
-                            <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
-                          </Card>
-                        </Fade>
-                      </Col>
-                      <Col span={24} lg={12}>
-                        <div className="mb-3 block lg:mb-0 lg:hidden">
-                          <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
-                            <Col>
-                              <Skeleton.Input active size="large" />
-                            </Col>
-                            <Col>
-                              <Skeleton.Avatar active size="large" shape="square" />
-                            </Col>
-                          </Row>
-                        </div>
-
-                        {Array(3)
-                          .fill()
-                          .map((_, i) => {
-                            return (
-                              <Fade key={i}>
-                                <Card size="small" bodyStyle={{ padding: 0 }} className="mb-2">
-                                  <Skeleton.Button active={true} size="large" block={true} style={{ height: 80 }} />
-                                </Card>
-                              </Fade>
-                            )
-                          })}
-                      </Col>
-                    </Row>
-                  </div>
-                )
-              })}
-          </>
+          LOADING_UI
         ) : (
           <>
             {isEmpty(state.dataResponse) ? null : (
@@ -290,7 +232,7 @@ function ListComponent({ reRender }) {
         )}
 
         {list.map((item, i) => {
-          return <CampaignItem key={item.id} order={item} first={i === 0} />
+          return <CampaignItem key={item.id} order={item} first={i === 0} reRenderParent={reRender} />
         })}
 
         <Row justify={`center`}>
@@ -303,6 +245,7 @@ function ListComponent({ reRender }) {
             pageSize={state.paginationPageSize}
             onChange={(page, pageSize) => {
               setState({ paginationCurrentPage: page, paginationPageSize: pageSize })
+              window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
           />
         </Row>
@@ -341,3 +284,67 @@ const EmptyUI = ({ showOnlyCompleted, filterExist, addBtnEl }) => {
     </Fade>
   )
 }
+
+const LOADING_UI = (
+  <>
+    {Array(3)
+      .fill()
+      .map((_, i) => {
+        return (
+          <div key={i} className={`mb-5 ${i === 0 ? 'mt-4' : ''}`}>
+            <Row gutter={[40, 0]}>
+              <Col span={24} lg={12}>
+                <Space className="mb-3">
+                  <Skeleton.Input active size="large" />
+                  <Skeleton.Avatar active size="large" shape="square" />
+                </Space>
+              </Col>
+              <Col span={24} lg={12} className="hidden lg:block">
+                <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+                  <Col>
+                    <Skeleton.Input active size="large" />
+                  </Col>
+                  <Col>
+                    <Skeleton.Avatar active size="large" shape="square" />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+            <Row gutter={[40, 30]}>
+              <Col span={24} lg={12}>
+                <Fade>
+                  <Card size="small" styles={{ body: { padding: 0 } }}>
+                    <Skeleton.Button active={true} size="large" block={true} style={{ height: 260 }} />
+                  </Card>
+                </Fade>
+              </Col>
+              <Col span={24} lg={12}>
+                <div className="mb-3 block lg:mb-0 lg:hidden">
+                  <Row justify={`space-between`} align={`middle`} gutter={[20, 20]}>
+                    <Col>
+                      <Skeleton.Input active size="large" />
+                    </Col>
+                    <Col>
+                      <Skeleton.Avatar active size="large" shape="square" />
+                    </Col>
+                  </Row>
+                </div>
+
+                {Array(3)
+                  .fill()
+                  .map((_, i) => {
+                    return (
+                      <Fade key={i}>
+                        <Card size="small" styles={{ body: { padding: 0 } }} className="mb-2">
+                          <Skeleton.Button active={true} size="large" block={true} style={{ height: 80 }} />
+                        </Card>
+                      </Fade>
+                    )
+                  })}
+              </Col>
+            </Row>
+          </div>
+        )
+      })}
+  </>
+)

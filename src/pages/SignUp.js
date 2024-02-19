@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player/lazy'
 import { useDispatch } from 'react-redux'
 import React, { useRef, useEffect } from 'react'
 import { useSafeState, useSetState } from 'ahooks'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LockOutlined, SendOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import { Row, Button, Form, Input, Col, Steps, Space, message, Tooltip, Alert } from 'antd'
 
@@ -89,6 +89,7 @@ export const companyFields = [
 function SignUp() {
   const [form] = Form.useForm()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const _isMounted = useRef(false)
   const { state } = useLocation() // Pending Campaign Creation Data
 
@@ -127,7 +128,11 @@ function SignUp() {
       localStorage.setItem(keys.SIGNUP_DONE_NOW, 'true')
       reloadChannel.postMessage(APP_ID)
     } catch (error) {
-      handleError(error, true)
+      const { finalMsg } = handleError(error, true)
+      console.log(finalMsg)
+      if (finalMsg && finalMsg.includes('Please Log In.')) {
+        navigate(links.login.to, { replace: true, state })
+      }
     } finally {
       setFirstTry(false)
       setLoading(false)
@@ -238,7 +243,8 @@ function SignUp() {
                   className="my-3"
                   message={
                     <>
-                      Please <b>Sign Up</b> or <b>Log In</b> to start a campaign with the information you just provided.
+                      {/* Please <b>Sign Up</b> or <b>Log In</b> to start a campaign with the information you just provided. */}
+                      Please <b>Sign Up</b> to start a campaign with the information you just provided.
                     </>
                   }
                 />

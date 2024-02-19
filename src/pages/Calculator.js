@@ -125,6 +125,7 @@ const Calculator = ({ embed }) => {
 
   const handleBudgetAmountEdit = () => {
     Modal.info({
+      centered: true,
       closable: true,
       maskClosable: true,
       title: 'Edit Budget Amount',

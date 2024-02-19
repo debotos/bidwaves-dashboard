@@ -62,6 +62,8 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
       const paginationQueryPrefix = _ep.includes('?') ? '&' : '?'
       _ep += paginationQueryPrefix + paginationQuery
 
+      if (suggestionUI) _ep += `&all=true`
+
       // For filters
       if (state.searchText) {
         _ep += `&${state.searchField}=${encodeURIComponent(state.searchText)}`
@@ -208,7 +210,7 @@ function ListComponent({ orderId, suggestionUI = false, getCurrentProductIds, se
 
           return (
             <Fade key={i}>
-              <Card size="small" bodyStyle={{}} className="mb-2">
+              <Card size="small" styles={{ body: {} }} className="mb-2">
                 <Space direction="vertical" className="w-100">
                   <Row gutter={[20, 10]} justify={`space-between`} align={`middle`}>
                     <Col>

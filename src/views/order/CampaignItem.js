@@ -39,6 +39,7 @@ import handleError from 'helpers/handleError'
 import emptyImage from 'assets/images/empty.svg'
 import { loadableOptions } from 'components/micro/Common'
 import { getErrorAlert, getOrderStatusTag, isEmpty, renderLoading } from 'helpers/utility'
+import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
 // const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
 const OrderQA = loadable(() => import('./manage/OrderQA'), loadableOptions)
@@ -49,7 +50,7 @@ const CampaignManager = loadable(() => import('./manage/manager/CampaignManager'
 const ProductSuggestion = loadable(() => import('./manage/suggestion/ProductSuggestion'), loadableOptions)
 
 function CampaignItem(props) {
-  const { order: initialOrder, first } = props
+  const { order: initialOrder, first, reRenderParent } = props
   const orderId = initialOrder.id
   const orderEp = endpoints.order(orderId)
   const [key, setKey] = useSafeState('order')
@@ -205,7 +206,7 @@ function CampaignItem(props) {
       <Col>{getOrderStatusTag(order.status, order, 'm-0')}</Col>
       <Col>
         <Space size={`middle`} align="end">
-          {!asyncActionRunning && getOrderNotification({ ...order, products: products })}
+          {!asyncActionRunning && !order.complete && getOrderNotification({ ...order, products: products })}
           {getPaymentInfoBtn()}
           <Tooltip
             title={<h5 className="m-0 text-2xl font-bold">{order.advertisement_info?.name}</h5>}
@@ -226,12 +227,21 @@ function CampaignItem(props) {
           type="info"
           message={<b>Please wait until BidWaves set up your next step.</b>}
           description={
-            <Space direction="vertical" align="end">
+            <Space direction="vertical" align="end" size={`middle`}>
               <p className="m-0 font-semibold">
                 BidWaves needs to review the fundamental campaign details you&apos;ve submitted and to set up the
                 necessary questions for a more thorough understanding of your campaign requirements.
               </p>
-              {getRefreshBtn('Refresh')}
+
+              <Space>
+                <AsyncDeleteButton
+                  label="Delete"
+                  endpoint={endpoints.order(order.id)}
+                  onFinish={reRenderParent}
+                  btnProps={{ size: 'small' }}
+                />
+                {getRefreshBtn('Refresh')}
+              </Space>
             </Space>
           }
         />
@@ -406,7 +416,7 @@ function CampaignItem(props) {
                   </Tooltip>
                 )}
               </Space>
-              <Card size="small" title={order.approved && topBarEl} bodyStyle={{ position: 'relative' }}>
+              <Card size="small" title={order.approved && topBarEl} styles={{ body: { position: 'relative' } }}>
                 {fetching ? (
                   renderLoading({ className: 'my-5' })
                 ) : (

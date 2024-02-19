@@ -2,13 +2,12 @@ import Axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 import React, { useState, useRef, useEffect } from 'react'
-import { Row, Button, Form, Input, message, Col, Alert } from 'antd'
+import { Row, Button, Form, Input, message, Col } from 'antd'
 import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
 import endpoints from 'config/endpoints'
-import { isEmpty } from 'helpers/utility'
 import { APP_ID, reloadChannel } from 'App'
 import handleError from 'helpers/handleError'
 import { Page, Logo } from 'components/micro/Common'
@@ -34,16 +33,16 @@ function Login() {
       setAxiosAuthHeaderToken(token)
       /* Store token to localStorage for future */
       localStorage.setItem(keys.AUTH_TOKEN, token)
-      if (!isEmpty(state)) {
-        try {
-          const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
-          window.log(`Create campaign response -> `, order)
-        } catch (error) {
-          window.log('Create campaign error:', error)
-        } finally {
-          localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
-        }
-      }
+      // if (!isEmpty(state)) {
+      //   try {
+      //     const { data: order } = await Axios.post(endpoints.orderBase, { ...state, clientId: user.id })
+      //     window.log(`Create campaign response -> `, order)
+      //   } catch (error) {
+      //     window.log('Create campaign error:', error)
+      //   } finally {
+      //     localStorage.removeItem(keys.PENDING_CREATE_CAMPAIGN_DATA)
+      //   }
+      // }
       /* Update the auth state */
       dispatch(setCurrentUser(user))
       reloadChannel.postMessage(APP_ID)
@@ -72,7 +71,7 @@ function Login() {
 
             <div className="w-100 flex justify-center">
               <div className="w-full max-w-md text-white">
-                {!isEmpty(state) && (
+                {/* {!isEmpty(state) && (
                   <Alert
                     showIcon
                     type="info"
@@ -84,7 +83,7 @@ function Login() {
                       </>
                     }
                   />
-                )}
+                )} */}
                 <h1 className="mb-4 text-center">Log In</h1>
 
                 <Form size="large" layout="vertical" name="login-form" onFinish={onFinish}>
