@@ -113,7 +113,11 @@ const Calculator = ({ embed }) => {
   let visitors_count = 0
   let leads_count = 0
   if (state.budget_amount && !isEmpty(state.industry)) {
-    visitors_count = Math.round(state.budget_amount / Number(state.industry.cpc))
+    let amount =
+      Number(state.budget_amount) - (Number(state.budget?.labor_cost || 0) + Number(state.budget?.fixed_fee || 0))
+    const holdout_cost = (amount * Number(state.budget?.holdout_percentage)) / 100
+    amount -= holdout_cost
+    visitors_count = Math.round(amount / Number(state.industry.cpc))
     leads_count = Math.round((visitors_count * Number(state.industry.rate_pct)) / 100)
 
     cta_el = (
@@ -291,19 +295,17 @@ const Calculator = ({ embed }) => {
                                 value={state.budget_amount}
                                 onChange={budget_amount => setState({ budget_amount })}
                                 tooltip={{ formatter: value => getReadableCurrency(value).replace('.00', '') }}
-                                railStyle={{ backgroundColor: '#fff', padding: 5, borderRadius: 5 }}
-                                trackStyle={{
-                                  backgroundColor: getCssVar('secondary-color'),
-                                  padding: 5,
-                                  borderRadius: 5
-                                }}
-                                handleStyle={{
-                                  backgroundColor: getCssVar('secondary-color'),
-                                  width: 22,
-                                  height: 22,
-                                  borderRadius: '50%',
-                                  zIndex: 9,
-                                  top: -2
+                                styles={{
+                                  rail: { backgroundColor: '#fff', padding: 5, borderRadius: 5 },
+                                  track: { backgroundColor: getCssVar('secondary-color'), padding: 5, borderRadius: 5 },
+                                  handle: {
+                                    backgroundColor: getCssVar('secondary-color'),
+                                    width: 22,
+                                    height: 22,
+                                    borderRadius: '50%',
+                                    zIndex: 9,
+                                    top: -2
+                                  }
                                 }}
                               />
                             </Space>
