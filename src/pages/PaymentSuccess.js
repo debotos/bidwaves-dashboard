@@ -28,7 +28,7 @@ export default function PaymentSuccess() {
     try {
       setProcessing(true)
       const ep = endpoints.order(decodeURIComponent(orderId))
-      const { data } = await Axios.post(ep + '/payment-success', { paymentIntent, clientSecret })
+      const { data } = await Axios.post(ep + '/payment/onetime-payment-success', { paymentIntent, clientSecret })
       window.log(`Payment success res:`, data)
       setResponse(data)
       if (data.success) {

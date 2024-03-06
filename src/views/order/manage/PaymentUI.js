@@ -3,14 +3,14 @@ import { useSafeState } from 'ahooks'
 import { Alert, Button, Col, Empty, Modal, Row, Table, message } from 'antd'
 
 import { getReadableCurrency, isEmpty } from 'helpers/utility'
-import RecurringCheckoutForm from 'components/micro/RecurringCheckoutForm'
+import OnetimeCheckoutForm from 'components/micro/OnetimeCheckoutForm'
 
 function PaymentUI({ refetch, order }) {
   const { pending_payment_info } = order || {}
   const [modal, showModal] = useSafeState(false)
   if (isEmpty(pending_payment_info)) return <Empty />
 
-  const { list, isRecurring } = pending_payment_info // Everything is recurring as of now
+  const { list } = pending_payment_info
   if (isEmpty(list) || !Array.isArray(list)) return <Alert message="Something went wrong." type="warning" showIcon />
 
   const total = (list || []).reduce((sum, x) => sum + Number(x?.price || 0), 0)
@@ -19,7 +19,7 @@ function PaymentUI({ refetch, order }) {
     <>
       <Row justify={`center`}>
         <Col span={24}>
-          <h2 className="mt-3">{isRecurring ? 'Monthly Recurring Payment' : 'Payment'}</h2>
+          <h2 className="mt-3">{'Payment for setup costs'}</h2>
           <Table
             bordered
             rowKey="_serial"
@@ -69,7 +69,7 @@ function PaymentUI({ refetch, order }) {
         footer={null}
         onCancel={() => showModal(false)}
       >
-        <RecurringCheckoutForm
+        <OnetimeCheckoutForm
           total={total}
           order={order}
           list={list}
