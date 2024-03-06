@@ -107,7 +107,14 @@ function Login() {
                   </Form.Item>
 
                   <Row align="middle" justify="center" className="mt-4">
-                    <Button block type="primary" htmlType="submit" icon={<LoginOutlined />} loading={loading}>
+                    <Button
+                      block
+                      className="within"
+                      type="primary"
+                      htmlType="submit"
+                      icon={<LoginOutlined />}
+                      loading={loading}
+                    >
                       Login
                     </Button>
                   </Row>

@@ -301,11 +301,16 @@ function SignUp() {
                   </div>
                   <Row align="middle" justify="center">
                     <Space className={current ? 'mt-8 lg:mt-1' : 'mt-1'}>
-                      {current > 0 && <Button onClick={() => prev()}>Previous</Button>}
+                      {current > 0 && (
+                        <Button className="within" onClick={() => prev()}>
+                          Previous
+                        </Button>
+                      )}
 
                       {current < steps.length - 1 && (
                         <Button
                           type="primary"
+                          className="within"
                           onClick={async () => {
                             const { errorFields } = await form.validateFields()
                             const hasError = errorFields?.filter(({ errors }) => errors.length).length
@@ -321,6 +326,7 @@ function SignUp() {
                           block
                           type="primary"
                           htmlType="submit"
+                          className="within"
                           icon={<SendOutlined rotate={-40} />}
                           loading={loading}
                         >
