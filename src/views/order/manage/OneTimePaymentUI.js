@@ -5,7 +5,7 @@ import { Alert, Button, Col, Empty, Modal, Row, Table, message } from 'antd'
 import { getReadableCurrency, isEmpty } from 'helpers/utility'
 import OnetimeCheckoutForm from 'components/micro/OnetimeCheckoutForm'
 
-function PaymentUI({ refetch, order }) {
+function OneTimePaymentUI({ refetch, order }) {
   const { pending_payment_info } = order || {}
   const [modal, showModal] = useSafeState(false)
   if (isEmpty(pending_payment_info)) return <Empty />
@@ -19,7 +19,8 @@ function PaymentUI({ refetch, order }) {
     <>
       <Row justify={`center`}>
         <Col span={24}>
-          <h2 className="mt-3">{'Payment for setup costs'}</h2>
+          <h2 className="mt-3">{'The Setup Fee Payment'}</h2>
+          <p>For now this will cover all the costs needed to set up the campaign. This is a one-time cost.</p>
           <Table
             bordered
             rowKey="_serial"
@@ -84,4 +85,4 @@ function PaymentUI({ refetch, order }) {
   )
 }
 
-export default PaymentUI
+export default OneTimePaymentUI

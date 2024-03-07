@@ -14,6 +14,7 @@ export default function PaymentSuccess() {
   const { search } = useLocation()
   const searchParams = new URLSearchParams(search)
   const orderId = searchParams.get('orderId')
+  const onetime = searchParams.get('onetime') === 'true'
   const paymentIntent = searchParams.get('payment_intent')
   const clientSecret = searchParams.get('payment_intent_client_secret')
 
@@ -28,7 +29,11 @@ export default function PaymentSuccess() {
     try {
       setProcessing(true)
       const ep = endpoints.order(decodeURIComponent(orderId))
-      const { data } = await Axios.post(ep + '/payment/onetime-payment-success', { paymentIntent, clientSecret })
+      const postData = { paymentIntent, clientSecret }
+      const { data } = await Axios.post(
+        ep + (onetime ? '/payment/onetime-payment-success' : '/payment/subscription-success'),
+        postData
+      )
       window.log(`Payment success res:`, data)
       setResponse(data)
       if (data.success) {
@@ -73,8 +78,22 @@ export default function PaymentSuccess() {
       return (
         <Result
           status="success"
-          title="Payment Successful"
-          subTitle={response.message}
+          title={`Thank You For Paying${onetime ? ` The Setup Cost` : ''}`}
+          subTitle={
+            <>
+              <p>{response.message}</p>
+              {onetime ? (
+                <>
+                  <p>BidWaves is working on developing your campaign.</p>
+                  <p>We will get back to you once your ad campaign is ready to be reviewed and launched.</p>
+                </>
+              ) : (
+                <>
+                  <p>Your subscription started successfully.</p>
+                </>
+              )}
+            </>
+          }
           extra={[
             <Button type="primary" key="orders" onClick={() => goToOrders()}>
               Go Back To Your Campaigns

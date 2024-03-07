@@ -102,7 +102,7 @@ const PaymentForm = ({ order, onComplete, total, amount }) => {
 const RecurringCheckoutForm = props => {
   const { order, total } = props
   const amount = Number(total) * 100
-  const [clientSecret] = useSafeState(order.pending_payment_info?.clientSecret)
+  const [clientSecret] = useSafeState(order.stripeSubscriptionClientSecret)
 
   if (!clientSecret) return getErrorAlert()
 

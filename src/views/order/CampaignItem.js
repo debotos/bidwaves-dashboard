@@ -1,5 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
+import { FaLink } from 'react-icons/fa'
 import loadable from '@loadable/component'
 import { Fade } from 'react-awesome-reveal'
 import { BsArrowReturnRight } from 'react-icons/bs'
@@ -18,7 +19,10 @@ import {
   Space,
   Tag,
   Tooltip,
-  message
+  message,
+  Flex,
+  Popover,
+  Divider
 } from 'antd'
 import {
   BellOutlined,
@@ -28,24 +32,33 @@ import {
   EditOutlined,
   ReloadOutlined,
   SyncOutlined,
-  WarningOutlined
+  WarningOutlined,
+  DollarOutlined
 } from '@ant-design/icons'
 
 import keys from 'config/keys'
 import { socketIO } from 'App'
 import endpoints from 'config/endpoints'
-import PaymentInfo from './PaymentInfo'
 import handleError from 'helpers/handleError'
+import SubscriptionInfo from './SubscriptionInfo'
 import emptyImage from 'assets/images/empty.svg'
 import { loadableOptions } from 'components/micro/Common'
-import { getErrorAlert, getOrderStatusTag, isEmpty, renderLoading } from 'helpers/utility'
+import {
+  getErrorAlert,
+  getOrderStatusTag,
+  getReadableCurrency,
+  isEmpty,
+  readableTime,
+  renderLoading
+} from 'helpers/utility'
 import AsyncDeleteButton from 'components/micro/fields/AsyncDeleteButton'
 
 // const OrderNote = loadable(() => import('./manage/note'), loadableOptions)
 const OrderQA = loadable(() => import('./manage/OrderQA'), loadableOptions)
-const PaymentUI = loadable(() => import('./manage/PaymentUI'), loadableOptions)
 const OrderEdit = loadable(() => import('./manage/OrderEdit'), loadableOptions)
 const Video = loadable(() => import('components/micro/Video'), loadableOptions)
+const OneTimePaymentUI = loadable(() => import('./manage/OneTimePaymentUI'), loadableOptions)
+const CampaignRightSideUI = loadable(() => import('./CampaignRightSideUI'), loadableOptions)
 const CampaignManager = loadable(() => import('./manage/manager/CampaignManager'), loadableOptions)
 const ProductSuggestion = loadable(() => import('./manage/suggestion/ProductSuggestion'), loadableOptions)
 
@@ -179,12 +192,36 @@ function CampaignItem(props) {
     !showOnlyQaUI && getOrderProducts(true)
   }
 
-  const getPaymentInfoBtn = () => {
-    if (!order.first_payment_date) return null
+  const getSubscriptionInfoBtn = () => {
+    if (!order.subscriptionStarted) return null
 
     return (
       <div onClick={e => e.stopPropagation()}>
-        <PaymentInfo order={order} />
+        <SubscriptionInfo order={order} />
+      </div>
+    )
+  }
+
+  const getPaymentInfoBtn = () => {
+    if (isEmpty(order.payments)) return null
+
+    return (
+      <div onClick={e => e.stopPropagation()}>
+        <Popover
+          trigger={`click`}
+          title={`One Time Payment(s)`}
+          content={
+            <Space direction="vertical" className="w-100 mt-2">
+              {order.payments.map((payment, i) => {
+                return <Alert key={i} type="info" description={<OneTimePaymentCard log={payment} />} />
+              })}
+            </Space>
+          }
+        >
+          <Tooltip title="One Time Payment(s)">
+            <Button icon={<DollarOutlined />} size="small" />
+          </Tooltip>
+        </Popover>
       </div>
     )
   }
@@ -208,6 +245,7 @@ function CampaignItem(props) {
         <Space size={`middle`} align="end">
           {!asyncActionRunning && !order.complete && getOrderNotification({ ...order, products: products })}
           {getPaymentInfoBtn()}
+          {getSubscriptionInfoBtn()}
           <Tooltip
             title={<h5 className="m-0 text-2xl font-bold">{order.advertisement_info?.name}</h5>}
             placement="left"
@@ -257,7 +295,7 @@ function CampaignItem(props) {
     if (!isEmpty(order.pending_payment_info)) {
       return (
         <Fade>
-          <PaymentUI key={key} {...props} {...cProps} />
+          <OneTimePaymentUI key={key} {...props} {...cProps} />
         </Fade>
       )
     }
@@ -408,7 +446,7 @@ function CampaignItem(props) {
           <Col span={24} lg={12}>
             <Fade>
               <Space className="mb-2">
-                <h5 className="m-0 text-2xl font-bold">{order.name}</h5>
+                <h1 className="m-0 text-2xl font-bold">{order.name}</h1>
 
                 {order.approved && (
                   <Tooltip title="Edit">
@@ -430,7 +468,10 @@ function CampaignItem(props) {
           <Col span={24} lg={12}>
             {order.approved && order.active && order.qa_approved && !order.complete && (
               <Fade>
-                <ProductSuggestion {...props} {...cProps} />
+                <Flex vertical gap={20}>
+                  <ProductSuggestion {...props} {...cProps} />
+                  <CampaignRightSideUI {...props} {...cProps} key={products.length} />
+                </Flex>
               </Fade>
             )}
           </Col>
@@ -516,5 +557,70 @@ const getOrderNotification = order => {
         <BellOutlined />
       </Badge>
     </Tooltip>
+  )
+}
+
+export const OneTimePaymentCard = ({ log }) => {
+  const coupons = log.meta_data?.coupons || []
+  return (
+    <Space direction="vertical" className="w-100">
+      <div className="text-sm font-medium text-gray-500">{readableTime(log.createdAt, true)}</div>
+      {!isEmpty(log.meta_data) && (
+        <>
+          <div className="text-sm font-medium text-gray-500">
+            {log.meta_data.brand?.toUpperCase()} {!log.meta_data.hide_last4 ? `**** ${log.meta_data.last4}` : ''}
+          </div>
+        </>
+      )}
+      {log.description && (
+        <div className="">
+          <Divider className="my-1" />
+          <Space direction="vertical" size={2} className="w-100 text-gray-500">
+            {JSON.parse(log.description).map((item, i) => {
+              return (
+                <Space key={i} size={`small`} className="">
+                  <p className="m-0 text-sm font-medium">{item.label}</p>
+                  <p className="m-0 text-sm font-medium">{getReadableCurrency(item.price)}</p>
+                </Space>
+              )
+            })}
+          </Space>
+          <Divider className="my-1" />
+        </div>
+      )}
+      <Space size="small" split={<Divider type="vertical" />} className="text-sm font-medium text-gray-500">
+        <span className="font-semibold">Total: {getReadableCurrency(log.amount)}</span>
+        <span className="text-sm font-medium text-green-600">Paid</span>
+        {log.meta_data.receipt_url && (
+          <Tooltip title="Receipt">
+            <Button size="small" icon={<FaLink />} onClick={() => window.open(log.meta_data.receipt_url, '_blank')} />
+          </Tooltip>
+        )}
+      </Space>
+
+      {!isEmpty(coupons) && Array.isArray(coupons) ? (
+        <>
+          <Space direction="vertical" size={3} className="w-100 text-sm font-medium text-gray-500">
+            <Divider plain dashed className="mb-2">
+              <div className="text-sm font-bold text-gray-500">Coupons Used</div>
+            </Divider>
+            <div className="grid grid-cols-2 gap-y-2">
+              {coupons.map((x, i) => {
+                return (
+                  <React.Fragment key={i}>
+                    <div className="bg-gray-100 p-2 text-center">
+                      <span className="text-sm font-semibold text-gray-500">{x.code}</span>
+                    </div>
+                    <div className="bg-gray-100 p-2 text-center">
+                      <span className="text-sm font-medium text-gray-500">{getReadableCurrency(x.amount)}</span>{' '}
+                    </div>
+                  </React.Fragment>
+                )
+              })}
+            </div>
+          </Space>
+        </>
+      ) : null}
+    </Space>
   )
 }

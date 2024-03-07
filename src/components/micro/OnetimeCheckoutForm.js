@@ -46,7 +46,8 @@ const PaymentForm = ({ order, onComplete, total, amount }) => {
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + links.paymentSuccess.to + `?orderId=${encodeURIComponent(order.id)}`
+          return_url:
+            window.location.origin + links.paymentSuccess.to + `?orderId=${encodeURIComponent(order.id)}&onetime=true`
         }
       })
 

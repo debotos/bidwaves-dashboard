@@ -9,7 +9,7 @@ import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
 import { getReadableCurrency, isEmpty, readableTime, renderLoading } from 'helpers/utility'
 
-function PaymentInfo({ order }) {
+function SubscriptionInfo({ order }) {
   const { id: orderId } = order
 
   const [info, setInfo] = useSafeState(null)
@@ -19,8 +19,8 @@ function PaymentInfo({ order }) {
   const init = async () => {
     try {
       setFetching(true)
-      const { data } = await Axios.get(endpoints.order(orderId) + `/payment-info`)
-      window.log(`Payment info response -> `, data)
+      const { data } = await Axios.get(endpoints.order(orderId) + `/payment/subscription-info`)
+      window.log(`Subscription info response -> `, data)
       setInfo(data)
     } catch (error) {
       handleError(error, true)
@@ -44,24 +44,24 @@ function PaymentInfo({ order }) {
   if (isEmpty(order)) return null
   return (
     <>
-      <Tooltip title="Campaign Payment Info">
+      <Tooltip title="Campaign Subscription Info">
         <Button icon={<FaRegCreditCard className="mt-1" />} size="small" onClick={showModal} />
       </Tooltip>
 
-      <Modal title="Payment Information" footer={null} open={isModalOpen} onCancel={handleCancel}>
+      <Modal title="Subscription Information" footer={null} open={isModalOpen} onCancel={handleCancel}>
         {fetching ? (
           renderLoading({ className: 'my-5' })
         ) : (
-          <OrderPaymentCard info={info} order={order} refetch={init} />
+          <OrderSubscriptionCard info={info} order={order} refetch={init} />
         )}
       </Modal>
     </>
   )
 }
 
-export default PaymentInfo
+export default SubscriptionInfo
 
-export const OrderPaymentCard = ({ info, refetch }) => {
+export const OrderSubscriptionCard = ({ info, refetch }) => {
   if (isEmpty(info)) {
     return (
       <>

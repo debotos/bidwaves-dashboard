@@ -18,7 +18,7 @@ import { getCssVar, getPlaceholderInput, getReadableCurrency, isEmpty } from 'he
 
 export const enterpriseCalenderLink = `https://calendly.com/bidwaves/bidwaves-enterprise?hide_gdpr_banner=1`
 
-const generateBudgetOptionLabel = item => {
+export const generateBudgetOptionLabel = item => {
   return {
     label: (
       <Space>
