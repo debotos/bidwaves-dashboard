@@ -162,6 +162,11 @@ function CampaignRightSideUI(props) {
                 Adjust
               </Button>
             </Flex>
+
+            <p className="mb-0 mt-3 font-semibold">
+              By approving the budget, you authorize BidWaves LLC to charge the stored card on Stripe. By submitting you
+              accept the Terms & Conditions.
+            </p>
           </Card>
         )}
 
