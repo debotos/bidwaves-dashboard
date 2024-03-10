@@ -178,6 +178,8 @@ function CampaignRightSideUI(props) {
   const searchCopyApproved = adCopy.is_text_accepted === true
   const assetCopyApproved = adCopy.is_asset_accepted === true
 
+  if (searchCopyApproved && assetCopyApproved && !showSubscriptionConfirmUI && !showSubscriptionPayUI) return null
+
   return (
     <>
       <div>
