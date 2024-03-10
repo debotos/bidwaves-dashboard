@@ -10,6 +10,8 @@ import { getAllCssVars } from 'helpers/utility'
 import CheckNetwork from 'components/micro/CheckNetwork'
 import ErrorBoundary from 'components/micro/ErrorBoundary'
 
+import 'react-perfect-scrollbar/dist/css/styles.css'
+
 import 'assets/styles/vars.css'
 import 'assets/styles/main.css'
 
