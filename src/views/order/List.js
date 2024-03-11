@@ -90,7 +90,9 @@ function ListComponent({ reRender }) {
       //   }
 
       //   if (state.paidStatus) {
-      //     _ep += `&${keys.BOOL_COL_PREFIX}paid=${state.paidStatus === PAID_STATUS.PAID ? 'true' : 'false'}`
+      //     _ep += `&${
+      //       state.paidStatus === PAID_STATUS.PAID ? keys.NOT_NULL_COL_PREFIX : keys.NULL_COL_PREFIX
+      //     }last_payment_date=`
       //   }
       // }
 
@@ -100,8 +102,7 @@ function ListComponent({ reRender }) {
         _ep += `&order=${order}&sort=${sort}`
       }
 
-      const req = await Axios.get(_ep)
-      const res = req.data
+      const { data: res } = await Axios.get(_ep)
       window.log(`Data response -> `, res)
       setState({ dataResponse: res, paginationCurrentPage: page })
     } catch (error) {

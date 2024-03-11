@@ -89,7 +89,7 @@ const Calculator = ({ embed }) => {
         message: 'Campaign created successfully!',
         description: `"${order.name}" created successfully!`
       })
-      navigate(links.orders.to)
+      navigate(links.dashboard.to)
     } catch (error) {
       handleError(error, true)
     } finally {

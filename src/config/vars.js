@@ -1,21 +1,15 @@
-import { MdCampaign } from 'react-icons/md'
 import { BsCalculator } from 'react-icons/bs'
+import { MdCampaign, MdDashboard } from 'react-icons/md'
 import { FaUserCircle, FaRegCalendarAlt, FaCheckCircle } from 'react-icons/fa'
-import { LoginOutlined, UserAddOutlined, LockOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icons'
+import { LoginOutlined, UserAddOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons'
 
 export const commonRoutes = {
   calculator: { to: '/', label: 'Calculator', icon: BsCalculator, iconSize: 22 },
   calendar: { to: '/calendar', label: 'Calendar', icon: FaRegCalendarAlt, iconSize: 22 }
 }
 export const privateRoutes = {
-  orders: { to: '/campaigns', label: 'Campaigns', icon: MdCampaign, iconSize: 22 },
-  stats: {
-    to: '/stats',
-    label: 'Statistics & Reports',
-    icon: LineChartOutlined,
-    iconSize: 22,
-    sidenav: user => !!user?.stats_iframe_url
-  },
+  dashboard: { to: '/dashboard', label: 'Dashboard', icon: MdDashboard, iconSize: 22 },
+  campaigns: { to: '/campaigns', label: 'Campaigns', icon: MdCampaign, iconSize: 22 },
   private_calculator: {
     ...commonRoutes.calculator,
     label: 'New Campaign',
@@ -23,7 +17,7 @@ export const privateRoutes = {
     icon: PlusOutlined,
     iconSize: 20
   },
-  profile: { to: '/profile', label: 'My Profile', icon: FaUserCircle, iconSize: 22, sidenav: false },
+  profile: { to: '/profile', label: 'Profile Settings', icon: FaUserCircle, iconSize: 22 },
   paymentSuccess: {
     to: '/payment-success',
     label: 'Payment Success',

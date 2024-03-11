@@ -7,7 +7,7 @@ import { links } from 'config/vars'
 export const PublicRoute = () => {
   const auth = useSelector(state => state.auth)
 
-  return auth.isAuthenticated ? <Navigate to={links.orders.to} /> : <Outlet />
+  return auth.isAuthenticated ? <Navigate to={links.dashboard.to} /> : <Outlet />
 }
 
 export default PublicRoute

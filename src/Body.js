@@ -2,7 +2,7 @@ import Axios from 'axios'
 import React from 'react'
 import { message } from 'antd'
 import jwt_decode from 'jwt-decode'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useMount, useBoolean, useResetState, useUnmount } from 'ahooks'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
@@ -22,11 +22,11 @@ import { setAxiosAuthHeaderToken } from 'helpers/axiosHelper'
 import { setCurrentUser, logoutUser } from 'redux/slices/authSlice'
 import { getErrorAlert, reloadOnVisibility } from 'helpers/utility'
 
-const Stats = React.lazy(() => import('pages/Stats'))
 const Profile = React.lazy(() => import('pages/Profile'))
 const SignIn = React.lazy(() => import('pages/SignIn'))
 const SignUp = React.lazy(() => import('pages/SignUp'))
 const Orders = React.lazy(() => import('pages/Orders'))
+const Campaigns = React.lazy(() => import('pages/Campaigns'))
 const Calendar = React.lazy(() => import('pages/Calendar'))
 const Calculator = React.lazy(() => import('pages/Calculator'))
 const ResetPassword = React.lazy(() => import('pages/ResetPassword'))
@@ -35,7 +35,6 @@ const ForgotPassword = React.lazy(() => import('pages/ForgotPassword'))
 
 function Body() {
   const dispatch = useDispatch()
-  const { user } = useSelector(state => state.auth)
 
   const [loading, { set: setLoading }] = useBoolean(true)
   const [state, setState, resetState] = useResetState({ error: null })
@@ -127,11 +126,9 @@ function Body() {
             {/* Private */}
             <Route element={<PrivateRoute />}>
               <Route element={<MainLayout />}>
-                {user?.stats_iframe_url && (
-                  <Route end path={links.stats.to} element={<Stats url={user?.stats_iframe_url} />} />
-                )}
                 <Route end path={links.profile.to} element={<Profile />} />
-                <Route end path={links.orders.to} element={<Orders />} />
+                <Route end path={links.dashboard.to} element={<Orders />} />
+                <Route end path={links.campaigns.to} element={<Campaigns />} />
                 <Route path={links.private_calculator.to} element={<Calculator embed={true} />} />
                 <Route path={links.paymentSuccess.to} element={<PaymentSuccess />} />
               </Route>

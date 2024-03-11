@@ -48,7 +48,12 @@ const PublicHeader = () => {
         <div className="w-100 container mx-auto flex h-14 items-center lg:h-16">
           <Row className="w-100 h-full px-4 sm:px-0" justify="space-between" align="middle">
             <Col>
-              <Logo light={true} width={150} rowProps={{ className: '' }} onClick={() => navigate(links.orders.to)} />
+              <Logo
+                light={true}
+                width={150}
+                rowProps={{ className: '' }}
+                onClick={() => navigate(links.dashboard.to)}
+              />
             </Col>
             {/* {renderPublicLinks({ screens })} */}
             {isAuthenticated ? (

@@ -1,15 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 
-function Stats({ url }) {
+function StatsIframe({ url, className }) {
   return (
     <>
-      <Wrapper className={`h-full pt-3`}>{url && <iframe src={url}></iframe>}</Wrapper>
+      <Wrapper className={className || `h-full pt-3`}>{url && <iframe src={url}></iframe>}</Wrapper>
     </>
   )
 }
 
-export default Stats
+export default StatsIframe
 
 export const Wrapper = styled.div`
   iframe {

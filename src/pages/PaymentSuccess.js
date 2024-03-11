@@ -22,7 +22,7 @@ export default function PaymentSuccess() {
   const [processing, setProcessing] = useSafeState(true)
 
   const goToOrders = (qs = '', state) => {
-    navigate(links.orders.to + qs, { replace: true, state })
+    navigate(links.dashboard.to + qs, { replace: true, state })
   }
 
   const checkPaymentDone = async () => {
@@ -39,7 +39,7 @@ export default function PaymentSuccess() {
       if (data.success) {
         setTimeout(() => {
           goToOrders(`?open=${encodeURIComponent(orderId)}`)
-        }, 2000)
+        }, 4000)
       }
     } catch (error) {
       handleError(error, true)

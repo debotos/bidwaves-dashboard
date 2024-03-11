@@ -12,7 +12,7 @@ const PageNotFound = () => {
         title="404"
         subTitle={`Page not found.`}
         extra={
-          <Link to={`${vars.links.orders.to}`}>
+          <Link to={`${vars.links.dashboard.to}`}>
             <Button type="primary" className="font-semibold">
               Go Back
             </Button>
