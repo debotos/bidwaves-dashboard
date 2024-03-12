@@ -79,7 +79,7 @@ export const OrderSubscriptionCard = ({ info, refetch }) => {
         <div className="text-sm font-medium text-gray-500">{info.charge.description}</div>
 
         <Space size="small" className="text-sm font-medium text-gray-500">
-          Last Paid:
+          Last Payment:
           <Tag>
             <div className="text-sm font-medium text-gray-500">
               {readableTime(moment.unix(info.invoice.created), true)}

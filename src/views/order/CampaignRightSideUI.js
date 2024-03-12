@@ -95,6 +95,8 @@ function CampaignRightSideUI(props) {
   if (checking) return renderLoading({ tip: 'Checking...', className: 'my-5' })
   if (suggestionCount || isEmpty(adCopy)) return null
 
+  const assetListExist = !isEmpty(adCopy.asset_list)
+  const textListExist = !isEmpty(adCopy.text_list)
   const showSubscriptionConfirmUI = !order.stripeSubscriptionId
   const showSubscriptionPayUI =
     !order.subscriptionStarted && order.stripeSubscriptionId && order.stripeSubscriptionClientSecret
@@ -178,7 +180,13 @@ function CampaignRightSideUI(props) {
   const searchCopyApproved = adCopy.is_text_accepted === true
   const assetCopyApproved = adCopy.is_asset_accepted === true
 
-  if (searchCopyApproved && assetCopyApproved && !showSubscriptionConfirmUI && !showSubscriptionPayUI) return null
+  if (
+    (!textListExist || searchCopyApproved) &&
+    (!assetListExist || assetCopyApproved) &&
+    !showSubscriptionConfirmUI &&
+    !showSubscriptionPayUI
+  )
+    return null
 
   return (
     <>
@@ -188,65 +196,69 @@ function CampaignRightSideUI(props) {
         </Space>
 
         <Space direction="vertical" className="w-full">
-          <Fade>
-            <Card>
-              <h3 className="font-bold">{`Review Search Ad Copy`}</h3>
-              <Flex justify="space-between" gap={20}>
-                <h4 className="m-0 font-semibold">{`Review Ad Copy`}</h4>
+          {textListExist && (
+            <Fade>
+              <Card>
+                <h3 className="font-bold">{`Review Search Ad Copy`}</h3>
+                <Flex justify="space-between" gap={20}>
+                  <h4 className="m-0 font-semibold">{`Review Ad Copy`}</h4>
 
-                <div>
-                  {searchCopyApproved ? (
-                    <Tag color="success" icon={<CheckCircleOutlined />}>
-                      Complete
-                    </Tag>
-                  ) : (
-                    <Tag color="warning" icon={<WarningOutlined />}>
-                      Incomplete
-                    </Tag>
-                  )}
-                </div>
+                  <div>
+                    {searchCopyApproved ? (
+                      <Tag color="success" icon={<CheckCircleOutlined />}>
+                        Complete
+                      </Tag>
+                    ) : (
+                      <Tag color="warning" icon={<WarningOutlined />}>
+                        Incomplete
+                      </Tag>
+                    )}
+                  </div>
 
-                <Button
-                  type={searchCopyApproved ? 'default' : 'primary'}
-                  shape="round"
-                  size="small"
-                  onClick={() => openSearchAdCopyModal(true)}
-                >
-                  {searchCopyApproved ? 'Review' : 'Complete'}
-                </Button>
-              </Flex>
-            </Card>
-          </Fade>
+                  <Button
+                    type={searchCopyApproved ? 'default' : 'primary'}
+                    shape="round"
+                    size="small"
+                    onClick={() => openSearchAdCopyModal(true)}
+                  >
+                    {searchCopyApproved ? 'Review' : 'Complete'}
+                  </Button>
+                </Flex>
+              </Card>
+            </Fade>
+          )}
 
-          <Fade>
-            <Card>
-              <h3 className="font-bold">{`Review Display Ad Copy`}</h3>
-              <Flex justify="space-between" gap={20}>
-                <h4 className="m-0 font-semibold">{`Review Ad Copy`}</h4>
+          {assetListExist && (
+            <Fade>
+              <Card>
+                <h3 className="font-bold">{`Review Display Ad Copy`}</h3>
+                <Flex justify="space-between" gap={20}>
+                  <h4 className="m-0 font-semibold">{`Review Ad Copy`}</h4>
 
-                <div>
-                  {assetCopyApproved ? (
-                    <Tag color="success" icon={<CheckCircleOutlined />}>
-                      Complete
-                    </Tag>
-                  ) : (
-                    <Tag color="warning" icon={<WarningOutlined />}>
-                      Incomplete
-                    </Tag>
-                  )}
-                </div>
+                  <div>
+                    {assetCopyApproved ? (
+                      <Tag color="success" icon={<CheckCircleOutlined />}>
+                        Complete
+                      </Tag>
+                    ) : (
+                      <Tag color="warning" icon={<WarningOutlined />}>
+                        Incomplete
+                      </Tag>
+                    )}
+                  </div>
 
-                <Button
-                  type={assetCopyApproved ? 'default' : 'primary'}
-                  shape="round"
-                  size="small"
-                  onClick={() => openDisplayAdCopyModal(true)}
-                >
-                  {assetCopyApproved ? 'Review' : 'Complete'}
-                </Button>
-              </Flex>
-            </Card>
-          </Fade>
+                  <Button
+                    type={assetCopyApproved ? 'default' : 'primary'}
+                    shape="round"
+                    size="small"
+                    onClick={() => openDisplayAdCopyModal(true)}
+                  >
+                    {assetCopyApproved ? 'Review' : 'Complete'}
+                  </Button>
+                </Flex>
+              </Card>
+            </Fade>
+          )}
 
           {showSubscriptionConfirmUI && (
             <Card>
