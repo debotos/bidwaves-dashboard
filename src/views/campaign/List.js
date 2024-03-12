@@ -1,9 +1,10 @@
 import Axios from 'axios'
 import { useRef, useEffect } from 'react'
+import loadable from '@loadable/component'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CaretDownFilled, PlusOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons'
-import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { Row, Col, Input, Dropdown, Space, Button, Table, Flex, Select, Drawer } from 'antd'
+import { Row, Col, Input, Dropdown, Space, Button, Table, Flex, Select, Drawer, Modal } from 'antd'
+import { useDebounceFn, useSetState, useLockFn, useMount, useUnmount, useUpdateEffect, useSafeState } from 'ahooks'
 
 import keys from 'config/keys'
 import { links } from 'config/vars'
@@ -11,8 +12,10 @@ import endpoints from 'config/endpoints'
 import CampaignStats from './CampaignStats'
 import handleError from 'helpers/handleError'
 import StatsIframe from 'components/micro/StatsIframe'
-import { RefreshButton } from 'components/micro/Common'
-import { defaultPaginationConfig, isEmpty } from 'helpers/utility'
+import { RefreshButton, loadableOptions } from 'components/micro/Common'
+import { defaultPaginationConfig, getErrorAlert, isEmpty, renderLoading } from 'helpers/utility'
+
+const OrderEdit = loadable(() => import('views/order/manage/OrderEdit'), loadableOptions)
 
 const FULLFIL_STATUS = { COMPLETE: 'Completed', NOT_COMPLETE: 'Running' }
 const searchableColumns = [{ key: 'name', label: 'Name' }]
@@ -24,6 +27,7 @@ function ListComponent({ reRender }) {
   const { search } = useLocation()
   const searchParams = new URLSearchParams(search)
   const openOrderId = searchParams.get('open')
+  const [updateModal, setUpdateModal] = useSafeState(null)
   const [state, setState] = useSetState({
     searchText: '',
     fullfilStatus: FULLFIL_STATUS.NOT_COMPLETE,
@@ -172,6 +176,7 @@ function ListComponent({ reRender }) {
               onClick={e => {
                 e.preventDefault()
                 e.stopPropagation()
+                setUpdateModal(record)
               }}
             >
               Manage Campaign
@@ -280,8 +285,51 @@ function ListComponent({ reRender }) {
       >
         <StatsIframe url={state.iFrameModal?.stats_iframe_url} className={`h-full`} />
       </Drawer>
+
+      <Modal
+        destroyOnClose
+        title="Campaign Information Update"
+        open={!isEmpty(updateModal)}
+        footer={null}
+        maskClosable={false}
+        onCancel={() => setUpdateModal(null)}
+        className="ant-modal-width-full"
+      >
+        <CampaignManageUI orderId={updateModal?.id} closeModal={() => setUpdateModal(null)} />
+      </Modal>
     </>
   )
 }
 
 export default ListComponent
+
+export const CampaignManageUI = props => {
+  const { orderId, closeModal } = props
+
+  const [order, setOrder] = useSafeState(null)
+  const [fetching, setFetching] = useSafeState(false)
+
+  const getData = async () => {
+    try {
+      setFetching(true)
+      const orderEp = endpoints.order(orderId)
+      const { data: res } = await Axios.get(orderEp)
+      console.log(`Order response: `, res)
+      setOrder(res)
+    } catch (error) {
+      handleError(error, true)
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  useMount(() => {
+    getData()
+  })
+
+  if (fetching) return renderLoading({ tip: 'Loading Campaign...', className: 'my-4' })
+  if (isEmpty(order)) return getErrorAlert({ onRetry: getData })
+
+  const cProps = { order, refetch: getData, fetching, closeModal }
+  return <OrderEdit key={orderId} {...cProps} />
+}
