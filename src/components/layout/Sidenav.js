@@ -50,7 +50,7 @@ function Sidenav() {
                 key: route.to,
                 icon,
                 label: route.label,
-                className: `font-normal text-[#939393]`,
+                className: `font-semibold text-[#939393]`,
                 onClick: () => {
                   closeNav()
                   navigate(route.to)

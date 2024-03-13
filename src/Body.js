@@ -26,6 +26,7 @@ const Profile = React.lazy(() => import('pages/Profile'))
 const SignIn = React.lazy(() => import('pages/SignIn'))
 const SignUp = React.lazy(() => import('pages/SignUp'))
 const Orders = React.lazy(() => import('pages/Orders'))
+const Billings = React.lazy(() => import('pages/Billings'))
 const Campaigns = React.lazy(() => import('pages/Campaigns'))
 const Calendar = React.lazy(() => import('pages/Calendar'))
 const Calculator = React.lazy(() => import('pages/Calculator'))
@@ -129,6 +130,7 @@ function Body() {
                 <Route end path={links.profile.to} element={<Profile />} />
                 <Route end path={links.dashboard.to} element={<Orders />} />
                 <Route end path={links.campaigns.to} element={<Campaigns />} />
+                <Route end path={links.billing.to} element={<Billings />} />
                 <Route path={links.private_calculator.to} element={<Calculator embed={true} />} />
                 <Route path={links.paymentSuccess.to} element={<PaymentSuccess />} />
               </Route>

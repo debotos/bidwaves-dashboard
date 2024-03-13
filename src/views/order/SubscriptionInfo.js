@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import React from 'react'
 import moment from 'moment'
+import { Link } from 'react-router-dom'
 import { useSafeState, useUpdateEffect } from 'ahooks'
 import { FaLink, FaRegCreditCard } from 'react-icons/fa'
 import { Button, Empty, Modal, Row, Space, Tag, Tooltip } from 'antd'
@@ -8,6 +9,7 @@ import { Button, Empty, Modal, Row, Space, Tag, Tooltip } from 'antd'
 import endpoints from 'config/endpoints'
 import handleError from 'helpers/handleError'
 import { getReadableCurrency, isEmpty, readableTime, renderLoading } from 'helpers/utility'
+import { links } from 'config/vars'
 
 function SubscriptionInfo({ order }) {
   const { id: orderId } = order
@@ -86,21 +88,25 @@ export const OrderSubscriptionCard = ({ info, refetch }) => {
             </div>
           </Tag>
           <Tag>{getReadableCurrency(info.charge.amount / 100)}</Tag>
+          {info.charge.receipt_url && (
+            <Tooltip title="Receipt">
+              <Button
+                size="small"
+                type="dashed"
+                icon={<FaLink />}
+                onClick={() => window.open(info.charge.receipt_url, '_blank')}
+              >
+                Receipt
+              </Button>
+            </Tooltip>
+          )}
         </Space>
 
-        {info.charge.receipt_url && (
-          <Tooltip title="Receipt">
-            <Button
-              block
-              className="mt-1"
-              type="primary"
-              icon={<FaLink />}
-              onClick={() => window.open(info.charge.receipt_url, '_blank')}
-            >
-              View Full Details
-            </Button>
-          </Tooltip>
-        )}
+        <Link to={links.billing.to}>
+          <Button type="link" className="pl-0">
+            To gain further insights, please visit&nbsp;<b>{links.billing.label}</b>
+          </Button>
+        </Link>
       </Space>
     </>
   )

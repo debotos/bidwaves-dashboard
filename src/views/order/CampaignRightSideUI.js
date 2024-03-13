@@ -97,7 +97,7 @@ function CampaignRightSideUI(props) {
 
   const assetListExist = !isEmpty(adCopy.asset_list)
   const textListExist = !isEmpty(adCopy.text_list)
-  const showSubscriptionConfirmUI = !order.stripeSubscriptionId
+  const showSubscriptionConfirmUI = !order.stripeSubscriptionId && order.last_payment_date
   const showSubscriptionPayUI =
     !order.subscriptionStarted && order.stripeSubscriptionId && order.stripeSubscriptionClientSecret
 
@@ -473,8 +473,10 @@ function CampaignRightSideUI(props) {
                           if (accepted === null) return
                           if (accepted === -1) return Modal.error(hintApproveModalConfig)
 
-                          handleAdCopyUpdate({ ...values, csm_reviewed_text_accepted: false }, true, () =>
-                            openSearchAdCopyModal(false)
+                          handleAdCopyUpdate(
+                            { ...values, is_text_accepted: true, csm_reviewed_text_accepted: false },
+                            true,
+                            () => openSearchAdCopyModal(false)
                           )
                         }}
                       >
@@ -682,8 +684,10 @@ function CampaignRightSideUI(props) {
                           if (accepted === null) return
                           if (accepted === -1) return Modal.error(hintApproveModalConfig)
 
-                          handleAdCopyUpdate({ ...values, csm_reviewed_asset_accepted: false }, true, () =>
-                            openDisplayAdCopyModal(false)
+                          handleAdCopyUpdate(
+                            { ...values, is_asset_accepted: true, csm_reviewed_asset_accepted: false },
+                            true,
+                            () => openDisplayAdCopyModal(false)
                           )
                         }}
                       >

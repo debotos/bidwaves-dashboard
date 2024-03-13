@@ -1,4 +1,5 @@
 import { BsCalculator } from 'react-icons/bs'
+import { FaMoneyBill } from 'react-icons/fa'
 import { MdCampaign, MdDashboard } from 'react-icons/md'
 import { FaUserCircle, FaRegCalendarAlt, FaCheckCircle } from 'react-icons/fa'
 import { LoginOutlined, UserAddOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons'
@@ -18,6 +19,7 @@ export const privateRoutes = {
     iconSize: 20
   },
   profile: { to: '/profile', label: 'Profile Settings', icon: FaUserCircle, iconSize: 22 },
+  billing: { to: '/billing', label: 'Billings', icon: FaMoneyBill, iconSize: 22 },
   paymentSuccess: {
     to: '/payment-success',
     label: 'Payment Success',

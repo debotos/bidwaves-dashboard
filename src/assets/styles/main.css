@@ -268,7 +268,6 @@ body::-webkit-scrollbar {
 .ant-menu-item:active,
 .ant-menu-item.ant-menu-item-selected {
   background-color: transparent !important;
-  font-weight: 500 !important;
 }
 
 .custom-dragger .ant-upload-wrapper {
