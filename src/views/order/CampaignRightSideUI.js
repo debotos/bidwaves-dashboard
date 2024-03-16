@@ -95,9 +95,18 @@ function CampaignRightSideUI(props) {
   if (checking) return renderLoading({ tip: 'Checking...', className: 'my-5' })
   if (suggestionCount || isEmpty(adCopy)) return null
 
+  const hasIncompleteProduct = products.some(x => !x.complete)
+  const searchCopyApproved = adCopy.is_text_accepted === true
+  const assetCopyApproved = adCopy.is_asset_accepted === true
   const assetListExist = !isEmpty(adCopy.asset_list)
   const textListExist = !isEmpty(adCopy.text_list)
-  const showSubscriptionConfirmUI = !order.stripeSubscriptionId && order.last_payment_date
+  const showSubscriptionConfirmUI =
+    !hasIncompleteProduct &&
+    !order.stripeSubscriptionId &&
+    searchCopyApproved &&
+    assetCopyApproved &&
+    order.last_payment_date
+
   const showSubscriptionPayUI =
     !order.subscriptionStarted && order.stripeSubscriptionId && order.stripeSubscriptionClientSecret
 
@@ -176,9 +185,6 @@ function CampaignRightSideUI(props) {
     visitors_count = Math.round(amount / Number(state.industry.cpc))
     leads_count = Math.round((visitors_count * Number(state.industry.rate_pct)) / 100)
   }
-
-  const searchCopyApproved = adCopy.is_text_accepted === true
-  const assetCopyApproved = adCopy.is_asset_accepted === true
 
   if (
     (!textListExist || searchCopyApproved) &&
@@ -342,7 +348,7 @@ function CampaignRightSideUI(props) {
               showIcon
               className="mb-2"
               type={adCopy.is_text_accepted ? 'success' : 'warning'}
-              message={<b>BidWaves saying,</b>}
+              message={<b>BidWaves Comment</b>}
               description={adCopy.csm_text_comment}
               closable
               onClose={() => handleAdCopyUpdate({ csm_text_comment: null }, false)}
@@ -526,7 +532,7 @@ function CampaignRightSideUI(props) {
               showIcon
               className="mb-2"
               type={adCopy.is_asset_accepted ? 'success' : 'warning'}
-              message={<b>BidWaves saying,</b>}
+              message={<b>BidWaves Comment</b>}
               description={adCopy.csm_asset_comment}
               closable
               onClose={() => handleAdCopyUpdate({ csm_asset_comment: null }, false)}
