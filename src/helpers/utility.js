@@ -341,7 +341,13 @@ export const getFileObjForAjax = (file, data, needClean = true) => {
 export const getReadableCurrency = (value, config) => {
   const { showUnlimited } = config || {}
   if (isEmpty(value) && showUnlimited) return `Unlimited`
-  return `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+  // Convert to a number and format with two decimal places if needed
+  const numberValue = Number(value)
+  const formattedValue = numberValue % 1 === 0 ? numberValue : numberValue.toFixed(2)
+
+  // Add commas for thousands, millions, etc.
+  return `$ ${formattedValue}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 export const getReadableFileSize = size => {

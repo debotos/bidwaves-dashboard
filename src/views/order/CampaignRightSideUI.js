@@ -118,10 +118,9 @@ function CampaignRightSideUI(props) {
       await Axios.patch(endpoints.order(orderId), { budget_amount })
 
       const postData = {
-        amount: Number(budget_amount) * 100,
+        amount: Number((Number(budget_amount) * 100).toFixed(2)),
         details: products.map(item => {
           return {
-            type: item.product_info?.type,
             name: item.product_info?.name,
             price: item.product_info?.price
           }
@@ -347,7 +346,7 @@ function CampaignRightSideUI(props) {
             <Alert
               showIcon
               className="mb-2"
-              type={adCopy.is_text_accepted ? 'success' : 'warning'}
+              type={adCopy.is_text_accepted ? 'success' : 'info'}
               message={<b>BidWaves Comment</b>}
               description={adCopy.csm_text_comment}
               closable
@@ -531,7 +530,7 @@ function CampaignRightSideUI(props) {
             <Alert
               showIcon
               className="mb-2"
-              type={adCopy.is_asset_accepted ? 'success' : 'warning'}
+              type={adCopy.is_asset_accepted ? 'success' : 'info'}
               message={<b>BidWaves Comment</b>}
               description={adCopy.csm_asset_comment}
               closable
